@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { scroll-behavior: smooth; }
+  body {
+    @apply bg-black text-white;
+    font-family: 'Montserrat', sans-serif;
+  }
+  html, body {
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+}
+
+/* =============================================
+   RD Station Form - Bi2B Premium Optimization
+   ============================================= */
+
+/* 1. Container e Estrutura Principal */
+[id^="formulario-site-bi2b"] {
+  width: 60% !important; 
+  margin: 0 auto !important;
+}
+
+[id^="formulario-site-bi2b"] .bricks-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1.2rem !important;
+}
+
+/* 2. Grid Horizontal (Desktop) */
+[id^="formulario-site-bi2b"] .bricks-form__fieldset {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 20px !important; 
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* 3. Inputs, Selects e Labels */
+[id^="formulario-site-bi2b"] label:not(.bricks-form__label--checkbox) {
+  color: #fff !important;
+  font-size: 0.8rem !important;
+  margin-bottom: 5px !important;
+}
+
+[id^="formulario-site-bi2b"] input:not([type="checkbox"]),
+[id^="formulario-site-bi2b"] select {
+  background-color: #0f0f0f !important;
+  border: 1px solid #222 !important;
+  padding: 12px !important;
+  font-size: 0.9rem !important;
+  border-radius: 6px !important;
+  color: #fff !important;
+}
+
+/* 4. Checkbox Redondo e Escuro */
+[id^="formulario-site-bi2b"] input[type="checkbox"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 18px !important;
+  height: 18px !important;
+  background-color: #1a1a1a !important;
+  border: 1px solid #333 !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: inline-block !important;
+  position: relative !important;
+  vertical-align: middle !important;
+}
+
+[id^="formulario-site-bi2b"] input[type="checkbox"]:checked {
+  background-color: #0d6084 !important;
+  border-color: #0d6084 !important;
+}
+
+[id^="formulario-site-bi2b"] input[type="checkbox"]:checked::after {
+  content: '✓' !important;
+  color: white !important;
+  font-size: 12px !important;
+  position: absolute !important;
+  left: 4px !important;
+  top: 0px !important;
+}
+
+/* 5. Texto de Consentimento e Rodapé */
+[id^="formulario-site-bi2b"] .bricks-form__label.bricks-form__label--checkbox,
+[id^="formulario-site-bi2b"] .bricks-form__field:last-of-type {
+  grid-column: 1 / -1 !important;
+  text-align: left !important;
+  font-size: 0.75rem !important;
+  color: #666 !important;
+  margin-top: 10px !important;
+  line-height: 1.4 !important;
+}
+
+.bricks-form__footer { display: none !important; }
+
+/* 6. Botão Cadastrar (Com Animações) */
+[id^="formulario-site-bi2b"] .bricks-form__submit {
+  display: flex !important;
+  justify-content: center !important; /* Centralização do botão */
+  grid-column: 1 / -1 !important;
+}
+
+[id^="formulario-site-bi2b"] .bricks-form__submit button,
+[id^="formulario-site-bi2b"] button[type="submit"] {
+  background-color: #0d6084 !important;
+  color: #fff !important;
+  border-radius: 60px !important;
+  padding: 14px 0 !important;
+  font-weight: 700 !important;
+  font-size: 1rem !important;
+  text-transform: uppercase !important;
+  width: auto !important;
+  min-width: 350px !important;
+  cursor: pointer !important;
+  /* Transição configurada para aceitar todas as mudanças */
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Efeito Hover (Mouse em cima) */
+[id^="formulario-site-bi2b"] .bricks-form__submit button:hover,
+[id^="formulario-site-bi2b"] button[type="submit"]:hover {
+  filter: brightness(1.2) !important;
+  transform: scale(1.03) !important; /* Aumenta levemente */
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Efeito Active (Ao clicar) */
+[id^="formulario-site-bi2b"] .bricks-form__submit button:active,
+[id^="formulario-site-bi2b"] button[type="submit"]:active {
+  transform: scale(0.97) !important; /* "Encolhe" ao clicar */
+}
+
+/* 7. Responsividade */
+@media (max-width: 992px) {
+  [id^="formulario-site-bi2b"] { width: 90% !important; }
+}
+
+@media (max-width: 768px) {
+  [id^="formulario-site-bi2b"] .bricks-form__fieldset {
+    grid-template-columns: 1fr !important;
+  }
+  [id^="formulario-site-bi2b"] button[type="submit"] {
+    min-width: 100% !important;
+  }
+}
