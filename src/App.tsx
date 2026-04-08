@@ -1,14 +1,14 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Hero from './components/Hero';
-import About from './components/About';
-import Services from './components/Services';
-import Portfolio from './components/Dashboard';
-import Footer from './components/Footer';
-import RDContact from './components/RDContact';
-import Obrigado from './components/Obrigado'; // Certifique-se de que o arquivo existe neste caminho
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import Header from "./components/Header"
+import Hero from "./components/Hero"
+import About from "./components/About"
+import Services from "./components/Services"
+import Portfolio from "./components/Dashboard"
+import Footer from "./components/Footer"
+import RDContact from "./components/RDContact"
+import Obrigado from "./components/Obrigado"
+import Campanha from "./components/Campanha"
 
-// Criamos um componente para a Home para organizar melhor
 const Home = () => (
   <>
     <Header />
@@ -19,7 +19,7 @@ const Home = () => (
     <RDContact />
     <Footer />
   </>
-);
+)
 
 function App() {
   return (
@@ -28,10 +28,11 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/obrigado" element={<Obrigado />} />
+          <Route path="/campanha" element={<Campanha />} />
         </Routes>
       </div>
     </Router>
-  );
+  )
 }
 
-export default App;
+export default App
