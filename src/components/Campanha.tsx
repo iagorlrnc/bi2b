@@ -2,6 +2,9 @@ import { Check, AlertCircle, TrendingUp, Building2, ShieldCheck, ArrowLeft, Down
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
+// Importação nativa do arquivo PDF para o Vite rastrear no build e dev
+import ebookPDF from '../assets/ebook/ResumoIHC.pdf';
+
 export default function Campanha() {
   const navigate = useNavigate();
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
@@ -308,8 +311,8 @@ export default function Campanha() {
                 onClick={() => {
                   if (isUnlocked) {
                     const link = document.createElement('a');
-                    link.href = '/assets/ebook/RelatorioIRA.pdf';
-                    link.download = 'RelatorioIRA.pdf'; // nome do arquivo
+                    link.href = ebookPDF; // Usa a referência correta do arquivo empacotado
+                    link.download = 'eBook_Abertura_de_Empresa_Bi2B.pdf'; // Nome ideal pro usuário
                     document.body.appendChild(link);
                     link.click();
                     document.body.removeChild(link);
