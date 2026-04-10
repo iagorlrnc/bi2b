@@ -305,38 +305,20 @@ export default function Campanha() {
 
             {/* BOTÃO E-BOOK - HABILITA APÓS O ENVIO DO FORMULÁRIO */}
             <div className="mt-8 pt-6 border-t border-white/20">
-              <button
-                type="button"
-                disabled={!isUnlocked}
-                onClick={() => {
-                  if (isUnlocked) {
-                    // Busca o arquivo processado pelo Vite e força o renomeamento via Blob (Ignorando o cache do navegador)
-                    fetch(ebookPDF)
-                      .then(response => response.blob())
-                      .then(blob => {
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = blobUrl;
-                        link.download = 'eBook_Abertura_de_Empresa_Bi2B.pdf'; // Agora o navegador respeitará este nome!
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(blobUrl); // Libera a memória
-                      })
-                      .catch(err => console.error("Erro ao baixar o ebook:", err));
-                  }
-                }}
+              <a
+                href={isUnlocked ? ebookPDF : undefined}
+                download={isUnlocked ? "eBook_Abertura_de_Empresa_Bi2B.pdf" : undefined}
                 className={`w-full font-bold text-lg py-5 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3
                   ${isUnlocked
-                    ? 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)] hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] hover:-translate-y-1'
-                    : 'bg-black/20 text-white/40 cursor-not-allowed border border-white/10'
+                    ? 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)] hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] hover:-translate-y-1 cursor-pointer'
+                    : 'bg-black/20 text-white/40 cursor-not-allowed border border-white/10 pointer-events-none'
                   }`}
               >
                 <Download size={24} className="flex-shrink-0" />
                 <span className="text-center">
                   {isUnlocked ? 'Baixar E-book Agora' : 'Baixar E-book'}
                 </span>
-              </button>
+              </a>
 
               {!isUnlocked && (
                 <p className="text-yellow-500 text-sm text-center mt-3 font-bold flex items-center justify-center gap-1.5">
