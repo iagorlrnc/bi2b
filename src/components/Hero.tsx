@@ -36,10 +36,10 @@ export default function Hero() {
             Conheça nossas soluções
           </button>
           <Link
-            to="/campanha"
+            to="/abrir-minha-empresa"
             className="bg-white text-[#0d6084] px-10 py-4 rounded-full text-lg font-bold hover:bg-gray-100 transition-all duration-300 transform hover:scale-105 uppercase tracking-widest shadow-lg shadow-black/20"
           >
-            Campanha
+            Abrir minha empresa
           </Link>
         </div>
       </div>

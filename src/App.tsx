@@ -28,7 +28,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/obrigado" element={<Obrigado />} />
-          <Route path="/campanha" element={<Campanha />} />
+          <Route path="/abrir-minha-empresa" element={<Campanha />} />
         </Routes>
       </div>
     </Router>

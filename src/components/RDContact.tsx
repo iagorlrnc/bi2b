@@ -11,28 +11,53 @@ const ContactFormRD = () => {
     const scriptId = 'rdstation-forms-script';
     const formId = 'formulario-site-bi2b-0eaf6e225952b1af5d6b';
 
-    const createForm = () => {
+    const renderForm = () => {
       const container = document.getElementById(formId);
-      if (window.RDStationForms && container) {
-        // LIMPEZA: Remove qualquer conteúdo pré-existente para evitar duplicidade
-        container.innerHTML = ''; 
+      if (!window.RDStationForms || !container) return;
+
+      // Usar o próprio elemento DOM como fonte da verdade garante robustez
+      // contra as re-montagens instantâneas duplas do React Strict Mode e do Router.
+      if (container.hasChildNodes() || container.dataset.rdLoaded === 'true') {
+        return;
+      }
+
+      container.dataset.rdLoaded = 'true';
+      try {
         new window.RDStationForms(formId, 'null').createForm();
+      } catch (err) {
+        console.error('RD Station Forms erro:', err);
       }
     };
 
     let script = document.getElementById(scriptId) as HTMLScriptElement;
 
     if (!script) {
+      // Criação inicial (script nunca esteve na página)
       script = document.createElement('script');
       script.id = scriptId;
       script.src = 'https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js';
       script.type = 'text/javascript';
       script.async = true;
-      script.onload = createForm;
+      script.addEventListener('load', renderForm);
       document.body.appendChild(script);
+    } else if (window.RDStationForms) {
+      // Script já existe e a biblioteca global está pronta (usuário navegou de volta)
+      // O setTimeout garante que o navegador finalizou a montagem do container do React.
+      setTimeout(renderForm, 100);
     } else {
-      createForm();
+      // Script existe mas a biblioteca ainda não (Strict Mode Mount 2)
+      script.addEventListener('load', renderForm);
     }
+
+    return () => {
+      // Deixamos a global ilesa, limpamos apenas o container do React para 
+      // esvaziar o iframe e a sua "trava" ao sair da página.
+      const container = document.getElementById(formId);
+      if (container) {
+        container.innerHTML = '';
+        delete container.dataset.rdLoaded;
+      }
+    };
   }, []);
 
   return (
@@ -46,6 +71,7 @@ const ContactFormRD = () => {
         <div
           role="main"
           id="formulario-site-bi2b-0eaf6e225952b1af5d6b"
+          className="min-h-[400px]" // Ajuda com CLS
         ></div>
       </div>
 
