@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 // Importação nativa do arquivo PDF para o Vite rastrear no build e dev
-import ebookPDF from '../assets/ebook/ResumoIHC.pdf';
+import ebookPDF from '../assets/ebook/eBook_Abertura_de_Empresa_Bi2B.pdf';
 
 export default function Campanha() {
   const navigate = useNavigate();
@@ -310,12 +310,20 @@ export default function Campanha() {
                 disabled={!isUnlocked}
                 onClick={() => {
                   if (isUnlocked) {
-                    const link = document.createElement('a');
-                    link.href = ebookPDF; // Usa a referência correta do arquivo empacotado
-                    link.download = 'eBook_Abertura_de_Empresa_Bi2B.pdf'; // Nome ideal pro usuário
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
+                    // Busca o arquivo processado pelo Vite e força o renomeamento via Blob (Ignorando o cache do navegador)
+                    fetch(ebookPDF)
+                      .then(response => response.blob())
+                      .then(blob => {
+                        const blobUrl = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = blobUrl;
+                        link.download = 'eBook_Abertura_de_Empresa_Bi2B.pdf'; // Agora o navegador respeitará este nome!
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(blobUrl); // Libera a memória
+                      })
+                      .catch(err => console.error("Erro ao baixar o ebook:", err));
                   }
                 }}
                 className={`w-full font-bold text-lg py-5 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3
