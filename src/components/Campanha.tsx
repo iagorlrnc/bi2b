@@ -1,9 +1,8 @@
-import { Check, AlertCircle, TrendingUp, Building2, ShieldCheck, ArrowLeft, Download, FileText, BadgeCheck } from 'lucide-react';
+import { Check, AlertCircle, TrendingUp, Building2, ShieldCheck, ArrowLeft, FileText, BadgeCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-// Importação nativa do arquivo PDF para o Vite rastrear no build e dev
-import ebookPDF from '../assets/ebook/eBook_Abertura_de_Empresa_Bi2B.pdf';
+
 import negocioImg from '../assets/img/negocio.jpg';
 import fechadoImg from '../assets/img/fechado.jpg';
 
@@ -11,19 +10,7 @@ export default function Campanha() {
   const navigate = useNavigate();
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [isUnlocked, setIsUnlocked] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [hasDownloadedOnce, setHasDownloadedOnce] = useState(false);
 
-  const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!isUnlocked || isDownloading) {
-      e.preventDefault();
-      return;
-    }
-    setIsDownloading(true);
-    setHasDownloadedOnce(true);
-    setTimeout(() => setIsDownloading(false), 2000);
-  };
 
   useEffect(() => {
     const scriptId = 'rdstation-forms-script';
@@ -341,7 +328,7 @@ export default function Campanha() {
               {!isFormSubmitted ? (
                 <p className="text-yellow-500 text-sm text-center font-bold flex items-center justify-center gap-1.5">
                   <AlertCircle size={16} />
-                  Preencha o formulário para liberar o E-book
+                  Preencha o formulário para receber o E-book
                 </p>
               ) : (
                 <p className="text-green-400 text-sm text-center font-bold flex items-center justify-center gap-1.5">
@@ -363,12 +350,11 @@ export default function Campanha() {
             </div>
             <h3 className="text-3xl font-extrabold text-gray-900 mb-3">Muito Obrigado!</h3>
             <p className="text-gray-600 mb-8 text-lg leading-relaxed">
-              Recebemos seus dados com sucesso. Seu e-book exclusivo já está desbloqueado e preparado para você!
+              Recebemos seus dados com sucesso.<br/>O e-book foi enviado para o endereço de<br/>e-mail preenchido no formulário!
             </p>
             <button
               onClick={() => {
                 setShowModal(false);
-                setIsUnlocked(true);
               }}
               className="w-full bg-blue-600 text-white font-bold py-4 text-lg rounded-2xl hover:bg-blue-500 hover:shadow-lg transition-all transform hover:-translate-y-1"
             >
