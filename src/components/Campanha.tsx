@@ -4,12 +4,26 @@ import { useEffect, useState } from 'react';
 
 // Importação nativa do arquivo PDF para o Vite rastrear no build e dev
 import ebookPDF from '../assets/ebook/eBook_Abertura_de_Empresa_Bi2B.pdf';
+import negocioImg from '../assets/img/negocio.jpg';
+import fechadoImg from '../assets/img/fechado.jpg';
 
 export default function Campanha() {
   const navigate = useNavigate();
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [hasDownloadedOnce, setHasDownloadedOnce] = useState(false);
+
+  const handleDownloadClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isUnlocked || isDownloading) {
+      e.preventDefault();
+      return;
+    }
+    setIsDownloading(true);
+    setHasDownloadedOnce(true);
+    setTimeout(() => setIsDownloading(false), 2000);
+  };
 
   useEffect(() => {
     const scriptId = 'rdstation-forms-script';
@@ -32,11 +46,11 @@ export default function Campanha() {
       if (!event.data) return;
       try {
         if (Array.isArray(event.data) && event.data[0] && event.data[0].event_type === 'conversion') {
-           setIsFormSubmitted(true);
-           setShowModal(true);
+          setIsFormSubmitted(true);
+          setShowModal(true);
         } else if (typeof event.data === 'object' && !Array.isArray(event.data) && event.data.eventType === 'conversion') {
-           setIsFormSubmitted(true);
-           setShowModal(true);
+          setIsFormSubmitted(true);
+          setShowModal(true);
         }
       } catch (e) {
         // Anti-crash override
@@ -59,8 +73,23 @@ export default function Campanha() {
         setTimeout(() => {
           const observer = new MutationObserver(() => {
             const html = container.innerHTML.toLowerCase();
+            const formObj = container.querySelector('form');
+            if (formObj && !formObj.dataset.btnListener) {
+              formObj.dataset.btnListener = 'true';
+              formObj.addEventListener('submit', () => {
+                const btn = formObj.querySelector('button.bricks-form__submit, button[type="submit"], input[type="submit"]') as any;
+                if (btn) {
+                  if (btn.tagName === 'INPUT') {
+                    btn.value = 'Aguarde...';
+                  } else {
+                    btn.innerHTML = 'Aguarde...';
+                  }
+                  btn.style.opacity = '0.7';
+                  btn.style.pointerEvents = 'none';
+                }
+              });
+            }
 
-            // Fallback visual robusto (SÓ destrava se injetar a mensagem final verdadeira)
             if (html.includes('rd-form-success')) {
               setIsFormSubmitted(true);
               setShowModal(true);
@@ -142,7 +171,7 @@ export default function Campanha() {
             <div className="flex-1 flex justify-center lg:justify-end">
               <div className="relative w-full max-w-md">
                 <img
-                  src="https://images.pexels.com/photos/1181534/pexels-photo-1181534.jpeg?auto=compress&cs=tinysrgb&w=600"
+                  src={negocioImg}
                   alt="Empreendedora planejando e trabalhando no laptop"
                   className="rounded-2xl shadow-xl object-cover w-full h-[320px] sm:h-[400px] lg:h-[500px]"
                 />
@@ -165,14 +194,14 @@ export default function Campanha() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1 relative">
               <img
-                src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=600"
+                src={fechadoImg}
                 alt="Equipe de especialistas analisando dados em reunião"
                 className="rounded-2xl shadow-lg w-full object-cover h-[320px] sm:h-[400px] lg:h-[450px]"
               />
               <div className="absolute top-6 -right-6 bg-white rounded-xl shadow-lg p-4 border border-gray-100 hidden lg:block z-10">
                 <div className="flex items-center gap-3">
                   <div className="bg-green-100 p-2 rounded-full"><TrendingUp className="text-green-600" size={20} /></div>
-                  <p className="font-semibold text-gray-900">Pague menos impostos</p>
+                  <p className="font-semibold text-gray-900">Maximize seus lucros</p>
                 </div>
               </div>
             </div>
@@ -252,6 +281,11 @@ export default function Campanha() {
             Abrir uma empresa não precisa ser complicado. Nossa equipe realiza todo o processo de forma rápida, com acompanhamento tributário e suporte contábil, garantindo que você comece sua jornada empreendedora com tranquilidade e segurança.
           </p>
           <div className="mt-8 sm:mt-12 max-w-3xl mx-auto bg-white/10 backdrop-blur-md p-6 sm:p-8 md:p-10 rounded-3xl border border-white/20 shadow-2xl text-left">
+            <div className={`text-center mb-6 transition-all duration-300 ${isFormSubmitted ? 'opacity-60' : ''}`}>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Baixe seu E-book Gratuito</h3>
+              <p className="text-blue-100 text-base md:text-lg">Preencha rapidamente o formulário abaixo para liberar o download do material exclusivo.</p>
+            </div>
+
             <style>
               {`
                 #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e form,
@@ -308,15 +342,18 @@ export default function Campanha() {
               <a
                 href={isUnlocked ? ebookPDF : undefined}
                 download={isUnlocked ? "eBook_Abertura_de_Empresa_Bi2B.pdf" : undefined}
+                onClick={handleDownloadClick}
                 className={`w-full font-bold text-lg py-5 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3
-                  ${isUnlocked
-                    ? 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)] hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] hover:-translate-y-1 cursor-pointer'
-                    : 'bg-black/20 text-white/40 cursor-not-allowed border border-white/10 pointer-events-none'
-                  }`}
+                  ${!isUnlocked 
+                    ? 'bg-black/20 text-white/40 cursor-not-allowed border border-white/10 pointer-events-none'
+                    : isDownloading
+                      ? 'bg-green-600/80 text-white/80 cursor-wait pointer-events-none shadow-none'
+                      : 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)] hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] hover:-translate-y-1 cursor-pointer'}
+                  `}
               >
-                <Download size={24} className="flex-shrink-0" />
+                <Download size={24} className={`flex-shrink-0 ${isDownloading ? 'animate-bounce' : ''}`} />
                 <span className="text-center">
-                  {isUnlocked ? 'Baixar E-book Agora' : 'Baixar E-book'}
+                  {!isUnlocked ? 'Baixar E-book' : isDownloading ? 'Aguarde...' : hasDownloadedOnce ? 'Baixar E-book Novamente' : 'Baixar E-book Agora'}
                 </span>
               </a>
 
