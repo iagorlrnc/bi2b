@@ -283,7 +283,7 @@ export default function Campanha() {
           <div className="mt-8 sm:mt-12 max-w-3xl mx-auto bg-white/10 backdrop-blur-md p-6 sm:p-8 md:p-10 rounded-3xl border border-white/20 shadow-2xl text-left">
             <div className={`text-center mb-6 transition-all duration-300 ${isFormSubmitted ? 'opacity-60' : ''}`}>
               <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Receba seu E-book Gratuitamente</h3>
-              <p className="text-blue-100 text-base md:text-lg">Preencha rapidamente o formulário abaixo para receber o material exclusivo.</p>
+              <p className="text-blue-100 text-base md:text-lg">Preencha o formulário abaixo para receber o material exclusivo.</p>
             </div>
 
             <style>
