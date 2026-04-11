@@ -142,26 +142,26 @@ export default function Campanha() {
             navigate('/');
           }}
           aria-label="Voltar para a página inicial"
-          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full hover:bg-blue-500 hover:shadow-md transition-all font-medium text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2"
+          className="flex items-center gap-2 bg-[#0d6084] text-white px-4 py-2 rounded-full hover:bg-[#0a4b66] hover:shadow-md transition-all font-medium text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0d6084] focus:ring-offset-2 focus:ring-offset-black"
         >
           <ArrowLeft size={18} />
           Voltar
         </button>
       </div>
       {/* SECTION 1: INÍCIO */}
-      <section id="inicio" className="bg-white pt-20 pb-6 md:pt-32 md:pb-12">
+      <section id="inicio" className="bg-black pt-20 pb-6 md:pt-32 md:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="flex-1 space-y-8">
               <div className="space-y-6">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight tracking-tight">
-                  Abra sua Empresa do Jeito Certo e Pague <span className="text-blue-600">Menos Impostos</span>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight tracking-tight">
+                  Abra sua Empresa do Jeito Certo e Pague <span className="text-[#FF0000]">Menos Impostos</span>
                 </h1>
-                <p className="text-xl text-gray-600 leading-relaxed">
+                <p className="text-xl text-gray-300 leading-relaxed">
                   Abrir uma empresa pode ser a melhor decisão para quem deseja crescer profissionalmente — mas também pode se tornar um problema quando é feito sem planejamento. O erro mais comum de quem inicia um negócio é ignorar o planejamento tributário, o que leva muitos empreendedores a pagarem milhares de reais a mais em impostos ao longo dos anos.
                 </p>
-                <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
-                  <p className="text-gray-700 italic">
+                <div className="bg-[#0d6084]/10 border-l-4 border-[#0d6084] p-4 rounded-r-lg">
+                  <p className="text-gray-300 italic">
                     "Antes de abrir sua empresa, é fundamental avaliar cada detalhe com cuidado. Inclusive, um ponto importante: o Simples Nacional nem sempre é a melhor opção. Cada caso precisa ser analisado individualmente para garantir economia desde o início."
                   </p>
                 </div>
@@ -175,12 +175,12 @@ export default function Campanha() {
                   alt="Empreendedora planejando e trabalhando no laptop"
                   className="rounded-2xl shadow-xl object-cover w-full h-[320px] sm:h-[400px] lg:h-[500px]"
                 />
-                <div className="absolute -bottom-6 left-4 right-4 sm:right-auto sm:-left-6 bg-white rounded-xl shadow-lg p-4 sm:p-5 sm:max-w-xs border border-gray-100 z-10 transition-transform hover:-translate-y-1">
+                <div className="absolute -bottom-6 left-4 right-4 sm:right-auto sm:-left-6 bg-[#111] rounded-xl shadow-2xl p-4 sm:p-5 sm:max-w-xs border border-[#333] z-10 transition-transform hover:-translate-y-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <AlertCircle className="text-blue-600" size={24} />
-                    <p className="font-semibold text-gray-900">Evite riscos</p>
+                    <AlertCircle className="text-[#FF0000]" size={24} />
+                    <p className="font-semibold text-white">Evite riscos</p>
                   </div>
-                  <p className="text-sm text-gray-600">Não pague impostos indevidamente por falta de análise prévia.</p>
+                  <p className="text-sm text-gray-400">Não pague impostos indevidamente por falta de análise prévia.</p>
                 </div>
               </div>
             </div>
@@ -189,7 +189,7 @@ export default function Campanha() {
       </section>
 
       {/* SECTION 2: SINAIS */}
-      <section id="sinais" className="py-6 md:py-12 bg-gray-50 border-t border-gray-100">
+      <section id="sinais" className="py-6 md:py-12 bg-[#050505] border-t border-[#1a1a1a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1 relative">
@@ -198,39 +198,39 @@ export default function Campanha() {
                 alt="Equipe de especialistas analisando dados em reunião"
                 className="rounded-2xl shadow-lg w-full object-cover h-[320px] sm:h-[400px] lg:h-[450px]"
               />
-              <div className="absolute top-6 -right-6 bg-white rounded-xl shadow-lg p-4 border border-gray-100 hidden lg:block z-10">
+              <div className="absolute top-6 -right-6 bg-[#111] rounded-xl shadow-2xl p-4 border border-[#333] hidden lg:block z-10">
                 <div className="flex items-center gap-3">
-                  <div className="bg-green-100 p-2 rounded-full"><TrendingUp className="text-green-600" size={20} /></div>
-                  <p className="font-semibold text-gray-900">Maximize seus lucros</p>
+                  <div className="bg-green-900/40 p-2 rounded-full"><TrendingUp className="text-green-400" size={20} /></div>
+                  <p className="font-semibold text-white">Maximize seus lucros</p>
                 </div>
               </div>
             </div>
 
             <div className="space-y-8 order-1 lg:order-2">
               <div>
-                <p className="text-sm font-semibold text-blue-600 mb-3 tracking-wide uppercase">Para Autônomos</p>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight mb-6">
+                <p className="text-sm font-semibold text-[#0d6084] mb-3 tracking-wide uppercase">Para Autônomos</p>
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
                   Sinais de que Você Precisa Abrir Uma Empresa Agora
                 </h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
+                <p className="text-lg text-gray-300 leading-relaxed">
                   Se você atua como Pessoa Física, preste atenção nestes sinais indicativos de que a hora de formalizar chegou:
                 </p>
               </div>
 
-              <div className="space-y-5 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+              <div className="space-y-5 bg-[#111] p-6 rounded-2xl shadow-sm border border-[#333]">
                 {[
                   'Você está pagando impostos demais como pessoa física (IRPF e INSS)',
                   'Precisa emitir nota fiscal para fechar contratos com empresas',
                   'Quer crescer profissionalmente e ter novas oportunidades no mercado'
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-start gap-3">
-                    <Check size={22} className="text-blue-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-gray-800 font-medium text-lg">{item}</p>
+                    <Check size={22} className="text-[#FF0000] flex-shrink-0 mt-0.5" />
+                    <p className="text-gray-200 font-medium text-lg">{item}</p>
                   </div>
                 ))}
               </div>
 
-              <p className="text-lg text-gray-700 font-medium bg-blue-50/50 p-4 border-l-4 border-blue-600 rounded-r-lg">
+              <p className="text-lg text-gray-300 font-medium bg-[#0d6084]/10 p-4 border-l-4 border-[#0d6084] rounded-r-lg">
                 Formalizar seu negócio pode reduzir sua carga tributária, dar mais credibilidade e abrir portas para novos contratos empresariais.
               </p>
             </div>
@@ -239,13 +239,13 @@ export default function Campanha() {
       </section>
 
       {/* SECTION 3: PROCESSO RÁPIDO */}
-      <section id="processo" className="py-6 md:py-12 bg-white">
+      <section id="processo" className="py-6 md:py-12 bg-black border-t border-[#1a1a1a]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-3xl md:text-5xl font-bold text-[#0d6084] mb-6">
               Abertura Rápida, Simples e Sem Burocracia
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-300">
               Não sabe por onde começar? Nós cuidamos de tudo para você com orientação especializada para garantir que você pague menos imposto desde o primeiro mês.
             </p>
           </div>
@@ -257,12 +257,12 @@ export default function Campanha() {
               { icon: BadgeCheck, title: "Alvará de Funcionamento", desc: "Garantimos a liberação do seu negócio para operar dentro da lei." },
               { icon: TrendingUp, title: "Enquadramento Tributário", desc: "Análise individual para escolher o regime mais vantajoso." }
             ].map((item, i) => (
-              <div key={i} className="bg-gray-50 p-8 rounded-2xl border border-gray-100 hover:shadow-lg transition-shadow duration-300">
-                <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <div key={i} className="bg-[#111] p-8 rounded-2xl border border-[#333] hover:border-[#0d6084]/50 hover:-translate-y-1 transition-all duration-300">
+                <div className="w-14 h-14 bg-[#0d6084]/10 text-[#FF0000] rounded-xl flex items-center justify-center mb-6">
                   <item.icon size={28} />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                <p className="text-gray-600">{item.desc}</p>
+                <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-gray-400">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -270,20 +270,26 @@ export default function Campanha() {
       </section>
 
       {/* SECTION 4: SEGURANÇA / CTA */}
-      <section className="bg-blue-900 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <section className="bg-[#050505] py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden border-t border-[#1a1a1a]">
         <div className="absolute inset-0 opacity-10 bg-[url('https://images.pexels.com/photos/3183153/pexels-photo-3183153.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2')] bg-cover bg-center"></div>
+        {/* Adicionamos um brilho sutil ao fundo */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0d6084]/5 to-transparent"></div>
+        
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <ShieldCheck className="text-blue-400 mx-auto mb-6" size={64} />
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+          <ShieldCheck className="text-white mx-auto mb-6" size={64} />
+          <h2 className="text-3xl md:text-5xl font-bold text-[#0d6084] mb-6 leading-tight">
             Comece seu Negócio com Segurança
           </h2>
-          <p className="text-lg sm:text-xl text-blue-100 mb-8 sm:mb-10 leading-relaxed px-2">
+          <p className="text-lg sm:text-xl text-gray-300 mb-8 sm:mb-10 leading-relaxed px-2">
             Abrir uma empresa não precisa ser complicado. Nossa equipe realiza todo o processo de forma rápida, com acompanhamento tributário e suporte contábil, garantindo que você comece sua jornada empreendedora com tranquilidade e segurança.
           </p>
-          <div className="mt-8 sm:mt-12 max-w-3xl mx-auto bg-white/10 backdrop-blur-md p-6 sm:p-8 md:p-10 rounded-3xl border border-white/20 shadow-2xl text-left">
+          <div className="mt-8 sm:mt-12 max-w-3xl mx-auto bg-black/40 backdrop-blur-md p-6 sm:p-8 md:p-10 rounded-3xl border border-[#333] shadow-2xl text-left relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#0d6084] to-transparent opacity-50"></div>
             <div className={`text-center mb-6 transition-all duration-300 ${isFormSubmitted ? 'opacity-60' : ''}`}>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Baixe seu E-book Gratuito</h3>
-              <p className="text-blue-100 text-base md:text-lg">Preencha rapidamente o formulário abaixo para liberar o download do material exclusivo.</p>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
+                Baixe seu <span className="text-[#FF0000]">E-book Gratuito</span>
+              </h3>
+              <p className="text-gray-300 text-base md:text-lg">Preencha rapidamente o formulário abaixo para liberar o download do material exclusivo.</p>
             </div>
 
             <style>
@@ -348,7 +354,7 @@ export default function Campanha() {
                     ? 'bg-black/20 text-white/40 cursor-not-allowed border border-white/10 pointer-events-none'
                     : isDownloading
                       ? 'bg-green-600/80 text-white/80 cursor-wait pointer-events-none shadow-none'
-                      : 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)] hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] hover:-translate-y-1 cursor-pointer'}
+                      : 'bg-green-700 text-white hover:bg-green-600 shadow-[0_0_15px_rgba(22,163,74,0.3)] hover:shadow-[0_0_25px_rgba(22,163,74,0.5)] hover:-translate-y-1 cursor-pointer'}
                   `}
               >
                 <Download size={24} className={`flex-shrink-0 ${isDownloading ? 'animate-bounce' : ''}`} />
@@ -370,13 +376,13 @@ export default function Campanha() {
 
       {/* MODAL DE SUCESSO CUSTOMIZADO */}
       {showModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 duration-300">
-          <div className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl transform transition-all text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Check size={32} className="text-green-600" />
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md px-4 duration-300">
+          <div className="bg-[#111] rounded-3xl p-8 max-w-md w-full shadow-[0_0_50px_rgba(13,96,132,0.15)] border border-[#333] transform transition-all text-center">
+            <div className="w-16 h-16 bg-[#0d6084]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Check size={32} className="text-[#FF0000]" />
             </div>
-            <h3 className="text-3xl font-extrabold text-gray-900 mb-3">Muito Obrigado!</h3>
-            <p className="text-gray-600 mb-8 text-lg leading-relaxed">
+            <h3 className="text-3xl font-extrabold text-white mb-3">Muito Obrigado!</h3>
+            <p className="text-gray-300 mb-8 text-lg leading-relaxed">
               Recebemos seus dados com sucesso. Seu e-book exclusivo já está desbloqueado e preparado para você!
             </p>
             <button
@@ -384,7 +390,7 @@ export default function Campanha() {
                 setShowModal(false);
                 setIsUnlocked(true);
               }}
-              className="w-full bg-blue-600 text-white font-bold py-4 text-lg rounded-2xl hover:bg-blue-500 hover:shadow-lg transition-all transform hover:-translate-y-1"
+              className="w-full bg-[#0d6084] text-white font-bold py-4 text-lg rounded-2xl hover:brightness-110 hover:shadow-[0_0_20px_rgba(13,96,132,0.4)] transition-all transform hover:-translate-y-1"
             >
               OK
             </button>
