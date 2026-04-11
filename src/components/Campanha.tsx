@@ -282,8 +282,8 @@ export default function Campanha() {
           </p>
           <div className="mt-8 sm:mt-12 max-w-3xl mx-auto bg-white/10 backdrop-blur-md p-6 sm:p-8 md:p-10 rounded-3xl border border-white/20 shadow-2xl text-left">
             <div className={`text-center mb-6 transition-all duration-300 ${isFormSubmitted ? 'opacity-60' : ''}`}>
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Baixe seu E-book Gratuito</h3>
-              <p className="text-blue-100 text-base md:text-lg">Preencha rapidamente o formulário abaixo para liberar o download do material exclusivo.</p>
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">Receba seu E-book Gratuitamente</h3>
+              <p className="text-blue-100 text-base md:text-lg">Preencha rapidamente o formulário abaixo para receber o material exclusivo.</p>
             </div>
 
             <style>
@@ -337,30 +337,16 @@ export default function Campanha() {
               className={`w-full transition-all duration-300 ${isFormSubmitted ? 'opacity-60 pointer-events-none grayscale-[20%]' : ''}`}
             ></div>
 
-            {/* BOTÃO E-BOOK - HABILITA APÓS O ENVIO DO FORMULÁRIO */}
             <div className="mt-8 pt-6 border-t border-white/20">
-              <a
-                href={isUnlocked ? ebookPDF : undefined}
-                download={isUnlocked ? "eBook_Abertura_de_Empresa_Bi2B.pdf" : undefined}
-                onClick={handleDownloadClick}
-                className={`w-full font-bold text-lg py-5 rounded-2xl transition-all duration-300 flex items-center justify-center gap-3
-                  ${!isUnlocked 
-                    ? 'bg-black/20 text-white/40 cursor-not-allowed border border-white/10 pointer-events-none'
-                    : isDownloading
-                      ? 'bg-green-600/80 text-white/80 cursor-wait pointer-events-none shadow-none'
-                      : 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)] hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] hover:-translate-y-1 cursor-pointer'}
-                  `}
-              >
-                <Download size={24} className={`flex-shrink-0 ${isDownloading ? 'animate-bounce' : ''}`} />
-                <span className="text-center">
-                  {!isUnlocked ? 'Baixar E-book' : isDownloading ? 'Aguarde...' : hasDownloadedOnce ? 'Baixar E-book Novamente' : 'Baixar E-book Agora'}
-                </span>
-              </a>
-
-              {!isUnlocked && (
-                <p className="text-yellow-500 text-sm text-center mt-3 font-bold flex items-center justify-center gap-1.5">
+              {!isFormSubmitted ? (
+                <p className="text-yellow-500 text-sm text-center font-bold flex items-center justify-center gap-1.5">
                   <AlertCircle size={16} />
                   Preencha o formulário para liberar o E-book
+                </p>
+              ) : (
+                <p className="text-green-400 text-sm text-center font-bold flex items-center justify-center gap-1.5">
+                  <Check size={16} />
+                  O e-book foi enviado para o seu e-mail!
                 </p>
               )}
             </div>
