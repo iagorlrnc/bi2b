@@ -1,20 +1,140 @@
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  * { scroll-behavior: smooth; }
-  body {
-    @apply bg-black text-white;
-    font-family: 'Montserrat', sans-serif;
+  * {
+    scroll-behavior: smooth;
   }
-  html, body {
+  body {
+    @apply text-white;
+    font-family: "Manrope", sans-serif;
+    background:
+      radial-gradient(
+        circle at top left,
+        rgba(13, 96, 132, 0.22),
+        transparent 32%
+      ),
+      radial-gradient(
+        circle at right center,
+        rgba(255, 0, 0, 0.12),
+        transparent 22%
+      ),
+      linear-gradient(180deg, #05070b 0%, #090d14 48%, #030507 100%);
+  }
+  html,
+  body {
     overflow-x: hidden;
     box-sizing: border-box;
+    min-height: 100%;
+    scroll-padding-top: 96px;
   }
-  *, *::before, *::after { box-sizing: inherit; }
+  *,
+  *::before,
+  *::after {
+    box-sizing: inherit;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Space Grotesk", sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  a,
+  button,
+  input,
+  textarea,
+  select {
+    outline: none;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    box-shadow:
+      0 0 0 3px rgba(126, 231, 255, 0.22),
+      0 0 0 1px rgba(126, 231, 255, 0.55);
+  }
+
+  ::selection {
+    background: rgba(13, 96, 132, 0.35);
+    color: #fff;
+  }
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent 92%);
+  opacity: 0.35;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+@layer components {
+  .section-shell {
+    @apply relative overflow-hidden py-20 md:py-24;
+  }
+
+  .section-shell::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      rgba(255, 255, 255, 0.02),
+      transparent
+    );
+    pointer-events: none;
+  }
+
+  .section-label {
+    @apply inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.35em] text-cyan-100/80 backdrop-blur-md;
+  }
+
+  .section-title {
+    @apply text-3xl md:text-5xl font-bold text-white leading-tight;
+  }
+
+  .section-copy {
+    @apply text-base md:text-lg text-slate-300 leading-relaxed;
+  }
+
+  .tech-panel {
+    @apply rounded-[28px] border border-white/10 bg-white/5 shadow-[0_24px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl;
+  }
+
+  .tech-card {
+    @apply rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:border-cyan-400/40 hover:shadow-[0_18px_50px_rgba(13,96,132,0.18)];
+  }
+
+  .tech-button-primary {
+    @apply inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 font-bold text-white transition-all duration-300;
+  }
+
+  .tech-button-accent {
+    @apply inline-flex items-center justify-center gap-3 rounded-full px-8 py-4 font-bold text-white transition-all duration-300;
+  }
 }
 
 /* =============================================
@@ -23,7 +143,7 @@
 
 /* 1. Container e Estrutura Principal */
 [id^="formulario-site-bi2b"] {
-  width: 60% !important; 
+  width: 60% !important;
   margin: 0 auto !important;
 }
 
@@ -37,7 +157,7 @@
 [id^="formulario-site-bi2b"] .bricks-form__fieldset {
   display: grid !important;
   grid-template-columns: repeat(3, 1fr) !important;
-  gap: 20px !important; 
+  gap: 20px !important;
   border: none !important;
   padding: 0 !important;
 }
@@ -81,7 +201,7 @@
 }
 
 [id^="formulario-site-bi2b"] input[type="checkbox"]:checked::after {
-  content: '✓' !important;
+  content: "✓" !important;
   color: white !important;
   font-size: 12px !important;
   position: absolute !important;
@@ -100,7 +220,9 @@
   line-height: 1.4 !important;
 }
 
-.bricks-form__footer { display: none !important; }
+.bricks-form__footer {
+  display: none !important;
+}
 
 /* 6. Botão Cadastrar (Com Animações) */
 [id^="formulario-site-bi2b"] .bricks-form__submit {
@@ -141,14 +263,37 @@
 
 /* 7. Responsividade */
 @media (max-width: 992px) {
-  [id^="formulario-site-bi2b"] { width: 90% !important; }
+  [id^="formulario-site-bi2b"] {
+    width: 90% !important;
+  }
 }
 
 @media (max-width: 768px) {
+  [id^="formulario-site-bi2b"] {
+    width: 100% !important;
+  }
+
   [id^="formulario-site-bi2b"] .bricks-form__fieldset {
     grid-template-columns: 1fr !important;
   }
+
   [id^="formulario-site-bi2b"] button[type="submit"] {
     min-width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-shell {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+
+  .section-title {
+    @apply text-3xl leading-tight;
+  }
+
+  .tech-card,
+  .tech-panel {
+    border-radius: 24px;
   }
 }

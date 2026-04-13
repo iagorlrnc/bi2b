@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { Sparkles } from "lucide-react"
 
 declare global {
   interface Window {
@@ -148,18 +149,27 @@ const ContactFormRD = () => {
   }, [])
 
   return (
-    <section id="contato" className="py-20 px-4 bg-black relative">
-      <div className="max-w-6xl mx-auto">
-        <h2 className="text-3xl md:text-5xl font-bold text-center mb-6 text-white uppercase tracking-wider w-full">
-          Contato
-        </h2>
+    <section id="contato" className="section-shell">
+      <div className="max-w-6xl mx-auto px-4 relative z-10">
+        <div className="max-w-4xl mx-auto text-center mb-10">
+          <div className="section-label mx-auto mb-5 w-fit">
+            <Sparkles size={14} />
+            Conversa estratégica
+          </div>
+          <h2 className="section-title mb-5">Contato</h2>
+          <p className="section-copy max-w-2xl mx-auto">
+            Preencha o formulário e receba uma resposta com mais direção e menos
+            ruído.
+          </p>
+        </div>
 
-        {/* O container do formulário */}
-        <div
-          role="main"
-          id="formulario-site-bi2b-0eaf6e225952b1af5d6b"
-          className="min-h-[400px]" // Ajuda com CLS
-        ></div>
+        <div className="tech-panel p-5 md:p-8">
+          <div
+            role="main"
+            id="formulario-site-bi2b-0eaf6e225952b1af5d6b"
+            className="min-h-[400px]"
+          ></div>
+        </div>
       </div>
 
       {/* Botão Flutuante WhatsApp - Posicionado de forma fixa */}
@@ -167,7 +177,7 @@ const ContactFormRD = () => {
         href="https://wa.me/556392812239"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-[9999] flex items-center justify-center w-14 h-14 bg-[#0d6084] text-white rounded-full shadow-2xl transition-all duration-300 hover:scale-110 hover:brightness-125 active:scale-95"
+        className="fixed bottom-6 right-6 z-[9999] flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-[#0d6084] to-[#0a4a62] text-white shadow-[0_14px_40px_rgba(13,96,132,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.38)]"
         aria-label="Contato via WhatsApp"
       >
         <svg

@@ -1,79 +1,82 @@
-import { useState, useEffect } from 'react';
-import logoMain from '../assets/img/logo.png';
+import { useState, useEffect } from "react"
+import logoMain from "../assets/img/logo.png"
 
 export default function Header() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isProgrammaticScroll, setIsProgrammaticScroll] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [isProgrammaticScroll, setIsProgrammaticScroll] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
       if (isProgrammaticScroll) {
-        return;
+        return
       }
-      setIsScrolled(window.scrollY > 50);
-    };
+      setIsScrolled(window.scrollY > 50)
+    }
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll)
     return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [isProgrammaticScroll]);
+      window.removeEventListener("scroll", handleScroll)
+    }
+  }, [isProgrammaticScroll])
 
   useEffect(() => {
     if (menuOpen) {
-      document.body.style.overflow = 'hidden';
+      document.body.style.overflow = "hidden"
     } else {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto"
     }
     return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [menuOpen]);
+      document.body.style.overflow = "auto"
+    }
+  }, [menuOpen])
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
+    const element = document.getElementById(id)
     if (element) {
-      setIsProgrammaticScroll(true);
-      setMenuOpen(false);
-      const targetIsScrolled = (id !== 'home');
-      setIsScrolled(targetIsScrolled);
-      element.scrollIntoView(); 
+      setIsProgrammaticScroll(true)
+      setMenuOpen(false)
+      const targetIsScrolled = id !== "home"
+      setIsScrolled(targetIsScrolled)
+      element.scrollIntoView()
       setTimeout(() => {
-        setIsProgrammaticScroll(false);
-      }, 1000); 
+        setIsProgrammaticScroll(false)
+      }, 1000)
     }
-  };
+  }
 
   const menuItems = [
-    { id: 'home', label: 'Home' },
-    { id: 'sobre', label: 'Sobre Nós' },
-    { id: 'servicos', label: 'Serviços' },
-    { id: 'dashboard', label: 'Dashboard' },
-    { id: 'contato', label: 'Contato' },
-  ];
+    { id: "home", label: "Home" },
+    { id: "sobre", label: "Sobre Nós" },
+    { id: "servicos", label: "Serviços" },
+    { id: "dashboard", label: "Dashboard" },
+    { id: "contato", label: "Contato" },
+  ]
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled || menuOpen
-          ? 'bg-black/60 backdrop-blur-md shadow-lg' 
-          : 'bg-transparent md:bg-transparent' 
+          ? "bg-slate-950/70 backdrop-blur-xl border-b border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+          : "pointer-events-none -translate-y-full opacity-0 bg-transparent md:bg-transparent"
       }`}
     >
-      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between box-border">
-        <div className="flex items-center z-[60]">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between box-border gap-3">
+        <div className="flex items-center z-[60] rounded-full border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md">
           <img
             src={logoMain}
             alt="Logo Bi2B"
-            className="h-10 md:h-12 w-auto max-w-full"
+            className="h-9 md:h-11 w-auto max-w-full"
           />
         </div>
 
         <button
-          className="md:hidden text-white focus:outline-none z-[60]" 
+          className="md:hidden text-white focus:outline-none z-[60] rounded-full border border-white/10 bg-white/5 p-3 backdrop-blur-md"
           onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Toggle menu"
+          aria-label="Abrir menu"
+          aria-expanded={menuOpen}
+          aria-controls="mobile-navigation"
+          type="button"
         >
           {/* Ícone SVG Hambuguer */}
           <svg
@@ -102,12 +105,13 @@ export default function Header() {
         </button>
 
         {/* Navegação Desktop */}
-        <nav className="hidden md:flex md:items-center md:space-x-8">
+        <nav className="hidden md:flex md:items-center md:gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md">
           {menuItems.map((item) => (
             <button
               key={item.id}
+              type="button"
               onClick={() => scrollToSection(item.id)}
-              className="text-white hover:text-[#FF0000] transition-colors duration-300 font-medium"
+              className="rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 transition-colors duration-300 hover:bg-white/10 hover:text-white"
             >
               {item.label}
             </button>
@@ -126,20 +130,22 @@ export default function Header() {
 
       {/* Navegação Mobile (Menu Dropdown do Topo) */}
       <nav
+        id="mobile-navigation"
         className={`
-          relative z-50 {/* <-- ADICIONADAS CLASSES 'relative' E 'z-50' */}
+          relative z-50
           md:hidden
-          bg-black shadow-xl
+          bg-slate-950/95 border-t border-white/10 shadow-2xl backdrop-blur-xl
           transition-all duration-300 ease-in-out
-          ${menuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}
+          ${menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 overflow-hidden"}
         `}
       >
         <div className="flex flex-col items-center space-y-6 py-6">
           {menuItems.map((item) => (
             <button
               key={item.id}
+              type="button"
               onClick={() => scrollToSection(item.id)}
-              className="text-white hover:text-[#FF0000] text-lg py-2 transition-colors duration-300 font-medium"
+              className="text-white hover:text-cyan-300 text-lg py-2 transition-colors duration-300 font-medium"
             >
               {item.label}
             </button>
@@ -147,5 +153,5 @@ export default function Header() {
         </div>
       </nav>
     </header>
-  );
+  )
 }
