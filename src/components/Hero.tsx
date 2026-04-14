@@ -12,7 +12,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center pt-24 pb-16 md:pt-28 md:pb-20 lg:pt-0 lg:pb-0"
+      className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center pt-12 pb-16 md:pt-12 md:pb-20 lg:pt-0 lg:pb-0"
     >
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(13,96,132,0.32),_transparent_34%),radial-gradient(circle_at_bottom_right,_rgba(255,0,0,0.12),_transparent_24%)]" />
@@ -28,9 +28,9 @@ export default function Hero() {
               Consultoria com visão estratégica
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold leading-[0.95] text-white">
+            <h1 className="text-5xl md:text-7xl font-bold leading-[0.95] text-white pb-2 md:pb-3 lg:pb-2">
               Bi2B:
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#7ee7ff] via-white to-[#0d6084]">
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#7ee7ff] via-white pb-[10px] to-[#0d6084]">
                 Inteligência para sua gestão
               </span>
             </h1>
