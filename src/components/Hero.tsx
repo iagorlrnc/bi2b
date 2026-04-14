@@ -12,7 +12,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center pt-24 pb-16 md:pt-0 md:pb-0"
+      className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center pt-24 pb-16 md:pt-28 md:pb-20 lg:pt-0 lg:pb-0"
     >
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(13,96,132,0.32),_transparent_34%),radial-gradient(circle_at_bottom_right,_rgba(255,0,0,0.12),_transparent_24%)]" />
@@ -82,7 +82,6 @@ export default function Hero() {
                   <h3 className="text-sm font-bold uppercase tracking-[0.24em] text-white">
                     {item.title}
                   </h3>
-                  <p className="mt-1 text-sm text-slate-300">{item.text}</p>
                 </div>
               ))}
             </div>
@@ -105,7 +104,7 @@ export default function Hero() {
                   </p>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                {/* <div className="grid gap-4 sm:grid-cols-2">
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
                     <p className="text-sm uppercase tracking-[0.25em] text-slate-400">
                       Eficiência
@@ -126,7 +125,7 @@ export default function Hero() {
                       dados, solução e contato em sequência.
                     </p>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
