@@ -24,6 +24,9 @@
       ),
       linear-gradient(180deg, #05070b 0%, #090d14 48%, #030507 100%);
   }
+  html {
+    background: #000;
+  }
   html,
   body {
     overflow-x: hidden;
