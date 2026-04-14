@@ -21,6 +21,8 @@ export default function Campanha() {
   const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
+    window.scrollTo(0, 0)
+    
     const scriptId = "rdstation-forms-script"
     const formId = "formulario-pag-abertura-de-empresa-060ce9f639cf1704454e"
 
@@ -157,11 +159,8 @@ export default function Campanha() {
       {/* BOTÃO VOLTAR */}
       <div className="fixed top-4 left-4 sm:top-6 sm:left-6 md:top-8 md:left-8 z-50">
         <button
-          onClick={() => {
-            window.scrollTo(0, 0)
-            navigate("/")
-          }}
-          aria-label="Voltar para a página inicial"
+          onClick={() => navigate(-1)}
+          aria-label="Voltar para a página anterior"
           className="tech-button-primary bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-6 py-3 shadow-[0_14px_40px_rgba(13,96,132,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.34)]"
         >
           <ArrowLeft size={18} />

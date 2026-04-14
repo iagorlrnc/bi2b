@@ -9,6 +9,7 @@ import {
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { FaWhatsapp } from "react-icons/fa"
+import { Link } from "react-router-dom"
 
 interface ServiceCardProps {
   icon: React.ReactNode
@@ -118,16 +119,22 @@ export default function Services() {
           ))}
         </div>
 
-        <div className="mt-20 flex justify-center">
+        <div className="mt-20 flex flex-col w-[90%] sm:w-fit mx-auto gap-4">
           <a
             href="https://wa.me/+556392812239"
             target="_blank"
             rel="noopener noreferrer"
-            className="tech-button-primary border border-[#7ee7ff]/15 bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-10 py-4 text-lg shadow-[0_14px_40px_rgba(13,96,132,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.34)] text-center"
+            className="tech-button-primary border border-[#7ee7ff]/15 bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-10 py-4 text-lg shadow-[0_14px_40px_rgba(13,96,132,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.34)] text-center w-full justify-center"
           >
             <FaWhatsapp className="text-2xl" />
             Fale com um especialista
           </a>
+          <Link
+            to="/abrir-minha-empresa"
+            className="tech-button-primary border border-white/15 bg-white/6 px-10 py-4 text-lg text-white hover:bg-white/10 text-center w-full justify-center"
+          >
+            Abrir minha empresa
+          </Link>
         </div>
       </div>
     </section>
