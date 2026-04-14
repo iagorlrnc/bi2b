@@ -16,13 +16,13 @@ export default function Resultados() {
           </p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-3 mb-8 justify-items-center md:justify-items-stretch">
+        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
           {[
             ["Indicadores", "Visão consolidada do negócio"],
             ["Performance", "Leituras rápidas do cenário"],
             ["Direção", "Tomada de decisão com base real"],
           ].map(([title, text]) => (
-            <div key={title} className="tech-card p-5">
+            <div key={title} className="tech-card w-full p-5">
               <p className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">
                 {title}
               </p>

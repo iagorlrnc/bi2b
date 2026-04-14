@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import { ArrowRight, DatabaseZap, ShieldCheck, Sparkles } from "lucide-react"
+import logoMain from "../assets/img/logo.png"
 
 export default function Hero() {
   const scrollToServices = () => {
@@ -12,7 +13,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center pt-12 pb-16 md:pt-12 md:pb-20 lg:pt-0 lg:pb-0"
+      className="relative overflow-hidden min-h-[100svh] flex flex-col items-center justify-center px-4 pt-[clamp(1.25rem,2.5vh,2rem)] pb-[clamp(4.5rem,8vh,6.5rem)] sm:px-6 sm:pt-[clamp(1.5rem,2.8vh,2.25rem)] sm:pb-[clamp(5rem,7vh,7rem)] md:pt-[clamp(2rem,3vh,2.75rem)] md:pb-[clamp(5.5rem,6.5vh,7.5rem)] lg:pt-[clamp(2.25rem,3.2vh,3rem)] lg:pb-[clamp(6rem,6vh,8rem)] xl:pt-[clamp(2.5rem,3.5vh,3.25rem)] xl:pb-[clamp(6.5rem,6vh,8.5rem)]"
     >
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(13,96,132,0.32),_transparent_34%),radial-gradient(circle_at_bottom_right,_rgba(255,0,0,0.12),_transparent_24%)]" />
@@ -29,7 +30,11 @@ export default function Hero() {
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold leading-[0.95] text-white pb-2 md:pb-3 lg:pb-2">
-              Bi2B:
+              <img
+                src={logoMain}
+                alt="Bi2B"
+                className="mb-2 h-11 w-auto sm:h-12 md:h-14 lg:h-16"
+              />
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#7ee7ff] via-white pb-[10px] to-[#0d6084]">
                 Inteligência para sua gestão
               </span>

@@ -66,7 +66,7 @@ export default function Header() {
           <img
             src={logoMain}
             alt="Logo Bi2B"
-            className="h-9 md:h-11 w-auto max-w-full"
+            className="h-6 md:h-7 w-auto max-w-full"
           />
         </div>
 

@@ -19,7 +19,7 @@ export default function Footer() {
               <img
                 src={logoMain}
                 alt="Logo Bi2B"
-                className="h-12 w-auto mx-auto md:mx-0"
+                className="h-6 md:h-7 w-auto max-w-full mx-auto md:mx-0"
               />
               <div className="mt-5 flex items-center justify-center md:justify-start gap-2 text-slate-300">
                 <MapPin size={18} className="text-cyan-300" />
@@ -35,10 +35,10 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="text-sm font-bold uppercase tracking-[0.28em] text-white">
+              <h3 className="mx-auto w-fit text-center text-sm font-bold uppercase tracking-[0.28em] text-white">
                 Links Rápidos
               </h3>
-              <ul className="mt-5 space-y-3 text-slate-300">
+              <ul className="mx-auto mt-5 w-fit space-y-3 text-center text-slate-300">
                 <li>
                   <button
                     onClick={() => scrollToSection("sobre")}
@@ -67,10 +67,10 @@ export default function Footer() {
             </div>
 
             <div>
-              <h3 className="text-sm font-bold uppercase tracking-[0.28em] text-white">
+              <h3 className="mx-auto w-fit text-center text-sm font-bold uppercase tracking-[0.28em] text-white">
                 Siga-nos
               </h3>
-              <div className="mt-5 flex flex-wrap gap-3">
+              <div className="mx-auto mt-5 grid w-fit grid-cols-2 gap-3 min-[520px]:grid-cols-4 md:grid-cols-2 lg:grid-cols-4">
                 {[
                   {
                     href: "https://www.linkedin.com/company/bi2b-consultoria/?viewAsMember=true",

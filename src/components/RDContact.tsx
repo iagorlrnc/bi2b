@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Sparkles } from "lucide-react"
 
 declare global {
@@ -8,6 +8,9 @@ declare global {
 }
 
 const ContactFormRD = () => {
+  const [isFormReady, setIsFormReady] = useState(false)
+  const [hasFormError, setHasFormError] = useState(false)
+
   useEffect(() => {
     const scriptId = "rdstation-forms-script"
     const formId = "formulario-site-bi2b-0eaf6e225952b1af5d6b"
@@ -17,6 +20,7 @@ const ContactFormRD = () => {
       "por qual canal nos conheceu",
     ]
     let mutationObserver: MutationObserver | null = null
+    let readyTimeout: number | null = null
 
     const normalizeText = (text: string) =>
       text
@@ -82,9 +86,121 @@ const ContactFormRD = () => {
       })
     }
 
+    const setupPhoneEmailInline = (container: HTMLElement) => {
+      const fields = Array.from(
+        container.querySelectorAll<HTMLElement>(".bricks-form__field"),
+      )
+
+      const phoneField = fields.find((field) => {
+        const text = normalizeText(field.textContent || "")
+        return (
+          text.includes("celular") ||
+          text.includes("telefone") ||
+          text.includes("whatsapp")
+        )
+      })
+
+      const emailField = fields.find((field) => {
+        const text = normalizeText(field.textContent || "")
+        return text.includes("email") || text.includes("e-mail")
+      })
+
+      if (!phoneField || !emailField || phoneField === emailField) return
+
+      const sharedParent = phoneField.parentElement
+      if (!sharedParent || emailField.parentElement !== sharedParent) return
+
+      const phoneInWrapper = phoneField.closest(".rd-inline-phone-email")
+      const emailInWrapper = emailField.closest(".rd-inline-phone-email")
+      if (
+        phoneInWrapper &&
+        emailInWrapper &&
+        phoneInWrapper === emailInWrapper
+      ) {
+        return
+      }
+
+      const siblings = Array.from(sharedParent.children)
+      const phoneIndex = siblings.indexOf(phoneField)
+      const emailIndex = siblings.indexOf(emailField)
+      const firstIndex = Math.min(phoneIndex, emailIndex)
+      const firstNode = siblings[firstIndex]
+
+      const wrapper = document.createElement("div")
+      wrapper.className = "rd-inline-phone-email"
+      sharedParent.insertBefore(wrapper, firstNode)
+
+      if (phoneIndex <= emailIndex) {
+        wrapper.appendChild(phoneField)
+        wrapper.appendChild(emailField)
+      } else {
+        wrapper.appendChild(emailField)
+        wrapper.appendChild(phoneField)
+      }
+    }
+
+    const setupServiceChannelInline = (container: HTMLElement) => {
+      const fields = Array.from(
+        container.querySelectorAll<HTMLElement>(".bricks-form__field"),
+      )
+
+      const serviceField = fields.find((field) => {
+        const text = normalizeText(field.textContent || "")
+        return (
+          text.includes("servico desejado") || text.includes("serviço desejado")
+        )
+      })
+
+      const channelField = fields.find((field) => {
+        const text = normalizeText(field.textContent || "")
+        return text.includes("por qual canal nos conheceu")
+      })
+
+      if (!serviceField || !channelField || serviceField === channelField)
+        return
+
+      const sharedParent = serviceField.parentElement
+      if (!sharedParent || channelField.parentElement !== sharedParent) return
+
+      const serviceInWrapper = serviceField.closest(
+        ".rd-inline-service-channel",
+      )
+      const channelInWrapper = channelField.closest(
+        ".rd-inline-service-channel",
+      )
+      if (
+        serviceInWrapper &&
+        channelInWrapper &&
+        serviceInWrapper === channelInWrapper
+      ) {
+        return
+      }
+
+      const siblings = Array.from(sharedParent.children)
+      const serviceIndex = siblings.indexOf(serviceField)
+      const channelIndex = siblings.indexOf(channelField)
+      const firstIndex = Math.min(serviceIndex, channelIndex)
+      const firstNode = siblings[firstIndex]
+
+      const wrapper = document.createElement("div")
+      wrapper.className = "rd-inline-service-channel"
+      sharedParent.insertBefore(wrapper, firstNode)
+
+      if (serviceIndex <= channelIndex) {
+        wrapper.appendChild(serviceField)
+        wrapper.appendChild(channelField)
+      } else {
+        wrapper.appendChild(channelField)
+        wrapper.appendChild(serviceField)
+      }
+    }
+
     const renderForm = () => {
       const container = document.getElementById(formId)
       if (!window.RDStationForms || !container) return
+
+      setHasFormError(false)
+      setIsFormReady(false)
 
       // Usar o próprio elemento DOM como fonte da verdade garante robustez
       // contra as re-montagens instantâneas duplas do React Strict Mode e do Router.
@@ -98,9 +214,21 @@ const ContactFormRD = () => {
 
         setTimeout(() => {
           setupSingleChoiceGroups(container)
+          setupServiceChannelInline(container)
+          setupPhoneEmailInline(container)
+
+          if (container.querySelector("form")) {
+            setIsFormReady(true)
+          }
 
           mutationObserver = new MutationObserver(() => {
             setupSingleChoiceGroups(container)
+            setupServiceChannelInline(container)
+            setupPhoneEmailInline(container)
+
+            if (container.querySelector("form")) {
+              setIsFormReady(true)
+            }
           })
 
           mutationObserver.observe(container, {
@@ -109,8 +237,15 @@ const ContactFormRD = () => {
             attributes: false,
           })
         }, 400)
+
+        readyTimeout = window.setTimeout(() => {
+          if (!container.querySelector("form")) {
+            setHasFormError(true)
+          }
+        }, 8000)
       } catch (err) {
         console.error("RD Station Forms erro:", err)
+        setHasFormError(true)
       }
     }
 
@@ -137,6 +272,9 @@ const ContactFormRD = () => {
 
     return () => {
       mutationObserver?.disconnect()
+      if (readyTimeout) {
+        window.clearTimeout(readyTimeout)
+      }
 
       // Deixamos a global ilesa, limpamos apenas o container do React para
       // esvaziar o iframe e a sua "trava" ao sair da página.
@@ -147,6 +285,12 @@ const ContactFormRD = () => {
       }
     }
   }, [])
+
+  const handleRetry = () => {
+    setHasFormError(false)
+    setIsFormReady(false)
+    window.location.reload()
+  }
 
   return (
     <section id="contato" className="section-shell">
@@ -163,11 +307,157 @@ const ContactFormRD = () => {
           </p>
         </div>
 
-        <div className="tech-panel p-5 md:p-8">
+        <div className="tech-panel p-4 sm:p-5 md:p-8">
+          <div className="mb-6 border-b border-white/10 pb-4 text-center sm:mb-7 sm:pb-5">
+            <h3 className="text-xl font-bold text-white sm:text-2xl">
+              Falar com Especialista
+            </h3>
+          </div>
+
+          {!isFormReady && !hasFormError && (
+            <p className="mb-4 text-center text-sm text-slate-300">
+              Carregando formulário...
+            </p>
+          )}
+
+          {hasFormError && (
+            <div className="mb-4 flex flex-col items-center gap-3 text-center">
+              <p className="text-sm text-slate-300">
+                Não foi possível carregar o formulário agora.
+              </p>
+              <button
+                type="button"
+                onClick={handleRetry}
+                className="tech-button-primary bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-5 py-2.5 text-sm"
+              >
+                Tentar novamente
+              </button>
+            </div>
+          )}
+
+          <style>
+            {`
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b form,
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b section,
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .bricks-form {
+                background-color: transparent !important;
+                background: transparent !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b input:not([type="checkbox"]):not([type="radio"]),
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b select,
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b textarea {
+                border-radius: 12px !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .bricks-form,
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .bricks-form__fieldset,
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .bricks-form__field {
+                width: 100% !important;
+                min-width: 0 !important;
+                box-sizing: border-box !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .bricks-form__label {
+                white-space: normal !important;
+                word-break: break-word !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .iti {
+                width: 100% !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .iti input {
+                width: 100% !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .iti__flag-container {
+                position: absolute !important;
+                top: 0 !important;
+                bottom: 0 !important;
+                display: flex !important;
+                align-items: center !important;
+                height: 100% !important;
+                border-radius: 12px 0 0 12px !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .iti__selected-flag {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 0 14px !important;
+                height: 100% !important;
+                background-color: transparent !important;
+                border-radius: 12px 0 0 12px !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .iti__flag {
+                margin: 0 !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .iti__arrow {
+                margin-left: 6px !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .rd-inline-phone-email {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 14px;
+                width: 100%;
+                max-width: 100%;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .rd-inline-phone-email .bricks-form__field {
+                margin: 0 !important;
+                width: 100% !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .rd-inline-service-channel {
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 14px;
+                width: 100%;
+                max-width: 100%;
+                padding-top: clamp(10px, 2vw, 18px);
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .rd-inline-service-channel .bricks-form__field {
+                margin: 0 !important;
+                width: 100% !important;
+              }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b button[type="submit"],
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b .bricks-form__submit button,
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b input[type="submit"] {
+                width: 100% !important;
+                max-width: 100% !important;
+              }
+
+              @media (min-width: 900px) {
+                #formulario-site-bi2b-0eaf6e225952b1af5d6b .rd-inline-service-channel {
+                  grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+
+                #formulario-site-bi2b-0eaf6e225952b1af5d6b .rd-inline-phone-email {
+                  grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+
+                #formulario-site-bi2b-0eaf6e225952b1af5d6b button[type="submit"],
+                #formulario-site-bi2b-0eaf6e225952b1af5d6b .bricks-form__submit button,
+                #formulario-site-bi2b-0eaf6e225952b1af5d6b input[type="submit"] {
+                  max-width: 360px !important;
+                }
+              }
+            `}
+          </style>
+
           <div
             role="main"
             id="formulario-site-bi2b-0eaf6e225952b1af5d6b"
-            className="min-h-[400px]"
+            className="min-h-[420px]"
           ></div>
         </div>
       </div>
