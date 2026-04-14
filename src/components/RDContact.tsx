@@ -307,7 +307,7 @@ const ContactFormRD = () => {
           </p>
         </div>
 
-        <div className="tech-panel p-4 sm:p-5 md:p-8">
+        <div className="tech-panel px-0 py-4 sm:p-5 md:p-8">
           <div className="mb-6 border-b border-white/10 pb-4 text-center sm:mb-7 sm:pb-5">
             <h3 className="text-xl font-bold text-white sm:text-2xl">
               Falar com Especialista
@@ -434,6 +434,14 @@ const ContactFormRD = () => {
               #formulario-site-bi2b-0eaf6e225952b1af5d6b input[type="submit"] {
                 width: 100% !important;
                 max-width: 100% !important;
+              }
+
+              @media (max-width: 639px) {
+                #formulario-site-bi2b-0eaf6e225952b1af5d6b form,
+                #formulario-site-bi2b-0eaf6e225952b1af5d6b .bricks-form {
+                  padding-left: 0 !important;
+                  padding-right: 0 !important;
+                }
               }
 
               @media (min-width: 900px) {
