@@ -1,5 +1,6 @@
 import { Target, TrendingUp, Shield, Sparkles } from "lucide-react"
 import { useCallback, useEffect, useRef, useState } from "react"
+import logo from "../assets/img/logo.png"
 
 function FeatureCard({
   cardId,
@@ -109,16 +110,21 @@ function FeatureCard({
 }
 
 export default function About() {
-  const [compactByCard, setCompactByCard] = useState<Record<string, boolean>>({})
+  const [compactByCard, setCompactByCard] = useState<Record<string, boolean>>(
+    {},
+  )
 
-  const handleCompactChange = useCallback((cardId: string, isCompact: boolean) => {
-    setCompactByCard((prev) => {
-      if (prev[cardId] === isCompact) {
-        return prev
-      }
-      return { ...prev, [cardId]: isCompact }
-    })
-  }, [])
+  const handleCompactChange = useCallback(
+    (cardId: string, isCompact: boolean) => {
+      setCompactByCard((prev) => {
+        if (prev[cardId] === isCompact) {
+          return prev
+        }
+        return { ...prev, [cardId]: isCompact }
+      })
+    },
+    [],
+  )
 
   const shouldUseCompactTitles = Object.values(compactByCard).some(Boolean)
 
@@ -133,7 +139,12 @@ export default function About() {
           <div className="grid gap-8 lg:grid-cols-[1fr_1.1fr] lg:items-end justify-items-center lg:justify-items-stretch">
             <div className="w-full">
               <h2 className="section-title mb-6 text-center md:text-left">
-                Sobre a Bi2B
+                Sobre a {" "} 
+                <img
+                  src={logo}
+                  alt="Bi2B"
+                  className="inline-block h-[0.8em] w-auto align-baseline"
+                />
               </h2>
             </div>
             <p className="section-copy text-center md:text-left lg:max-w-2xl lg:justify-self-end">
