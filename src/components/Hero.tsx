@@ -12,7 +12,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center"
+      className="relative overflow-hidden min-h-screen flex flex-col items-center justify-center pt-24 pb-16 md:pt-0 md:pb-0"
     >
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(13,96,132,0.32),_transparent_34%),radial-gradient(circle_at_bottom_right,_rgba(255,0,0,0.12),_transparent_24%)]" />
