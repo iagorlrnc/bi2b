@@ -8,6 +8,7 @@ import Footer from "./components/Footer.tsx"
 import RDContact from "./components/RDContact"
 import Obrigado from "./components/Obrigado"
 import Campanha from "./components/Campanha"
+import Faturamento from "./components/Faturamento"
 
 const Home = () => (
   <>
@@ -34,6 +35,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/obrigado" element={<Obrigado />} />
           <Route path="/abrir-minha-empresa" element={<Campanha />} />
+          <Route path="/faturamento" element={<Faturamento />} />
         </Routes>
       </div>
     </Router>
