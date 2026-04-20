@@ -1,24 +1,22 @@
 import { useEffect } from "react"
 import { ArrowLeft, Sparkles } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-
-const RETURN_SCROLL_KEY = "bi2b:faturamento:return-scroll"
+import { useLocation, useNavigate } from "react-router-dom"
 
 export default function Faturamento() {
   const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" })
   }, [])
 
   const handleBack = () => {
-    const hasReturnScroll = sessionStorage.getItem(RETURN_SCROLL_KEY)
-    if (hasReturnScroll) {
-      navigate("/")
+    if (location.state?.fromInternalLink) {
+      navigate(-1)
       return
     }
 
-    navigate(-1)
+    navigate("/")
   }
 
   return (
@@ -53,6 +51,7 @@ export default function Faturamento() {
                 title="Dashboard Bi2B - Amostra Comercial"
                 className="absolute left-0 top-0 h-full w-full"
                 src="https://app.powerbi.com/view?r=eyJrIjoiZTYxNzQ5MjktYWZkMS00M2ZhLTg3YzAtMWE1ZWM0ZmJiMzE0IiwidCI6IjAwZTBjNDIzLTk2MzYtNGM0Mi1hMTMwLTlhNWI1YjQwYzg3YiJ9"
+                loading="eager"
                 frameBorder="0"
                 allowFullScreen={true}
               ></iframe>

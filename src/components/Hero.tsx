@@ -56,6 +56,7 @@ export default function Hero() {
               </button>
               <Link
                 to="/abrir-minha-empresa"
+                state={{ fromInternalLink: true }}
                 className="tech-button-primary border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10"
               >
                 Abrir minha empresa

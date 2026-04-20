@@ -131,6 +131,7 @@ export default function Services() {
           </a>
           <Link
             to="/abrir-minha-empresa"
+            state={{ fromInternalLink: true }}
             className="tech-button-primary border border-white/15 bg-white/6 px-10 py-4 text-lg text-white hover:bg-white/10 text-center w-full justify-center"
           >
             Abrir minha empresa

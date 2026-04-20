@@ -5,6 +5,9 @@ import { Link } from "react-router-dom"
 const RETURN_SCROLL_KEY = "bi2b:faturamento:return-scroll"
 
 export default function Resultados() {
+  const powerBiSrc =
+    "https://app.powerbi.com/view?r=eyJrIjoiZTYxNzQ5MjktYWZkMS00M2ZhLTg3YzAtMWE1ZWM0ZmJiMzE0IiwidCI6IjAwZTBjNDIzLTk2MzYtNGM0Mi1hMTMwLTlhNWI1YjQwYzg3YiJ9"
+
   useEffect(() => {
     const storedScroll = sessionStorage.getItem(RETURN_SCROLL_KEY)
     if (!storedScroll) return
@@ -35,10 +38,7 @@ export default function Resultados() {
   ]
 
   return (
-    <section
-      id="dashboard"
-      className="section-shell pb-[48px]"
-    >
+    <section id="dashboard" className="section-shell pb-6">
       <div className="container mx-auto px-6 relative z-10">
         <div className="mb-14 max-w-4xl mx-auto text-center md:text-left md:mx-0">
           <div className="section-label mb-5 w-fit mx-auto md:mx-0">
@@ -58,6 +58,7 @@ export default function Resultados() {
               <Link
                 key={card.title}
                 to={card.to}
+                state={{ fromInternalLink: true }}
                 onClick={() => {
                   sessionStorage.setItem(
                     RETURN_SCROLL_KEY,
@@ -85,6 +86,14 @@ export default function Resultados() {
         <p className="mb-4 text-center text-sm text-red-500">
           Clique nos cards acima para abrir os paineis com nossos resultados.
         </p>
+
+        <iframe
+          title="Pré-carregamento do painel PowerBI"
+          src={powerBiSrc}
+          className="pointer-events-none absolute left-0 top-0 h-px w-px opacity-0"
+          aria-hidden="true"
+          tabIndex={-1}
+        />
       </div>
     </section>
   )
