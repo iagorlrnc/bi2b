@@ -1,4 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
+import { useEffect } from "react"
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from "react-router-dom"
 import Header from "./components/Header"
 import Hero from "./components/Hero"
 import About from "./components/About"
@@ -10,17 +16,27 @@ import Obrigado from "./components/Obrigado"
 import Campanha from "./components/Campanha"
 import Faturamento from "./components/Faturamento"
 
-const Home = () => (
-  <>
-    <Header />
-    <Hero />
-    <About />
-    <Services />
-    <Portfolio />
-    <RDContact />
-    <Footer />
-  </>
-)
+function Home() {
+  const location = useLocation()
+
+  useEffect(() => {
+    if (location.state?.scrollToTop) {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" })
+    }
+  }, [location.state])
+
+  return (
+    <>
+      <Header />
+      <Hero />
+      <About />
+      <Services />
+      <Portfolio />
+      <RDContact />
+      <Footer />
+    </>
+  )
+}
 
 function App() {
   return (

@@ -38,7 +38,7 @@ export default function Resultados() {
   ]
 
   return (
-    <section id="dashboard" className="section-shell pb-6">
+    <section id="dashboard" className="section-shell">
       <div className="container mx-auto px-6 relative z-10">
         <div className="mb-14 max-w-4xl mx-auto text-center md:text-left md:mx-0">
           <div className="section-label mb-5 w-fit mx-auto md:mx-0">
@@ -83,7 +83,7 @@ export default function Resultados() {
           )}
         </div>
 
-        <p className="mb-4 text-center text-sm text-red-500">
+        <p className="mb-4 pt-4 text-center text-sm text-red-500">
           Clique nos cards acima para abrir os paineis com nossos resultados.
         </p>
 
