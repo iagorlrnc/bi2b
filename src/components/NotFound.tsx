@@ -20,9 +20,9 @@ export default function NotFound() {
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-200/70 mb-4">
             Erro 404
           </p>
-          <h1 className="section-title mb-4">Pagina nao encontrada</h1>
+          <h1 className="section-title mb-4">Página não encontrada</h1>
           <p className="section-copy mx-auto max-w-2xl mb-10">
-            A rota que voce tentou acessar nao existe ou foi movida. <br />
+            A rota que voce tentou acessar não existe ou foi movida. <br />
             Escolha um dos atalhos abaixo para continuar navegando.
           </p>
 
