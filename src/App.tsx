@@ -15,6 +15,8 @@ import RDContact from "./components/RDContact"
 import Obrigado from "./components/Obrigado"
 import Campanha from "./components/Campanha"
 import Faturamento from "./components/Faturamento"
+import Performance from "./components/Performance"
+import Estrategia from "./components/Estrategia"
 
 function Home() {
   const location = useLocation()
@@ -52,6 +54,8 @@ function App() {
           <Route path="/obrigado" element={<Obrigado />} />
           <Route path="/abrir-minha-empresa" element={<Campanha />} />
           <Route path="/faturamento" element={<Faturamento />} />
+          <Route path="/performance" element={<Performance />} />
+          <Route path="/estrategia" element={<Estrategia />} />
         </Routes>
       </div>
     </Router>

@@ -29,11 +29,13 @@ export default function Resultados() {
     },
     {
       title: "Performance",
-      text: "Leituras rápidas do cenário",
+      text: "Leituras rápidas do cenário operacional",
+      to: "/performance",
     },
     {
-      title: "Direção",
-      text: "Tomada de decisão com base real",
+      title: "Estratégia",
+      text: "Direcionamento estratégico com dados",
+      to: "/estrategia",
     },
   ]
 
@@ -53,34 +55,25 @@ export default function Resultados() {
         </div>
 
         <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {cards.map((card) =>
-            card.to ? (
-              <Link
-                key={card.title}
-                to={card.to}
-                state={{ fromInternalLink: true }}
-                onClick={() => {
-                  sessionStorage.setItem(
-                    RETURN_SCROLL_KEY,
-                    String(window.scrollY),
-                  )
-                }}
-                className="tech-card w-full p-5"
-              >
-                <p className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">
-                  {card.title}
-                </p>
-                <p className="mt-2 text-slate-200">{card.text}</p>
-              </Link>
-            ) : (
-              <div key={card.title} className="tech-card w-full p-5">
-                <p className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">
-                  {card.title}
-                </p>
-                <p className="mt-2 text-slate-200">{card.text}</p>
-              </div>
-            ),
-          )}
+          {cards.map((card) => (
+            <Link
+              key={card.title}
+              to={card.to}
+              state={{ fromInternalLink: true }}
+              onClick={() => {
+                sessionStorage.setItem(
+                  RETURN_SCROLL_KEY,
+                  String(window.scrollY),
+                )
+              }}
+              className="tech-card w-full p-5"
+            >
+              <p className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">
+                {card.title}
+              </p>
+              <p className="mt-2 text-slate-200">{card.text}</p>
+            </Link>
+          ))}
         </div>
 
         <p className="mb-4 pt-4 text-center text-sm text-red-500">
