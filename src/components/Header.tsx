@@ -75,13 +75,18 @@ export default function Header() {
       }`}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between box-border gap-3">
-        <div className="flex items-center z-[60] rounded-full border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md">
+        <button
+          type="button"
+          onClick={() => scrollToSection("home")}
+          aria-label="Ir para o início"
+          className="flex items-center z-[60] rounded-full border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md"
+        >
           <img
             src={logoMain}
             alt="Logo Bi2B"
             className="h-6 md:h-7 w-auto max-w-full"
           />
-        </div>
+        </button>
 
         <button
           className="md:hidden text-white focus:outline-none z-[60] rounded-full border border-white/10 bg-white/5 p-3 backdrop-blur-md"
