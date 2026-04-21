@@ -369,7 +369,7 @@ export default function Campanha() {
               empreendedora com tranquilidade.
             </p>
 
-            <div className="tech-panel max-w-3xl mx-auto p-8 border-white/10">
+            <div className="tech-panel py-4 sm:py-0 md:py-0">
               <div
                 className={`text-center mb-8 transition-all duration-300 ${isFormSubmitted ? "opacity-60" : ""}`}
               >

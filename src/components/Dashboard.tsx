@@ -1,92 +1,206 @@
-import { useEffect } from "react"
-import { Sparkles } from "lucide-react"
-import { Link } from "react-router-dom"
-
-const RETURN_SCROLL_KEY = "bi2b:faturamento:return-scroll"
+import { useState } from "react"
+import {
+  BarChart3,
+  DollarSign,
+  Target,
+  Sparkles,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react"
 
 export default function Resultados() {
   const powerBiSrc =
     "https://app.powerbi.com/view?r=eyJrIjoiZTYxNzQ5MjktYWZkMS00M2ZhLTg3YzAtMWE1ZWM0ZmJiMzE0IiwidCI6IjAwZTBjNDIzLTk2MzYtNGM0Mi1hMTMwLTlhNWI1YjQwYzg3YiJ9"
 
-  useEffect(() => {
-    const storedScroll = sessionStorage.getItem(RETURN_SCROLL_KEY)
-    if (!storedScroll) return
-
-    sessionStorage.removeItem(RETURN_SCROLL_KEY)
-    const top = Number(storedScroll)
-    if (Number.isFinite(top)) {
-      requestAnimationFrame(() => {
-        window.scrollTo({ top, behavior: "auto" })
-      })
-    }
-  }, [])
-
-  const cards = [
+  const menus = [
     {
+      id: "faturamento",
       title: "Faturamento",
-      text: "Visão consolidada do negócio",
-      to: "/faturamento",
+      icon: DollarSign,
+      heading: "Painel de Faturamento",
+      subtitle: "Visão consolidade de negócio.",
+      frameTitle: "Painel Power BI - Faturamento",
+      src: powerBiSrc,
     },
     {
+      id: "performance",
       title: "Performance",
-      text: "Leituras rápidas do cenário operacional",
-      to: "/performance",
+      icon: BarChart3,
+      heading: "Painel de Performance",
+      subtitle: "Acompanhamento de eficiência e metas operacionais.",
+      frameTitle: "Painel Power BI - Performance",
+      src: powerBiSrc,
     },
     {
+      id: "estrategia",
       title: "Estratégia",
-      text: "Direcionamento estratégico com dados",
-      to: "/estrategia",
+      icon: Target,
+      heading: "Painel de Estratégia",
+      subtitle: "Leitura executiva para direcionamento tático e crescimento.",
+      frameTitle: "Painel Power BI - Estratégia",
+      src: powerBiSrc,
     },
-  ]
+  ] as const
+
+  const [activeMenuId, setActiveMenuId] =
+    useState<(typeof menus)[number]["id"]>("faturamento")
+
+  const activeMenu = menus.find((menu) => menu.id === activeMenuId) ?? menus[0]
+
+  const handlePrevMenu = () => {
+    const currentIndex = menus.findIndex((m) => m.id === activeMenuId)
+    if (currentIndex > 0) {
+      setActiveMenuId(menus[currentIndex - 1].id)
+    }
+  }
+
+  const handleNextMenu = () => {
+    const currentIndex = menus.findIndex((m) => m.id === activeMenuId)
+    if (currentIndex < menus.length - 1) {
+      setActiveMenuId(menus[currentIndex + 1].id)
+    }
+  }
+
+  const currentIndex = menus.findIndex((m) => m.id === activeMenuId)
 
   return (
-    <section id="dashboard" className="section-shell pt-6">
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="mb-14 max-w-4xl mx-auto text-center md:text-left md:mx-0">
-          <div className="section-label mb-5 w-fit mx-auto md:mx-0">
+    <section id="dashboard" className="section-shell pt-6 pb-32">
+      <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:hidden">
+        {/* Mobile Layout */}
+        <div className="mb-8 max-w-4xl mx-auto text-center">
+          <div className="section-label mb-5 w-fit mx-auto">
             <Sparkles size={14} />
-            Resultados e leitura de dados
+            Painel de Análise de Negócio
           </div>
-          <h2 className="section-title mb-4">Nossos Resultados</h2>
-          <p className="section-copy max-w-2xl mx-auto md:mx-0">
-            Um painel que reforça a proposta da marca: leitura direta, análise
-            clara e decisões mais seguras com base em informação.
+          <h2 className="section-title mb-4">Dashboards Corporativos</h2>
+          <p className="section-copy max-w-2xl mx-auto">
+            Visualização em tempo real dos nossos dados com painéis interativos
+            para melhor tomada de decisão.
           </p>
         </div>
 
-        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {cards.map((card) => (
-            <Link
-              key={card.title}
-              to={card.to}
-              state={{ fromInternalLink: true }}
-              onClick={() => {
-                sessionStorage.setItem(
-                  RETURN_SCROLL_KEY,
-                  String(window.scrollY),
-                )
-              }}
-              className="tech-card w-full p-5"
+        <div className="space-y-4">
+          {/* Top Bar */}
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950/40 to-slate-900/20 p-4 backdrop-blur-lg">
+            <button
+              onClick={handlePrevMenu}
+              disabled={currentIndex === 0}
+              className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <p className="text-sm uppercase tracking-[0.28em] text-cyan-200/70">
-                {card.title}
+              <ChevronLeft size={20} />
+            </button>
+
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              {activeMenu.title} ({currentIndex + 1} de {menus.length})
+            </span>
+
+            <button
+              onClick={handleNextMenu}
+              disabled={currentIndex === menus.length - 1}
+              className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+
+          {/* Main Container */}
+          <div className="space-y-3">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
+              <h2 className="mb-2 text-xl font-semibold tracking-tight text-slate-100">
+                {activeMenu.heading}
+              </h2>
+              <p className="mb-4 text-sm text-slate-400">
+                {activeMenu.subtitle}
               </p>
-              <p className="mt-2 text-slate-200">{card.text}</p>
-            </Link>
-          ))}
+              <iframe
+                title={activeMenu.frameTitle}
+                src={activeMenu.src}
+                className="h-[360px] w-full rounded-xl border border-white/10 bg-black"
+                loading="lazy"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Desktop Layout */}
+      <div className="mx-auto hidden w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:block">
+        <div className="mb-12 max-w-4xl mx-auto text-center md:text-left md:mx-0">
+          <div className="section-label mb-5 w-fit mx-auto md:mx-0">
+            <Sparkles size={14} />
+            Painel de Análise de Negócio
+          </div>
+          <h2 className="section-title mb-4">Dashboards Corporativos</h2>
+          <p className="section-copy max-w-2xl mx-auto md:mx-0">
+            Visualização em tempo real dos nossos dados com painéis interativos
+            para melhor tomada de decisão.
+          </p>
         </div>
 
-        <p className="mb-4 pt-4 text-center text-sm text-red-500">
-          Clique nos cards acima para abrir os paineis com nossos resultados.
-        </p>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-[240px_minmax(0,1fr)] md:items-stretch">
+          <aside className="h-full w-full rounded-[20px] border border-white/10 bg-gradient-to-b from-slate-950/40 to-slate-900/20 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl">
+            <p className="mb-6 px-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+              Menu
+            </p>
 
-        <iframe
-          title="Pré-carregamento do painel PowerBI"
-          src={powerBiSrc}
-          className="pointer-events-none absolute left-0 top-0 h-px w-px opacity-0"
-          aria-hidden="true"
-          tabIndex={-1}
-        />
+            <nav className="space-y-3">
+              {menus.map((menu) => {
+                const Icon = menu.icon
+                const isActive = activeMenuId === menu.id
+                return (
+                  <button
+                    key={menu.title}
+                    type="button"
+                    onClick={() => setActiveMenuId(menu.id)}
+                    className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.16),0_0_24px_rgba(255,255,255,0.18),inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-md"
+                        : "border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 hover:text-slate-100 hover:shadow-[0_0_18px_rgba(255,255,255,0.12)]"
+                    }`}
+                  >
+                    <Icon
+                      size={16}
+                      className={`${
+                        isActive
+                          ? "text-slate-300"
+                          : "text-slate-500 group-hover:text-slate-300"
+                      } transition-colors duration-200`}
+                    />
+                    <span>{menu.title}</span>
+                  </button>
+                )
+              })}
+            </nav>
+          </aside>
+
+          <main className="rounded-[20px] border border-white/10 bg-gradient-to-br from-slate-950/40 to-slate-900/20 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl sm:p-8">
+            <header>
+              <h2 className="text-3xl font-semibold tracking-tight text-slate-100 md:text-4xl">
+                {activeMenu.heading}
+              </h2>
+              <p className="mt-2 text-sm text-slate-400 md:text-base">
+                {activeMenu.subtitle}
+              </p>
+            </header>
+
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                  Dashboard Corporativo
+                </p>
+              </div>
+
+              <iframe
+                title={activeMenu.frameTitle}
+                src={activeMenu.src}
+                className="h-[420px] w-full rounded-xl border border-white/10 bg-black md:h-[540px]"
+                loading="lazy"
+                allowFullScreen
+              />
+            </div>
+          </main>
+        </div>
       </div>
     </section>
   )

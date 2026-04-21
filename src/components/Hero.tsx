@@ -46,10 +46,10 @@ export default function Hero() {
               crescimento do seu negócio.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-4">
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
               <button
                 onClick={scrollToServices}
-                className="tech-button-primary bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)]"
+                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] sm:w-auto"
               >
                 Conheça nossas soluções
                 <ArrowRight size={18} />
@@ -57,13 +57,13 @@ export default function Hero() {
               <Link
                 to="/abrir-minha-empresa"
                 state={{ fromInternalLink: true }}
-                className="tech-button-primary border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10"
+                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 sm:w-auto"
               >
                 Abrir minha empresa
               </Link>
             </div>
 
-            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+            <div className="mt-10 hidden gap-4 sm:grid sm:grid-cols-3">
               {[
                 {
                   icon: DatabaseZap,
