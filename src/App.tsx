@@ -17,6 +17,7 @@ import Campanha from "./components/Campanha"
 import Faturamento from "./components/Faturamento"
 import Performance from "./components/Performance"
 import Estrategia from "./components/Estrategia"
+import NotFound from "./components/NotFound"
 
 function Home() {
   const location = useLocation()
@@ -56,6 +57,7 @@ function App() {
           <Route path="/faturamento" element={<Faturamento />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/estrategia" element={<Estrategia />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
     </Router>
