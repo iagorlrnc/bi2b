@@ -369,9 +369,9 @@ export default function Campanha() {
               empreendedora com tranquilidade.
             </p>
 
-            <div className="tech-panel px-[15px] py-4 sm:p-5 md:p-8">
+            <div className="tech-panel px-4 py-4 sm:p-5 md:p-8">
               <div
-                className={`text-center mb-8 transition-all duration-300 ${isFormSubmitted ? "opacity-60" : ""}`}
+                className={`text-center mb-8 rounded-2xl p-4 sm:p-6 transition-all duration-300 ${isFormSubmitted ? "opacity-60" : ""}`}
               >
                 <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
                   Receba seu E-book Gratuitamente
@@ -430,10 +430,11 @@ export default function Campanha() {
               <div
                 role="main"
                 id="formulario-pag-abertura-de-empresa-060ce9f639cf1704454e"
-                className={`w-full transition-all duration-300 ${isFormSubmitted ? "opacity-60 pointer-events-none grayscale-[20%]" : ""}`}
+                className={` py-0 w-full transition-all duration-300 ${isFormSubmitted ? "opacity-60 pointer-events-none grayscale-[20%]" : ""}`}
+                style={{ paddingLeft: "0px", paddingRight: "0px" }}
               ></div>
 
-              <div className="mt-8 pt-6 border-t border-white/20">
+              <div className="mt-8 border-t border-white/20 pb-4 pt-6">
                 {!isFormSubmitted ? (
                   <p className="text-[#7ee7ff] text-sm text-center font-bold flex items-center justify-center gap-1.5">
                     <AlertCircle size={16} />
