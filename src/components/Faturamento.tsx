@@ -32,7 +32,7 @@ export default function Faturamento() {
         </button>
       </div>
 
-      <section className="section-shell">
+      <section className="section-shell pt-24">
         <div className="container mx-auto px-6 relative z-10">
           <div className="mb-10 max-w-4xl mx-auto text-center md:text-left md:mx-0">
             <div className="section-label mb-5 w-fit mx-auto md:mx-0">

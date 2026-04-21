@@ -129,7 +129,7 @@ export default function About() {
   const shouldUseCompactTitles = Object.values(compactByCard).some(Boolean)
 
   return (
-    <section id="sobre" className="section-shell pt-[10px]">
+    <section id="sobre" className="section-shell pt-6">
       <div className="container mx-auto px-6 relative z-10">
         <div className="max-w-5xl mx-auto mb-16 text-center md:text-left">
           <div className="section-label mb-5 w-fit mx-auto md:mx-0">

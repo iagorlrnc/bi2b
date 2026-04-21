@@ -170,7 +170,7 @@ export default function Campanha() {
   return (
     <div className="min-h-screen relative">
       {/* SECTION 1: INÍCIO */}
-      <section id="inicio" className="section-shell">
+      <section id="inicio" className="section-shell pt-12">
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-14 items-center">
             <div className="space-y-8">
@@ -195,7 +195,7 @@ export default function Campanha() {
                 desnecessários de impostos.
               </p>
 
-              <div className="tech-panel border-l-4 border-[#7ee7ff] p-6 max-w-2xl">
+              <div className="tech-panel border-l-4 border-[#7ee7ff] p-3 max-w-2xl">
                 <p className="text-slate-300 italic">
                   "Antes de abrir sua empresa, é fundamental avaliar cada
                   detalhe com cuidado. O Simples Nacional nem sempre é a melhor
@@ -229,7 +229,7 @@ export default function Campanha() {
       </section>
 
       {/* SECTION 2: SINAIS */}
-      <section id="sinais" className="section-shell">
+      <section id="sinais" className="section-shell pt-6">
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-2 gap-14 items-center">
             <div className="order-2 lg:order-1 relative">
@@ -294,7 +294,7 @@ export default function Campanha() {
       </section>
 
       {/* SECTION 3: PROCESSO RÁPIDO */}
-      <section id="processo" className="section-shell">
+      <section id="processo" className="section-shell pt-6">
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-3xl mx-auto mb-16 text-center">
             <div className="section-label w-fit mx-auto mb-5">
@@ -351,7 +351,7 @@ export default function Campanha() {
       </section>
 
       {/* SECTION 4: SEGURANÇA / CTA */}
-      <section className="section-shell relative isolate">
+      <section className="section-shell relative isolate pt-6">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,_rgba(13,96,132,0.15),_transparent_50%)]" />
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-4xl mx-auto text-center">

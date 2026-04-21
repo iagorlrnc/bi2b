@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import logoMain from "../assets/img/logo.png"
 
 export default function Header() {
+  const headerRef = useRef<HTMLElement>(null)
   const [isScrolled, setIsScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [isProgrammaticScroll, setIsProgrammaticScroll] = useState(false)
@@ -38,7 +39,18 @@ export default function Header() {
       setMenuOpen(false)
       const targetIsScrolled = id !== "home"
       setIsScrolled(targetIsScrolled)
-      element.scrollIntoView()
+
+      if (id === "home") {
+        window.scrollTo({ top: 0, behavior: "smooth" })
+      } else {
+        const headerOffset = headerRef.current?.offsetHeight ?? 0
+        const targetTop = element.getBoundingClientRect().top + window.scrollY
+        window.scrollTo({
+          top: Math.max(targetTop - headerOffset + 1, 0),
+          behavior: "smooth",
+        })
+      }
+
       setTimeout(() => {
         setIsProgrammaticScroll(false)
       }, 1000)
@@ -55,9 +67,10 @@ export default function Header() {
 
   return (
     <header
+      ref={headerRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled || menuOpen
-          ? "bg-slate-950/70 backdrop-blur-xl border-b border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.35)]"
+          ? "bg-slate-950/45 backdrop-blur-lg border-b border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.22)]"
           : "pointer-events-none -translate-y-full opacity-0 bg-transparent md:bg-transparent"
       }`}
     >

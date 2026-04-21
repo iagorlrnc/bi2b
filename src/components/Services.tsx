@@ -93,7 +93,7 @@ export default function Services() {
   ]
 
   return (
-    <section id="servicos" className="section-shell">
+    <section id="servicos" className="section-shell pt-6">
       <div className="container mx-auto px-6 relative z-10">
         <div className="mb-16 max-w-4xl text-center md:text-left mx-auto md:mx-0">
           <div className="section-label mb-5 w-fit mx-auto md:mx-0">

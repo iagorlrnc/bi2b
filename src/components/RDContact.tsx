@@ -293,7 +293,7 @@ const ContactFormRD = () => {
   }
 
   return (
-    <section id="contato" className="section-shell">
+    <section id="contato" className="section-shell pt-6">
       <div className="max-w-6xl mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center mb-10">
           <div className="section-label mx-auto mb-5 w-fit">

@@ -38,7 +38,7 @@ export default function Resultados() {
   ]
 
   return (
-    <section id="dashboard" className="section-shell">
+    <section id="dashboard" className="section-shell pt-6">
       <div className="container mx-auto px-6 relative z-10">
         <div className="mb-14 max-w-4xl mx-auto text-center md:text-left md:mx-0">
           <div className="section-label mb-5 w-fit mx-auto md:mx-0">
