@@ -101,7 +101,7 @@ export default function Hero() {
                   <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/70">
                     Diagnóstico guiado
                   </p>
-                  <h2 className="mt-3 text-2xl font-bold text-white">
+                  <h2 className="mt-3 text-2xl font-bold text-white text-center py-2">
                     Um posicionamento mais claro para sua empresa
                   </h2>
                   <p className="mt-3 text-slate-300 leading-relaxed">
