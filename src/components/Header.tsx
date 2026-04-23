@@ -137,37 +137,52 @@ export default function Header() {
         </nav>
       </div>
 
-      {/* Overlay (fundo escuro) */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
-          onClick={() => setMenuOpen(false)}
-          aria-hidden="true"
-        />
-      )}
-
-      {/* Navegação Mobile (Menu Dropdown do Topo) */}
+      {/* Navegação Mobile (Tela cheia) */}
       <nav
         id="mobile-navigation"
         className={`
-          relative z-50
+          fixed inset-0 z-[100]
           md:hidden
-          bg-slate-950/95 border-t border-white/10 shadow-2xl backdrop-blur-xl
+          h-[100dvh] w-screen bg-slate-950/95 border-t border-white/10 shadow-2xl backdrop-blur-xl
           transition-all duration-300 ease-in-out
-          ${menuOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0 overflow-hidden"}
+          ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
         `}
       >
-        <div className="flex flex-col items-center space-y-6 py-6">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => scrollToSection(item.id)}
-              className="text-white hover:text-cyan-300 text-lg py-2 transition-colors duration-300 font-medium"
+        <div className="flex h-full flex-col items-center justify-center overflow-y-auto px-4 py-8 sm:px-6">
+          <button
+            className="absolute right-4 top-4 text-white focus:outline-none z-[60] rounded-full border border-white/10 bg-white/5 p-3 backdrop-blur-md"
+            onClick={() => setMenuOpen(false)}
+            aria-label="Fechar menu"
+            type="button"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-7 w-7"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
             >
-              {item.label}
-            </button>
-          ))}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+
+          <div className="flex flex-col items-center space-y-6 py-6">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => scrollToSection(item.id)}
+                className="text-white hover:text-cyan-300 text-lg py-2 transition-colors duration-300 font-medium"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
       </nav>
     </header>
