@@ -97,7 +97,7 @@ export default function Hero() {
             <div className="tech-panel relative w-full max-w-xl overflow-hidden p-6 md:p-8">
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(13,96,132,0.2),_transparent_55%)]" />
               <div className="relative grid gap-4 text-center sm:text-left">
-                <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-5">
+                <div className="rounded-3xl border border-white/10 bg-slate-950/70 p-5 px-2">
                   <p className="text-xs uppercase tracking-[0.35em] text-cyan-200/70">
                     Diagnóstico guiado
                   </p>
