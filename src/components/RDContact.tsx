@@ -302,8 +302,7 @@ const ContactFormRD = () => {
           </div>
           <h2 className="section-title mb-5">Contato</h2>
           <p className="section-copy max-w-2xl mx-auto">
-            Preencha o formulário e receba uma resposta com mais direção e menos
-            ruído.
+            Preencha o formulário e receba uma resposta com mais direção.
           </p>
         </div>
 
