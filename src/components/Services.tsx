@@ -40,12 +40,14 @@ function ServiceCard({ icon, title, description }: ServiceCardProps) {
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
       }`}
     >
-      <div className="w-14 h-14 bg-[#0d6084]/15 text-[#7ee7ff] rounded-2xl flex items-center justify-center mb-6 border border-[#7ee7ff]/15">
-        <div className="text-2xl">{icon}</div>
+      <div className="mb-4 flex items-center gap-4 lg:block lg:mb-0">
+        <div className="w-14 h-14 bg-[#0d6084]/15 text-[#7ee7ff] rounded-2xl flex items-center justify-center mb-0 border border-[#7ee7ff]/15 shrink-0 lg:mb-6">
+          <div className="text-2xl">{icon}</div>
+        </div>
+        <h3 className="text-xl font-bold text-white mb-0 uppercase tracking-wide lg:mb-3">
+          {title}
+        </h3>
       </div>
-      <h3 className="text-xl font-bold text-white mb-3 uppercase tracking-wide">
-        {title}
-      </h3>
       <div className="w-12 h-0.5 bg-[#FF0000] mb-4"></div>
       <p className="text-gray-400 leading-relaxed">{description}</p>
     </div>
