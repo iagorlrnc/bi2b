@@ -334,12 +334,14 @@ export default function Campanha() {
               },
             ].map((item, i) => (
               <div key={i} className="tech-card w-full">
-                <div className="w-14 h-14 bg-[#0d6084]/15 text-[#7ee7ff] rounded-2xl flex items-center justify-center mb-6 border border-[#7ee7ff]/15">
-                  <item.icon size={24} />
+                <div className="mb-4 flex items-center gap-4 lg:block lg:mb-0">
+                  <div className="w-14 h-14 bg-[#0d6084]/15 text-[#7ee7ff] rounded-2xl flex items-center justify-center mb-0 border border-[#7ee7ff]/15 shrink-0 lg:mb-6">
+                    <item.icon size={24} />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-0 uppercase tracking-wide lg:mb-3">
+                    {item.title}
+                  </h3>
                 </div>
-                <h3 className="text-lg font-bold text-white mb-3 uppercase tracking-wide">
-                  {item.title}
-                </h3>
                 <div className="w-12 h-0.5 bg-[#FF0000] mb-4"></div>
                 <p className="text-slate-400 text-sm leading-relaxed">
                   {item.desc}
