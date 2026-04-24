@@ -90,8 +90,8 @@ export default function Resultados() {
               <ChevronLeft size={20} />
             </button>
 
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-              {activeMenu.title} ({currentIndex + 1} de {menus.length})
+            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
+              {activeMenu.title}<br/>({currentIndex + 1} de {menus.length})
             </span>
 
             <button
