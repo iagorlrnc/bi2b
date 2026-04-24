@@ -83,15 +83,15 @@ function FeatureCard({
       }`}
     >
       <div className="mb-4 flex items-center gap-4 md:block md:mb-0">
-        <div className="w-14 h-14 bg-[#0d6084]/15 text-[#7ee7ff] rounded-2xl flex items-center justify-center mb-0 border border-[#7ee7ff]/15 shrink-0 md:mb-6">
-          <div className="text-2xl">{icon}</div>
+        <div className="w-14 h-14 max-[400px]:w-10 max-[400px]:h-10 bg-[#0d6084]/15 text-[#7ee7ff] rounded-2xl flex items-center justify-center mb-0 border border-[#7ee7ff]/15 shrink-0 md:mb-6">
+          <div className="text-2xl max-[400px]:text-lg">{icon}</div>
         </div>
         <div ref={titleBoxRef} className="mb-0 w-full max-w-full md:mb-3">
           <h3
             className={`w-full max-w-full whitespace-nowrap font-bold uppercase text-white ${
               forceCompactTitle || isCompactTitle
-                ? "text-[0.82rem] tracking-[0.02em]"
-                : "text-xl tracking-wide"
+                ? "text-[0.82rem] tracking-[0.02em] max-[382px]:text-[0.95rem] max-[382px]:tracking-normal"
+                : "text-xl tracking-wide max-[382px]:text-[1.05rem] max-[382px]:tracking-[0.02em]"
             }`}
           >
             {title}
@@ -106,7 +106,9 @@ function FeatureCard({
         </div>
       </div>
       <div className="w-12 h-0.5 bg-[#FF0000] mb-4"></div>
-      <p className="text-gray-400 leading-relaxed">{description}</p>
+      <p className="text-gray-400 leading-relaxed max-[382px]:text-[0.8rem]">
+        {description}
+      </p>
     </div>
   )
 }
