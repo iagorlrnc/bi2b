@@ -97,24 +97,26 @@ export default function Chatbot() {
   }, [messages]);
 
   // Bloqueia o scroll do body no mobile quando o chat está aberto
-  // Isso evita que o chat se mova pela tela ao abrir o teclado no iOS
   useEffect(() => {
     // Aplica o bloqueio apenas em telas móveis (sm)
     if (isOpen && window.innerWidth < 640) {
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
+      document.documentElement.style.overflow = 'hidden';
+      document.documentElement.style.height = '100%';
+      document.body.style.height = '100%';
     } else {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.height = '';
+      document.body.style.height = '';
     }
 
     // Cleanup
     return () => {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
+      document.documentElement.style.overflow = '';
+      document.documentElement.style.height = '';
+      document.body.style.height = '';
     };
   }, [isOpen]);
 
@@ -127,21 +129,19 @@ export default function Chatbot() {
 
     const handleViewportChange = () => {
       if (chatRef.current && window.visualViewport) {
+        // Apenas ajusta a altura, sem forçar scroll para não "brigar" com o navegador
         chatRef.current.style.height = `${window.visualViewport.height}px`;
-        window.scrollTo(0, 0);
       }
     };
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleViewportChange);
-      window.visualViewport.addEventListener('scroll', handleViewportChange);
       handleViewportChange();
     }
 
     return () => {
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', handleViewportChange);
-        window.visualViewport.removeEventListener('scroll', handleViewportChange);
       }
       if (chatRef.current) {
         chatRef.current.style.height = '';
@@ -241,7 +241,7 @@ export default function Chatbot() {
 
       {/* Janela de Chat */}
       {isOpen && (
-        <div ref={chatRef} className="fixed top-0 left-0 right-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#061826] sm:top-auto sm:inset-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
+        <div ref={chatRef} className="fixed inset-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#05070b] sm:bg-[#061826] sm:inset-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden sm:backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="flex items-center gap-3 border-b border-white/10 bg-[#0d6084]/20 p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0d6084] text-[#7ee7ff]">
