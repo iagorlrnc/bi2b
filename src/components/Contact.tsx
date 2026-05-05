@@ -237,7 +237,7 @@ export default function Contact() {
         href="https://wa.me/+556392812239"
         target="_blank"
         rel="noopener noreferrer"
-        className={`fixed bottom-6 right-6 z-50 bg-[#0d6084] text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 ease-in-out ${
+        className={`floating-button fixed bottom-6 right-6 z-50 bg-[#0d6084] text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 ease-in-out ${
           isSectionVisible
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-10 pointer-events-none"
