@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
 
-const SYSTEM_PROMPT = `Você é o assistente virtual da Bi2B (Business to Business).
+const SYSTEM_PROMPT = `Você é o assistente virtual da Bi2B - Soluções Contábeis, Tributárias, de Consultoria.
 Você deve responder as dúvidas dos usuários EXCLUSIVAMENTE com base no conteúdo do site da Bi2B.
 Se o usuário perguntar algo que não está no contexto abaixo ou que você não saiba responder, informe gentilmente que você não tem essa informação e oriente o usuário a entrar em contato com um especialista via WhatsApp através deste link: https://wa.me/556392812239. Não invente dados de fora.
 
