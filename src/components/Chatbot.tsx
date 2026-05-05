@@ -94,30 +94,52 @@ export default function Chatbot() {
       const isBold = boldPart.startsWith('**') && boldPart.endsWith('**');
       const textToProcess = isBold ? boldPart.slice(2, -2) : boldPart;
       
-      // 2. Agora processa as URLs dentro de cada pedaço
-      const urlRegex = /(https?:\/\/[^\s]+)/g;
-      const urlParts = textToProcess.split(urlRegex);
+      // 2. Regex para encontrar links em formato Markdown [texto](url) OU urls soltas
+      // Grupo 1: texto do markdown, Grupo 2: url do markdown, Grupo 3: url solta
+      const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s]+)/g;
+      const parts = textToProcess.split(linkRegex);
       
-      const parsedContent = urlParts.map((part, i) => {
-        if (part.match(urlRegex)) {
-          let url = part;
-          let suffix = '';
-          const lastChar = url.slice(-1);
-          if (['.', ',', '!', '?'].includes(lastChar)) {
-            suffix = lastChar;
-            url = url.slice(0, -1);
-          }
-          return (
-            <span key={i}>
-              <a href={url} target="_blank" rel="noopener noreferrer" className="text-[#7ee7ff] font-semibold underline underline-offset-2 hover:text-white transition-colors break-all">
-                {url}
-              </a>
-              {suffix}
-            </span>
-          );
+      const parsedContent = [];
+      for (let i = 0; i < parts.length; i++) {
+        // Se for texto normal (fora dos grupos de captura do regex)
+        if (parts[i]) {
+          parsedContent.push(<span key={`${boldIndex}-${i}`}>{parts[i]}</span>);
         }
-        return <span key={i}>{part}</span>;
-      });
+        
+        // Verifica os grupos de captura associados a esse texto
+        if (i + 1 < parts.length) {
+          const mdText = parts[i + 1];
+          const mdUrl = parts[i + 2];
+          const bareUrl = parts[i + 3];
+          
+          if (mdText && mdUrl) {
+            parsedContent.push(
+              <a key={`md-${boldIndex}-${i}`} href={mdUrl} target="_blank" rel="noopener noreferrer" className="text-[#7ee7ff] font-semibold underline underline-offset-2 hover:text-white transition-colors break-all">
+                {mdText}
+              </a>
+            );
+          } else if (bareUrl) {
+            let url = bareUrl;
+            let suffix = '';
+            const lastChar = url.slice(-1);
+            // Se a URL capturou pontuação final indesejada, separa
+            if (['.', ',', '!', '?', ')', ']'].includes(lastChar)) {
+              suffix = lastChar;
+              url = url.slice(0, -1);
+            }
+            parsedContent.push(
+              <span key={`bare-${boldIndex}-${i}`}>
+                <a href={url} target="_blank" rel="noopener noreferrer" className="text-[#7ee7ff] font-semibold underline underline-offset-2 hover:text-white transition-colors break-all">
+                  {url}
+                </a>
+                {suffix}
+              </span>
+            );
+          }
+          // Pula os 3 índices de grupos de captura que o split inseriu no array
+          i += 3;
+        }
+      }
 
       // Se for um bloco em negrito, encapsula na tag strong
       if (isBold) {
@@ -287,7 +309,7 @@ export default function Chatbot() {
 
       {/* Janela de Chat */}
       {isOpen && (
-        <div ref={chatRef} className="fixed top-0 left-0 right-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#05070b] sm:bg-[#061826] sm:top-auto sm:left-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden sm:backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
+        <div ref={chatRef} className="fixed top-0 left-0 right-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#05070b] sm:bg-[#061826] sm:top-auto sm:left-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden overscroll-none sm:backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="flex items-center gap-3 border-b border-white/10 bg-[#0d6084]/20 p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0d6084] text-[#7ee7ff]">
@@ -306,7 +328,7 @@ export default function Chatbot() {
           </div>
 
           {/* Área de Mensagens */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
