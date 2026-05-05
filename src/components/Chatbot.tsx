@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Bot, User } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const SYSTEM_PROMPT = `Você é o assistente virtual da Bi2B - Soluções Contábeis, Tributárias e de Consultoria.
 Você deve responder as dúvidas dos usuários EXCLUSIVAMENTE com base no contexto abaixo. Se a pergunta for sobre um assunto fora do contexto, ou você não souber a resposta, informe que não tem a informação e oriente o usuário a chamar um especialista no WhatsApp: https://wa.me/556392812239.
@@ -38,7 +39,46 @@ REGRAS DE RESPOSTA (OBRIGATÓRIO):
 - Quando houver tópicos, SEMPRE faça quebra de linhas (pule uma linha) para separar cada item.`;
 
 export default function Chatbot() {
-  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      return window.location.pathname === '/chatbot';
+    }
+    return false;
+  });
+
+  // Sincroniza o estado de aberto com a rota no mobile
+  useEffect(() => {
+    if (window.innerWidth < 640) {
+      if (location.pathname === '/chatbot') {
+        setIsOpen(true);
+      } else {
+        setIsOpen(false);
+      }
+    }
+  }, [location.pathname]);
+
+  const toggleChat = () => {
+    if (window.innerWidth < 640) {
+      if (!isOpen) {
+        navigate('/chatbot', { state: { backgroundLocation: location } });
+      } else {
+        navigate(-1);
+      }
+    } else {
+      setIsOpen(!isOpen);
+    }
+  };
+
+  const closeChat = () => {
+    if (window.innerWidth < 640 && location.pathname === '/chatbot') {
+      navigate(-1);
+    } else {
+      setIsOpen(false);
+    }
+  };
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant' | 'system', content: string }[]>([
     { role: 'assistant', content: 'Olá! Sou o assistente virtual da Bi2B. Como posso ajudar você hoje?' }
   ]);
@@ -100,24 +140,23 @@ export default function Chatbot() {
   useEffect(() => {
     // Aplica o bloqueio apenas em telas móveis (sm)
     if (isOpen && window.innerWidth < 640) {
+      const scrollY = window.scrollY;
+      
+      // Fixa o body exatamente na posição atual para não pular pro topo
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-      document.documentElement.style.height = '100%';
-      document.body.style.height = '100%';
-    } else {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-      document.documentElement.style.height = '';
-      document.body.style.height = '';
-    }
 
-    // Cleanup
-    return () => {
-      document.body.style.overflow = '';
-      document.documentElement.style.overflow = '';
-      document.documentElement.style.height = '';
-      document.body.style.height = '';
-    };
+      return () => {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        // Restaura a posição de scroll instantaneamente
+        window.scrollTo({ top: scrollY, behavior: 'instant' });
+      };
+    }
   }, [isOpen]);
 
   const chatRef = useRef<HTMLDivElement>(null);
@@ -129,22 +168,29 @@ export default function Chatbot() {
 
     const handleViewportChange = () => {
       if (chatRef.current && window.visualViewport) {
-        // Apenas ajusta a altura, sem forçar scroll para não "brigar" com o navegador
+        // A altura do viewport real (encolhe com o teclado)
         chatRef.current.style.height = `${window.visualViewport.height}px`;
+        
+        // Se o navegador fizer pan na tela (iOS), o offsetTop diz quanto ele empurrou
+        // Ao aplicar isso no top, ancoramos a janela perfeitamente
+        chatRef.current.style.top = `${window.visualViewport.offsetTop}px`;
       }
     };
 
     if (window.visualViewport) {
       window.visualViewport.addEventListener('resize', handleViewportChange);
+      window.visualViewport.addEventListener('scroll', handleViewportChange);
       handleViewportChange();
     }
 
     return () => {
       if (window.visualViewport) {
         window.visualViewport.removeEventListener('resize', handleViewportChange);
+        window.visualViewport.removeEventListener('scroll', handleViewportChange);
       }
       if (chatRef.current) {
         chatRef.current.style.height = '';
+        chatRef.current.style.top = '';
       }
     };
   }, [isOpen]);
@@ -158,7 +204,7 @@ export default function Chatbot() {
         buttonRef.current &&
         !buttonRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false);
+        closeChat();
       }
     };
 
@@ -219,7 +265,7 @@ export default function Chatbot() {
 
         {/* Tooltip Chamativo */}
         {!isOpen && (
-          <div className="relative flex items-center animate-bounce cursor-pointer" onClick={() => setIsOpen(true)}>
+          <div className="relative flex items-center animate-bounce cursor-pointer" onClick={toggleChat}>
             <div className="bg-[#0d6084] text-[#7ee7ff] text-sm font-semibold px-4 py-2.5 rounded-2xl shadow-[0_10px_25px_rgba(13,96,132,0.3)] border border-[#7ee7ff]/20 whitespace-nowrap">
               Tire suas dúvidas!
             </div>
@@ -231,7 +277,7 @@ export default function Chatbot() {
         {/* Botão */}
         <button
           ref={buttonRef}
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={toggleChat}
           className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-[#0d6084] to-[#0a4a62] text-white shadow-[0_14px_40px_rgba(13,96,132,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.38)]"
           aria-label="Abrir chat"
         >
@@ -241,7 +287,7 @@ export default function Chatbot() {
 
       {/* Janela de Chat */}
       {isOpen && (
-        <div ref={chatRef} className="fixed inset-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#05070b] sm:bg-[#061826] sm:inset-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden sm:backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
+        <div ref={chatRef} className="fixed top-0 left-0 right-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#05070b] sm:bg-[#061826] sm:top-auto sm:left-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden sm:backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="flex items-center gap-3 border-b border-white/10 bg-[#0d6084]/20 p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0d6084] text-[#7ee7ff]">
@@ -252,7 +298,7 @@ export default function Chatbot() {
               <p className="text-xs text-gray-400">Online agora</p>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={closeChat}
               className="ml-auto text-gray-400 hover:text-white transition-colors"
             >
               <X size={20} />
