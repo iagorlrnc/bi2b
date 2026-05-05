@@ -34,6 +34,26 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
+  // Bloqueia o scroll do body no mobile quando o chat está aberto
+  // Isso evita que o chat se mova pela tela ao abrir o teclado no iOS
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      // Ajuste extra para iOS Safari
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -166,8 +186,8 @@ export default function Chatbot() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Digite sua dúvida..."
-                disabled={isLoading}
-                className="w-full rounded-full border border-white/10 bg-black/40 py-3 pl-4 pr-12 text-sm text-white placeholder-gray-500 focus:border-[#7ee7ff]/50 focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]/50 disabled:opacity-50 transition-all"
+                // text-[16px] é obrigatório no mobile para evitar que o iOS dê zoom automático ao focar no input
+                className="w-full rounded-full border border-white/10 bg-black/40 py-3 pl-4 pr-12 text-[16px] sm:text-sm text-white placeholder-gray-500 focus:border-[#7ee7ff]/50 focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]/50 disabled:opacity-50 transition-all"
               />
               <button
                 type="submit"
