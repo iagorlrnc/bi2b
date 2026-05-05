@@ -106,7 +106,7 @@ export default function Chatbot() {
 
       {/* Janela de Chat */}
       {isOpen && (
-        <div className="fixed bottom-24 right-6 sm:right-28 z-[9999] w-[90vw] sm:w-[380px] h-[500px] max-h-[70vh] flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#061826] shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
+        <div className="fixed inset-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#061826] sm:inset-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="flex items-center gap-3 border-b border-white/10 bg-[#0d6084]/20 p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0d6084] text-[#7ee7ff]">
