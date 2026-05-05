@@ -18,6 +18,7 @@ import Faturamento from "./components/Faturamento"
 import Performance from "./components/Performance"
 import Estrategia from "./components/Estrategia"
 import NotFound from "./components/NotFound"
+import Chatbot from "./components/Chatbot"
 
 function Home() {
   const location = useLocation()
@@ -59,6 +60,7 @@ function App() {
           <Route path="/estrategia" element={<Estrategia />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
+        <Chatbot />
       </div>
     </Router>
   )
