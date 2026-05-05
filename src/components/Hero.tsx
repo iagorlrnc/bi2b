@@ -21,7 +21,19 @@ export default function Hero() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,15,0.35)_0%,rgba(4,8,15,0.55)_45%,rgba(3,5,8,0.96)_100%)]" />
       </div>
 
-      <div className="container mx-auto px-6 w-full">
+      {/* Botão Portal do Cliente (Canto Superior Direito) */}
+      <div className="absolute top-20 right-8 sm:top-24 sm:right-16 md:right-24 z-40">
+        <a
+          href="https://share.google/ZDrIBH8t9kXoMq5nJ"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="tech-button-primary flex items-center justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3.5 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] text-white text-base font-semibold whitespace-nowrap rounded-full"
+        >
+          Portal do cliente
+        </a>
+      </div>
+
+      <div className="container mx-auto px-6 w-full mt-10 md:mt-0">
         <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="max-w-3xl">
             <div className="section-label mb-12 w-fit">

@@ -80,25 +80,25 @@ export default function Header() {
           type="button"
           onClick={() => scrollToSection("home")}
           aria-label="Ir para o início"
-          className="flex items-center z-[60] rounded-full border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md"
+          className="flex items-center justify-center z-[60] h-[48px] rounded-full border border-white/10 bg-white/5 px-4 backdrop-blur-md"
         >
           <img
             src={logoMain}
             alt="Logo Bi2B"
-            className="h-6 md:h-7 w-auto max-w-full"
+            className="h-6 w-auto max-w-full"
           />
         </button>
 
         {/* Direita: Navegação Desktop + Botão + Hamburger */}
         <div className="flex items-center gap-3 lg:gap-4">
           {/* Navegação Desktop */}
-          <nav className="hidden md:flex md:items-center md:gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-2 backdrop-blur-md">
+          <nav className="hidden md:flex md:items-center md:gap-1 lg:gap-2 h-[48px] rounded-full border border-white/10 bg-white/5 px-2 lg:px-3 backdrop-blur-md">
             {menuItems.map((item) => (
               <button
                 key={item.id}
                 type="button"
                 onClick={() => scrollToSection(item.id)}
-                className="rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 transition-colors duration-300 hover:bg-white/10 hover:text-white"
+                className="h-[36px] rounded-full px-3 lg:px-4 text-[11px] lg:text-xs font-semibold uppercase tracking-[0.2em] text-slate-200 transition-colors duration-300 hover:bg-white/10 hover:text-white"
               >
                 {item.label}
               </button>
@@ -109,9 +109,9 @@ export default function Header() {
             href="https://share.google/ZDrIBH8t9kXoMq5nJ"
             target="_blank"
             rel="noopener noreferrer"
-            className="tech-button-primary hidden md:flex items-center justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-6 py-2.5 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] text-white text-sm whitespace-nowrap rounded-full"
+            className="tech-button-primary hidden md:flex items-center justify-center h-[48px] bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-6 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] text-white text-sm rounded-full whitespace-nowrap"
           >
-            Portal do cliente
+            Portal do Cliente
           </a>
 
           <button
@@ -201,7 +201,7 @@ export default function Header() {
               rel="noopener noreferrer"
               className="tech-button-primary mt-4 flex items-center justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] text-white w-full"
             >
-              Portal do cliente
+              Portal do Cliente
             </a>
           </div>
         </div>

@@ -1,21 +1,41 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Bot, User } from 'lucide-react';
+import { X, Send, Bot, User } from 'lucide-react';
 
-const SYSTEM_PROMPT = `Você é o assistente virtual da Bi2B - Soluções Contábeis, Tributárias, de Consultoria.
-Você deve responder as dúvidas dos usuários EXCLUSIVAMENTE com base no conteúdo do site da Bi2B.
-Se o usuário perguntar algo que não está no contexto abaixo ou que você não saiba responder, informe gentilmente que você não tem essa informação e oriente o usuário a entrar em contato com um especialista via WhatsApp através deste link: https://wa.me/556392812239. Não invente dados de fora. Faça as respostas simples e direto ao ponto. Responda sempre em Português. Não utilize jargões técnicos. Não faça respostas longas e detalhadas. Seja objetivo. Não utilize frases como "Estou feliz em ajudar", “Espero ter ajudado” ou “Estou aqui para ajudar”. 
+const SYSTEM_PROMPT = `Você é o assistente virtual da Bi2B - Soluções Contábeis, Tributárias e de Consultoria.
+Você deve responder as dúvidas dos usuários EXCLUSIVAMENTE com base no contexto abaixo. Se a pergunta for sobre um assunto fora do contexto, ou você não souber a resposta, informe que não tem a informação e oriente o usuário a chamar um especialista no WhatsApp: https://wa.me/556392812239.
 
-Contexto da Bi2B:
-A Bi2B é especialista em transformar dados em decisões estratégicas. Com experiência em consultoria empresarial, entrega soluções que combinam clareza visual, eficiência operacional e crescimento. Seus pilares são: Excelência, Comprometimento e Resultado.
-Serviços oferecidos:
-1. Análise de Dados, KPI e Indicadores: Análise de dados e gestão de KPIs para guiar estratégia. Suas decisões baseadas em fatos.
-2. Consultoria Empresarial: Soluções estratégicas para otimizar sua gestão e impulsionar o crescimento.
-3. Planejamento Tributário: Reestruturação do modelo de negócio visando redução da carga tributária.
-4. Assessoria Mensal Contábil, Fiscal e Pessoal: Mantenha sua empresa em conformidade. Cuidamos de toda a rotina contábil, fiscal e pessoal.
-5. Recuperação Tributária: Recupere créditos tributários dos últimos 5 anos. Uma injeção de caixa segura para sua empresa.
-6. Registro de Marcas no INPI: Proteja sua identidade e garanta exclusividade da marca. Segurança jurídica.
+CONTEXTO DA BI2B (SITE PRINCIPAL):
+A Bi2B transforma dados em decisões estratégicas. Entregamos soluções com clareza visual, eficiência operacional e crescimento. 
+Pilares: Excelência, Comprometimento e Resultado.
+Links Úteis: 
+- WhatsApp: https://wa.me/556392812239
+- Portal do Cliente: https://share.google/ZDrIBH8t9kXoMq5nJ
 
-O site também tem opções para "Abrir minha empresa" e "Falar com especialista" (via WhatsApp).`;
+SERVIÇOS OFERECIDOS:
+1. Análise de Dados e KPIs: Gestão guiada por fatos.
+2. Consultoria Empresarial: Otimização de gestão e crescimento.
+3. Planejamento Tributário: Redução lícita da carga tributária.
+4. Assessoria Mensal (Contábil, Fiscal, Pessoal): Cuidamos de toda a rotina para manter a empresa em conformidade legal.
+5. Recuperação Tributária: Resgate de créditos tributários dos últimos 5 anos (injeção de caixa segura).
+6. Registro de Marcas (INPI): Proteção jurídica e exclusividade.
+
+ABERTURA DE EMPRESA:
+Ajudamos autônomos e pessoas físicas a abrirem CNPJ pagando menos impostos.
+- Sinais para abrir empresa: Pagar muito IRPF/INSS na Pessoa Física, precisar emitir nota fiscal ou buscar contratos corporativos.
+- Diferencial Bi2B: Não colocamos o cliente automaticamente no Simples Nacional. Fazemos análise tributária individual para garantir economia real desde o início.
+- Processo sem burocracia: Cuidamos de obter o CNPJ, Inscrição Municipal, Alvará e enquadramento ideal.
+- Oferecemos um E-book gratuito sobre o tema para quem preencher o formulário na página "Abrir minha empresa".
+
+REGRAS DE RESPOSTA (OBRIGATÓRIO):
+- Não invente dados de fora.
+- Faça as respostas simples e direto ao ponto.
+- Responda sempre em Português.
+- Não utilize jargões técnicos.
+- Não faça respostas longas e detalhadas.
+- Seja objetivo.
+- Não utilize frases como "Estou feliz em ajudar", "Espero ter ajudado" ou "Estou aqui para ajudar".
+- Escreva suas respostas com a formatação adequada para justificar o texto.
+- Quando houver tópicos, SEMPRE faça quebra de linhas (pule uma linha) para separar cada item.`;
 
 export default function Chatbot() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,6 +45,48 @@ export default function Chatbot() {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const formatMessage = (content: string) => {
+    // 1. Divide o texto pelos marcadores de negrito "**"
+    const boldParts = content.split(/(\*\*.*?\*\*)/g);
+    
+    return boldParts.map((boldPart, boldIndex) => {
+      const isBold = boldPart.startsWith('**') && boldPart.endsWith('**');
+      const textToProcess = isBold ? boldPart.slice(2, -2) : boldPart;
+      
+      // 2. Agora processa as URLs dentro de cada pedaço
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const urlParts = textToProcess.split(urlRegex);
+      
+      const parsedContent = urlParts.map((part, i) => {
+        if (part.match(urlRegex)) {
+          let url = part;
+          let suffix = '';
+          const lastChar = url.slice(-1);
+          if (['.', ',', '!', '?'].includes(lastChar)) {
+            suffix = lastChar;
+            url = url.slice(0, -1);
+          }
+          return (
+            <span key={i}>
+              <a href={url} target="_blank" rel="noopener noreferrer" className="text-[#7ee7ff] font-semibold underline underline-offset-2 hover:text-white transition-colors break-all">
+                {url}
+              </a>
+              {suffix}
+            </span>
+          );
+        }
+        return <span key={i}>{part}</span>;
+      });
+
+      // Se for um bloco em negrito, encapsula na tag strong
+      if (isBold) {
+        return <strong key={boldIndex} className="font-bold">{parsedContent}</strong>;
+      }
+      
+      return <span key={boldIndex}>{parsedContent}</span>;
+    });
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -37,9 +99,9 @@ export default function Chatbot() {
   // Bloqueia o scroll do body no mobile quando o chat está aberto
   // Isso evita que o chat se mova pela tela ao abrir o teclado no iOS
   useEffect(() => {
-    if (isOpen) {
+    // Aplica o bloqueio apenas em telas móveis (sm)
+    if (isOpen && window.innerWidth < 640) {
       document.body.style.overflow = 'hidden';
-      // Ajuste extra para iOS Safari
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
     } else {
@@ -47,10 +109,34 @@ export default function Chatbot() {
       document.body.style.position = '';
       document.body.style.width = '';
     }
+
+    // Cleanup
     return () => {
       document.body.style.overflow = '';
       document.body.style.position = '';
       document.body.style.width = '';
+    };
+  }, [isOpen]);
+
+  const chatRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isOpen &&
+        chatRef.current &&
+        !chatRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
 
@@ -67,7 +153,7 @@ export default function Chatbot() {
     try {
       const response = await fetch('/api/ia', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -102,7 +188,7 @@ export default function Chatbot() {
     <>
       {/* Container Flutuante para Tooltip e Botão (Posicionado ao lado do WhatsApp) */}
       <div className="fixed bottom-6 right-28 z-[9999] flex items-center gap-3">
-        
+
         {/* Tooltip Chamativo */}
         {!isOpen && (
           <div className="relative flex items-center animate-bounce cursor-pointer" onClick={() => setIsOpen(true)}>
@@ -116,17 +202,18 @@ export default function Chatbot() {
 
         {/* Botão */}
         <button
+          ref={buttonRef}
           onClick={() => setIsOpen(!isOpen)}
           className="flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-[#0d6084] to-[#0a4a62] text-white shadow-[0_14px_40px_rgba(13,96,132,0.28)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.38)]"
           aria-label="Abrir chat"
         >
-          {isOpen ? <X size={28} /> : <MessageCircle size={28} />}
+          {isOpen ? <X size={28} /> : <Bot size={28} />}
         </button>
       </div>
 
       {/* Janela de Chat */}
       {isOpen && (
-        <div className="fixed inset-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#061826] sm:inset-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
+        <div ref={chatRef} className="fixed inset-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#061826] sm:inset-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="flex items-center gap-3 border-b border-white/10 bg-[#0d6084]/20 p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0d6084] text-[#7ee7ff]">
@@ -145,7 +232,7 @@ export default function Chatbot() {
           </div>
 
           {/* Área de Mensagens */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
@@ -155,11 +242,11 @@ export default function Chatbot() {
                   }`}>
                   {msg.role === 'user' ? <User size={16} /> : <Bot size={16} />}
                 </div>
-                <div className={`rounded-2xl p-3 text-sm leading-relaxed shadow-sm ${msg.role === 'user'
-                    ? 'bg-[#0d6084] text-white rounded-tr-sm'
-                    : 'bg-white/5 text-gray-200 border border-white/10 rounded-tl-sm'
+                <div className={`rounded-2xl p-3 text-sm leading-relaxed shadow-sm whitespace-pre-wrap break-words text-left ${msg.role === 'user'
+                  ? 'bg-[#0d6084] text-white rounded-tr-sm'
+                  : 'bg-white/5 text-gray-200 border border-white/10 rounded-tl-sm'
                   }`}>
-                  {msg.content}
+                  {formatMessage(msg.content)}
                 </div>
               </div>
             ))}
