@@ -21,8 +21,8 @@ export default function Hero() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,15,0.35)_0%,rgba(4,8,15,0.55)_45%,rgba(3,5,8,0.96)_100%)]" />
       </div>
 
-      {/* Botão Portal do Cliente (Canto Superior Direito) */}
-      <div className="absolute top-[80px] right-6 sm:top-[90px] sm:right-16 z-40">
+      {/* Botão Portal do Cliente (Canto Superior Direito, deslocado para a esquerda) */}
+      <div className="absolute top-[80px] right-8 sm:top-[90px] sm:right-16 md:right-24 z-40">
         <a
           href="https://share.google/ZDrIBH8t9kXoMq5nJ"
           target="_blank"
