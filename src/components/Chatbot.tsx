@@ -9,24 +9,13 @@ Seu papel é responder dúvidas de usuários de forma clara, objetiva e humaniza
 ━━━━━━━━━━━━━━━━━━━
 REGRA PRINCIPAL
 ━━━━━━━━━━━━━━━━━━━
-Se a pergunta do usuário:
-- Não estiver no contexto, OU
-- Não tiver informação suficiente para responder com segurança
-
-Você deve responder:
-"Não tenho essa informação no momento. Para te ajudar melhor, fale com um especialista pelo WhatsApp: https://wa.me/556392812239"
-
+Você deve responder as dúvidas dos usuários EXCLUSIVAMENTE com base no contexto abaixo. Se a pergunta for sobre um assunto fora do contexto, ou você não souber a resposta, informe que não tem a informação e oriente o usuário a chamar um especialista no WhatsApp: https://wa.me/556392812239.
 Nunca invente ou deduza informações.
 
 ━━━━━━━━━━━━━━━━━━━
 CONTEXTO DA BI2B
 ━━━━━━━━━━━━━━━━━━━
 A Bi2B transforma dados em decisões estratégicas, oferecendo soluções com clareza visual, eficiência operacional e foco em crescimento.
-
-Pilares:
-- Excelência
-- Comprometimento
-- Resultado
 
 Links úteis:
 - WhatsApp: https://wa.me/556392812239
@@ -60,13 +49,13 @@ ABERTURA DE EMPRESA
 A Bi2B auxilia na abertura de empresas com foco em pagar menos impostos de forma legal.
 
 Indicado para quem:
-- Paga muito IRPF ou INSS como pessoa física
-- Precisa emitir nota fiscal
-- Quer fechar contratos com empresas
+- Paga muito IRPF ou INSS como pessoa física.
+- Precisa emitir nota fiscal.
+- Quer fechar contratos com empresas.
 
 Diferencial:
-- Não enquadra automaticamente no Simples Nacional
-- Realiza análise tributária individual para garantir economia real
+- Não enquadra automaticamente no Simples Nacional.
+- Realiza análise tributária individual para garantir economia real.
 
 Processo:
 - CNPJ
@@ -80,15 +69,24 @@ Material gratuito:
 ━━━━━━━━━━━━━━━━━━━
 ESTILO DE RESPOSTA (OBRIGATÓRIO)
 ━━━━━━━━━━━━━━━━━━━
+- Não invente dados de fora.
+- Faça as respostas simples e direto ao ponto.
 - Responda sempre em Português
-- Seja direto e objetivo
+- Seja direto e objetivo.
 - Use linguagem simples (sem jargões técnicos)
-- Responda como uma conversa natural (tom humano)
-- Evite respostas longas
+- Não faça respostas longas e detalhadas.
+- Não utilize emojis.
+- Responda como uma conversa natural (tom humano).
+- Converse como se fosse uma pessoa real conversando.
+- Evite repetir informações.
+- Quando houver tópicos, SEMPRE faça quebra de linhas (pule uma linha) para separar cada item.
+- Escreva suas respostas com a formatação adequada para justificar o texto.
 - Não use frases como:
   - "Estou feliz em ajudar"
   - "Espero ter ajudado"
   - "Estou aqui para ajudar"
+- Ao listar itens, sempre separe cada item com uma linha em branco e um traço (-).
+-FAÇA RESPOSTAS CURTAS E OBJETIVAS, APENAS LONGA SE FOR NECESSÁRIO.
 
 ━━━━━━━━━━━━━━━━━━━
 FORMATAÇÃO
@@ -97,6 +95,7 @@ FORMATAÇÃO
 - Quando usar tópicos:
   - Separe cada item com uma linha em branco
 - Evite blocos grandes de texto
+- NUNCA adicione quebras de linha duplas, espaços em branco ou traços (---) no final da sua resposta. Encerre o texto no último ponto final, sem nenhum espaçamento depois.
 
 ━━━━━━━━━━━━━━━━━━━
 OBJETIVO FINAL
@@ -220,6 +219,7 @@ export default function Chatbot() {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Função para envio ao RD Station
   const sendToRDStation = async (data: typeof leadData) => {
@@ -509,6 +509,9 @@ export default function Chatbot() {
 
     const userMessage = input.trim();
     setInput('');
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
 
     // --- LÓGICA DO FUNIL DE LEADS ---
     if (leadStep === 0) {
@@ -641,7 +644,7 @@ export default function Chatbot() {
           </div>
 
           {/* Área de Mensagens */}
-          <div ref={messagesContainerRef} className="messages-container flex-1 overflow-y-auto overflow-x-hidden overscroll-contain touch-pan-y p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
+          <div ref={messagesContainerRef} className="messages-container flex-1 overflow-y-auto overflow-x-hidden overscroll-contain touch-pan-y p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
@@ -712,33 +715,53 @@ export default function Chatbot() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="p-4 border-t border-white/10 bg-[#061826]">
-              <div className="relative flex items-center">
-                <input
-                  type={(leadStep === 1 || leadStep === 2) ? "tel" : "text"}
-                  inputMode={(leadStep === 1 || leadStep === 2) ? "numeric" : "text"}
-                  value={input}
-                  onChange={(e) => {
-                    let val = e.target.value;
-                    if (leadStep === 1) {
-                      val = maskPhone(val);
-                    } else if (leadStep === 2) {
-                      val = maskDocument(val);
-                    }
-                    setInput(val);
-                  }}
-                  placeholder={
-                    leadStep === 0 ? "Digite seu nome..." :
-                      leadStep === 1 ? "Digite seu número..." :
-                        leadStep === 2 ? "Digite seu CPF/CNPJ..." :
-                          "Digite sua dúvida..."
-                  }
-                  disabled={isLoading}
-                  className="w-full bg-white/5 border border-white/10 rounded-full pl-6 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#0d6084] transition-colors text-[16px]"
-                />
+              <div className="relative flex items-end">
+                {(leadStep === 1 || leadStep === 2) ? (
+                  <input
+                    type="tel"
+                    inputMode="numeric"
+                    value={input}
+                    onChange={(e) => {
+                      let val = e.target.value;
+                      if (leadStep === 1) {
+                        val = maskPhone(val);
+                      } else if (leadStep === 2) {
+                        val = maskDocument(val);
+                      }
+                      setInput(val);
+                    }}
+                    placeholder={leadStep === 1 ? "Digite seu número..." : "Digite seu CPF/CNPJ..."}
+                    disabled={isLoading}
+                    className="w-full bg-white/5 border border-white/10 rounded-full pl-6 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#0d6084] transition-colors text-[16px]"
+                  />
+                ) : (
+                  <textarea
+                    ref={textareaRef}
+                    rows={1}
+                    value={input}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      e.target.style.height = 'auto';
+                      e.target.style.height = `${Math.min(e.target.scrollHeight, 120)}px`;
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (input.trim() && !isLoading) {
+                          handleSubmit(e as unknown as React.FormEvent);
+                        }
+                      }
+                    }}
+                    placeholder={leadStep === 0 ? "Digite seu nome..." : "Digite sua dúvida..."}
+                    disabled={isLoading}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-6 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#0d6084] transition-colors text-[16px] resize-none overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+                    style={{ minHeight: '48px', maxHeight: '120px' }}
+                  />
+                )}
                 <button
                   type="submit"
                   disabled={!input.trim() || isLoading}
-                  className="absolute right-2 p-2 text-[#7ee7ff] hover:text-white disabled:opacity-50 disabled:hover:text-[#7ee7ff] transition-colors"
+                  className="absolute right-2 bottom-[6px] p-2 text-[#7ee7ff] hover:text-white disabled:opacity-50 disabled:hover:text-[#7ee7ff] transition-colors"
                 >
                   <Send size={20} />
                 </button>
