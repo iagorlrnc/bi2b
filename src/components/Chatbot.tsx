@@ -219,6 +219,27 @@ export default function Chatbot() {
     };
   }, [isOpen]);
 
+  // Bloqueio agressivo de touchmove para o iOS (evita que o fundo arraste com o teclado aberto)
+  useEffect(() => {
+    if (!isOpen || window.innerWidth >= 640) return;
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      // Permite o scroll apenas se o toque for dentro da área de mensagens
+      // Caso contrário (como no header, no input ou fundo), bloqueia o movimento nativo
+      if (!target.closest('.messages-container')) {
+        e.preventDefault();
+      }
+    };
+
+    // { passive: false } é obrigatório para o preventDefault() funcionar no touchmove
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      document.removeEventListener('touchmove', handleTouchMove);
+    };
+  }, [isOpen]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -330,7 +351,7 @@ export default function Chatbot() {
           </div>
 
           {/* Área de Mensagens */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain touch-pan-y p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
+          <div className="messages-container flex-1 overflow-y-auto overflow-x-hidden overscroll-contain touch-pan-y p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
