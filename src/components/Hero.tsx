@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { ArrowRight, DatabaseZap, ShieldCheck, Sparkles } from "lucide-react"
+import { DatabaseZap, ShieldCheck, Sparkles } from "lucide-react"
 import logoMain from "../assets/img/logo.png"
 
 export default function Hero() {
