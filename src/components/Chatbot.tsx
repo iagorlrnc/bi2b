@@ -169,12 +169,14 @@ export default function Chatbot() {
       document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
 
       return () => {
         document.body.style.position = '';
         document.body.style.top = '';
         document.body.style.width = '';
         document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
         // Restaura a posição de scroll instantaneamente
         window.scrollTo({ top: scrollY, behavior: 'instant' });
       };
@@ -309,7 +311,7 @@ export default function Chatbot() {
 
       {/* Janela de Chat */}
       {isOpen && (
-        <div ref={chatRef} className="fixed top-0 left-0 right-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#05070b] sm:bg-[#061826] sm:top-auto sm:left-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden overscroll-none sm:backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
+        <div ref={chatRef} className="fixed top-0 left-0 right-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#05070b] sm:bg-[#061826] sm:top-auto sm:left-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden overscroll-none touch-none sm:touch-auto sm:backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="flex items-center gap-3 border-b border-white/10 bg-[#0d6084]/20 p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0d6084] text-[#7ee7ff]">
@@ -328,7 +330,7 @@ export default function Chatbot() {
           </div>
 
           {/* Área de Mensagens */}
-          <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
+          <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain touch-pan-y p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
