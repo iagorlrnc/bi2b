@@ -19,6 +19,7 @@ import Performance from "./components/Performance"
 import Estrategia from "./components/Estrategia"
 import NotFound from "./components/NotFound"
 import Chatbot from "./components/Chatbot"
+import Ferramentas from "./components/Ferramentas"
 
 function Home() {
   const location = useLocation()
@@ -61,9 +62,10 @@ function AppRoutes() {
         <Route path="/faturamento" element={<Faturamento />} />
         <Route path="/performance" element={<Performance />} />
         <Route path="/estrategia" element={<Estrategia />} />
+        <Route path="/ferramentas" element={<Ferramentas />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <Chatbot />
+      {location.pathname !== "/ferramentas" && <Chatbot />}
     </div>
   )
 }

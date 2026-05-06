@@ -48,29 +48,34 @@ export default function Hero() {
               crescimento do seu negócio.
             </p>
 
-            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+            <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <a
                 href="https://share.google/ZDrIBH8t9kXoMq5nJ"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 sm:w-auto"
+                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)]"
               >
                 Portal do Cliente
               </a>
               <Link
-                to="/abrir-minha-empresa"
-                state={{ fromInternalLink: true }}
-                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 sm:w-auto"
+                to="/ferramentas"
+                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10"
               >
-                Abrir minha empresa
+                Ferramentas
               </Link>
               <button
                 onClick={scrollToServices}
-                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] sm:w-auto"
+                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] order-4 sm:order-3"
               >
                 Conheça nossas soluções
-                <ArrowRight size={18} />
               </button>
+              <Link
+                to="/abrir-minha-empresa"
+                state={{ fromInternalLink: true }}
+                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 order-3 sm:order-4"
+              >
+                Abrir minha empresa
+              </Link>
             </div>
 
             <div className="mt-10 hidden gap-4 sm:grid sm:grid-cols-3">
