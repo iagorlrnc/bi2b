@@ -223,19 +223,46 @@ export default function Chatbot() {
   useEffect(() => {
     if (!isOpen || window.innerWidth >= 640) return;
 
+    let touchStartY = 0;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+    };
+
     const handleTouchMove = (e: TouchEvent) => {
       const target = e.target as HTMLElement;
-      // Permite o scroll apenas se o toque for dentro da área de mensagens
-      // Caso contrário (como no header, no input ou fundo), bloqueia o movimento nativo
-      if (!target.closest('.messages-container')) {
-        e.preventDefault();
+      const messageContainer = target.closest('.messages-container') as HTMLElement;
+      
+      // Se não estiver dentro da área de mensagens, bloqueio absoluto
+      if (!messageContainer) {
+        if (e.cancelable) e.preventDefault();
+        return;
+      }
+
+      // Se for dentro da caixa de mensagens, precisamos garantir que não dê "bounce" no limite
+      const touchY = e.touches[0].clientY;
+      const deltaY = touchY - touchStartY;
+      
+      const isAtTop = messageContainer.scrollTop === 0;
+      const isAtBottom = messageContainer.scrollTop + messageContainer.clientHeight >= messageContainer.scrollHeight - 1;
+
+      // Se está no topo e tentando rolar pra cima (arrastando dedo pra baixo)
+      if (isAtTop && deltaY > 0) {
+        if (e.cancelable) e.preventDefault();
+      }
+      
+      // Se está no fundo e tentando rolar pra baixo (arrastando dedo pra cima)
+      if (isAtBottom && deltaY < 0) {
+        if (e.cancelable) e.preventDefault();
       }
     };
 
     // { passive: false } é obrigatório para o preventDefault() funcionar no touchmove
+    document.addEventListener('touchstart', handleTouchStart, { passive: true });
     document.addEventListener('touchmove', handleTouchMove, { passive: false });
 
     return () => {
+      document.removeEventListener('touchstart', handleTouchStart);
       document.removeEventListener('touchmove', handleTouchMove);
     };
   }, [isOpen]);
