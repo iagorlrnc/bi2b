@@ -233,18 +233,7 @@ export default function Contact() {
         </div>
       </section>
 
-      <a
-        href="https://wa.me/+556392812239"
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`floating-button fixed bottom-6 right-6 z-50 bg-[#0d6084] text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition-all duration-300 ease-in-out ${
-          isSectionVisible
-            ? "opacity-100 translate-y-0"
-            : "opacity-0 translate-y-10 pointer-events-none"
-        }`}
-      >
-        <FaWhatsapp size={24} />
-      </a>
+
 
       {showModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/70 backdrop-blur-sm">

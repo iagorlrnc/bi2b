@@ -34,9 +34,67 @@ REGRAS DE RESPOSTA (OBRIGATÓRIO):
 - Não utilize jargões técnicos.
 - Não faça respostas longas e detalhadas.
 - Seja objetivo.
+- Converse como se fosse uma pessoa real conversando.
 - Não utilize frases como "Estou feliz em ajudar", "Espero ter ajudado" ou "Estou aqui para ajudar".
 - Escreva suas respostas com a formatação adequada para justificar o texto.
 - Quando houver tópicos, SEMPRE faça quebra de linhas (pule uma linha) para separar cada item.`;
+const maskPhone = (value: string) => {
+  let v = value.replace(/\D/g, '');
+  if (v.length > 11) v = v.substring(0, 11);
+  if (v.length > 10) {
+    return v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+  } else if (v.length > 6) {
+    return v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, '($1) $2-$3');
+  } else if (v.length > 2) {
+    return v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+  }
+  return v;
+};
+
+const maskDocument = (value: string) => {
+  let v = value.replace(/\D/g, '');
+  if (v.length <= 11) {
+    // CPF
+    return v
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+  } else {
+    // CNPJ
+    v = v.substring(0, 14);
+    return v
+      .replace(/(\d{2})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d)/, '$1/$2')
+      .replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+  }
+};
+
+// Função customizada para um scroll suave, lento e elegante
+const smoothScrollTo = (element: HTMLElement, targetPosition: number, duration: number) => {
+  const startPosition = element.scrollTop;
+  const distance = targetPosition - startPosition;
+  let startTime: number | null = null;
+
+  const animation = (currentTime: number) => {
+    if (startTime === null) startTime = currentTime;
+    const timeElapsed = currentTime - startTime;
+    const progress = Math.min(timeElapsed / duration, 1);
+
+    // Função de aceleração (Easing): easeInOutQuart - começa devagar, acelera no meio e termina bem suave
+    const ease = progress < 0.5 
+      ? 8 * progress * progress * progress * progress 
+      : 1 - Math.pow(-2 * progress + 2, 4) / 2;
+
+    element.scrollTop = startPosition + distance * ease;
+
+    if (timeElapsed < duration) {
+      requestAnimationFrame(animation);
+    }
+  };
+
+  requestAnimationFrame(animation);
+};
 
 export default function Chatbot() {
   const navigate = useNavigate();
@@ -61,57 +119,113 @@ export default function Chatbot() {
   }, [location.pathname]);
 
   const toggleChat = () => {
-    if (window.innerWidth < 640) {
-      if (!isOpen) {
+    if (isOpen) {
+      closeChat();
+    } else {
+      if (window.innerWidth < 640) {
         navigate('/chatbot', { state: { backgroundLocation: location } });
       } else {
-        navigate(-1);
+        setIsOpen(true);
       }
-    } else {
-      setIsOpen(!isOpen);
     }
   };
 
   const closeChat = () => {
+    // Se o usuário já passou do consentimento, pede confirmação antes de fechar
+    if (leadStep >= 4 && !showCloseConfirm) {
+      setShowCloseConfirm(true);
+      return;
+    }
+
+    // Se não chegou no consentimento ou se já estiver confirmando
+    setShowCloseConfirm(false);
     if (window.innerWidth < 640 && location.pathname === '/chatbot') {
       navigate(-1);
     } else {
       setIsOpen(false);
     }
   };
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
+  const [leadStep, setLeadStep] = useState(0); // 0: Nome, 1: Telefone, 2: Documento, 3: Consentimento, 4: Chat Normal, -1: Negado
+  const [leadData, setLeadData] = useState({ name: '', phone: '', document: '', consent: false, questions: [] as string[] });
+
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant' | 'system', content: string }[]>([
-    { role: 'assistant', content: 'Olá! Sou o assistente virtual da Bi2B. Como posso ajudar você hoje?' }
+    { role: 'assistant', content: 'Olá! Para começarmos o atendimento, por favor, digite seu **nome completo**:' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  // Função para envio ao RD Station
+  const sendToRDStation = async (data: typeof leadData) => {
+    try {
+      const token = import.meta.env.VITE_RD_STATION_PUBLIC_TOKEN;
+      if (!token) {
+        console.warn('VITE_RD_STATION_PUBLIC_TOKEN não está definido no .env');
+        return;
+      }
+
+      // O RD Station OBRIGA a existência de um campo "email" para criar o lead.
+      // Como não pedimos email no funil, geramos um email fictício baseado no telefone.
+      const telefoneNumeros = data.phone.replace(/\D/g, '');
+      const dummyEmail = `cliente.${telefoneNumeros}@chatbot.com`;
+
+      const historicoPerguntas = data.questions.length > 0
+        ? data.questions.join(" | ")
+        : "Nenhuma pergunta feita.";
+
+      const payload = {
+        token_rdstation: token,
+        identificador: "chatbot-bi2b-lead",
+        email: dummyEmail,
+        nome: data.name,
+        telefone: data.phone,
+        cf_cnpj_cpf: data.document,
+        cf_historico_perguntas: historicoPerguntas,
+        cf_consentimento_lgpd: data.consent ? "Sim" : "Não"
+      };
+
+      console.log('Enviando para RD Station...', payload);
+
+      await fetch('https://www.rdstation.com.br/api/1.2/conversions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      console.log('Lead enviado com sucesso ao RD Station!');
+    } catch (error) {
+      console.error('Erro ao enviar dados para o RD Station', error);
+    }
+  };
 
   const formatMessage = (content: string) => {
     // 1. Divide o texto pelos marcadores de negrito "**"
     const boldParts = content.split(/(\*\*.*?\*\*)/g);
-    
+
     return boldParts.map((boldPart, boldIndex) => {
       const isBold = boldPart.startsWith('**') && boldPart.endsWith('**');
       const textToProcess = isBold ? boldPart.slice(2, -2) : boldPart;
-      
+
       // 2. Regex para encontrar links em formato Markdown [texto](url) OU urls soltas
       // Grupo 1: texto do markdown, Grupo 2: url do markdown, Grupo 3: url solta
       const linkRegex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s]+)/g;
       const parts = textToProcess.split(linkRegex);
-      
+
       const parsedContent = [];
       for (let i = 0; i < parts.length; i++) {
         // Se for texto normal (fora dos grupos de captura do regex)
         if (parts[i]) {
           parsedContent.push(<span key={`${boldIndex}-${i}`}>{parts[i]}</span>);
         }
-        
+
         // Verifica os grupos de captura associados a esse texto
         if (i + 1 < parts.length) {
           const mdText = parts[i + 1];
           const mdUrl = parts[i + 2];
           const bareUrl = parts[i + 3];
-          
+
           if (mdText && mdUrl) {
             parsedContent.push(
               <a key={`md-${boldIndex}-${i}`} href={mdUrl} target="_blank" rel="noopener noreferrer" className="text-[#7ee7ff] font-semibold underline underline-offset-2 hover:text-white transition-colors break-all">
@@ -145,25 +259,64 @@ export default function Chatbot() {
       if (isBold) {
         return <strong key={boldIndex} className="font-bold">{parsedContent}</strong>;
       }
-      
+
       return <span key={boldIndex}>{parsedContent}</span>;
     });
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      const targetScroll = container.scrollHeight - container.clientHeight;
+      smoothScrollTo(container, targetScroll, 1000); // 1 segundo (1000ms) para um scroll bem leve
+    }
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    const lastMessage = messages[messages.length - 1];
+
+    if (lastMessage && lastMessage.role === 'user') {
+      // Quando o usuário envia, rola para baixo
+      scrollToBottom();
+    } else if (lastMessage && lastMessage.role === 'assistant') {
+      // Quando a IA responde, calculamos se a resposta cabe na tela
+      const container = messagesContainerRef.current;
+      if (container) {
+        const messageElements = container.querySelectorAll('.message-wrapper');
+        const userElements = container.querySelectorAll('.message-wrapper[data-role="user"]');
+
+        const lastUserElement = userElements[userElements.length - 1] as HTMLElement;
+        const lastAssistantElement = messageElements[messageElements.length - 1] as HTMLElement;
+
+        if (lastUserElement && lastAssistantElement) {
+          const userHeight = lastUserElement.getBoundingClientRect().height;
+          const assistantHeight = lastAssistantElement.getBoundingClientRect().height;
+          const containerHeight = container.clientHeight;
+
+          // Adicionamos 40px de margem de segurança
+          if (userHeight + assistantHeight + 40 < containerHeight) {
+            // Se cabe tudo na tela, rola até o fim
+            scrollToBottom();
+          } else {
+            // Se for gigante (ou teclado aberto limitando a tela),
+            // rola até a pergunta do usuário para que ele leia desde o início
+            const targetTop = Math.max(0, lastUserElement.offsetTop - 20);
+            smoothScrollTo(container, targetTop, 1000); // 1 segundo de transição suave
+          }
+        } else {
+          // Se for a primeira mensagem ou uma das mensagens curtas do funil inicial, rola pra baixo
+          scrollToBottom();
+        }
+      }
+    }
+  }, [messages, leadStep]);
 
   // Bloqueia o scroll do body no mobile quando o chat está aberto
   useEffect(() => {
     // Aplica o bloqueio apenas em telas móveis (sm)
     if (isOpen && window.innerWidth < 640) {
       const scrollY = window.scrollY;
-      
+
       // Fixa o body exatamente na posição atual para não pular pro topo
       document.body.style.position = 'fixed';
       document.body.style.top = `-${scrollY}px`;
@@ -194,7 +347,7 @@ export default function Chatbot() {
       if (chatRef.current && window.visualViewport) {
         // A altura do viewport real (encolhe com o teclado)
         chatRef.current.style.height = `${window.visualViewport.height}px`;
-        
+
         // Se o navegador fizer pan na tela (iOS), usamos transform (GPU acelerado) 
         // ao invés de 'top' para evitar tremores (jitter)
         chatRef.current.style.transform = `translateY(${window.visualViewport.offsetTop}px)`;
@@ -232,7 +385,7 @@ export default function Chatbot() {
     const handleTouchMove = (e: TouchEvent) => {
       const target = e.target as HTMLElement;
       const messageContainer = target.closest('.messages-container') as HTMLElement;
-      
+
       // Se não estiver dentro da área de mensagens, bloqueio absoluto
       if (!messageContainer) {
         if (e.cancelable) e.preventDefault();
@@ -242,7 +395,7 @@ export default function Chatbot() {
       // Se for dentro da caixa de mensagens, precisamos garantir que não dê "bounce" no limite
       const touchY = e.touches[0].clientY;
       const deltaY = touchY - touchStartY;
-      
+
       const isAtTop = messageContainer.scrollTop === 0;
       const isAtBottom = messageContainer.scrollTop + messageContainer.clientHeight >= messageContainer.scrollHeight - 1;
 
@@ -250,7 +403,7 @@ export default function Chatbot() {
       if (isAtTop && deltaY > 0) {
         if (e.cancelable) e.preventDefault();
       }
-      
+
       // Se está no fundo e tentando rolar pra baixo (arrastando dedo pra cima)
       if (isAtBottom && deltaY < 0) {
         if (e.cancelable) e.preventDefault();
@@ -284,16 +437,56 @@ export default function Chatbot() {
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, leadStep, showCloseConfirm]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!input.trim() || isLoading) return;
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if ((!input.trim() && leadStep !== 3) || isLoading) return;
 
     const userMessage = input.trim();
     setInput('');
+
+    // --- LÓGICA DO FUNIL DE LEADS ---
+    if (leadStep === 0) {
+      setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+      setLeadData(prev => ({ ...prev, name: userMessage }));
+      setLeadStep(1);
+      setTimeout(() => {
+        setMessages(prev => [...prev, { role: 'assistant', content: `Prazer em conhecer, **${userMessage.split(' ')[0]}**! Qual é o seu **telefone para contato**? ` }]);
+      }, 500);
+      return;
+    }
+
+    if (leadStep === 1) {
+      setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+      setLeadData(prev => ({ ...prev, phone: userMessage }));
+      setLeadStep(2);
+      setTimeout(() => {
+        setMessages(prev => [...prev, { role: 'assistant', content: `Obrigado! Agora, por favor, informe seu **CNPJ** (ou CPF, caso não possua empresa):` }]);
+      }, 500);
+      return;
+    }
+
+    if (leadStep === 2) {
+      setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+      setLeadData(prev => ({ ...prev, document: userMessage }));
+      setLeadStep(3);
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: `Por último, a Bi2B Consultoria está comprometida em proteger e respeitar sua privacidade. Você concorda em receber nossas comunicações e que seus dados sejam utilizados para fins de marketing e otimização de preferências do cliente?`
+        }]);
+      }, 500);
+      return;
+    }
+
+    // --- LÓGICA DE CHAT NORMAL ---
     const newMessages = [...messages, { role: 'user' as const, content: userMessage }];
     setMessages(newMessages);
+
+    // Acumula as perguntas no histórico
+    setLeadData(prev => ({ ...prev, questions: [...prev.questions, userMessage] }));
+
     setIsLoading(true);
 
     try {
@@ -315,7 +508,13 @@ export default function Chatbot() {
       }
 
       const data = await response.json();
-      const assistantText = data.text || 'Desculpe, não consegui obter uma resposta.';
+      let assistantText = data.text || 'Desculpe, não consegui obter uma resposta.';
+
+      // Remove a propaganda de fim de resposta da API gratuita
+      const adIdentifier = "Support Pollinations.AI";
+      if (assistantText.includes(adIdentifier)) {
+        assistantText = assistantText.split(adIdentifier)[0];
+      }
 
       setMessages(prev => [...prev, { role: 'assistant', content: assistantText.trim() }]);
 
@@ -333,7 +532,7 @@ export default function Chatbot() {
   return (
     <>
       {/* Container Flutuante para Tooltip e Botão (Posicionado ao lado do WhatsApp) */}
-      <div className="floating-button fixed bottom-6 right-28 z-[9999] flex items-center gap-3">
+      <div className="floating-button fixed bottom-6 right-6 z-[9999] flex items-center gap-3">
 
         {/* Tooltip Chamativo */}
         {!isOpen && (
@@ -359,7 +558,7 @@ export default function Chatbot() {
 
       {/* Janela de Chat */}
       {isOpen && (
-        <div ref={chatRef} className="fixed top-0 left-0 right-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#05070b] sm:bg-[#061826] sm:top-auto sm:left-auto sm:bottom-24 sm:right-28 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden overscroll-none touch-none sm:touch-auto sm:backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
+        <div ref={chatRef} className="fixed top-0 left-0 right-0 z-[10000] w-full h-[100dvh] flex flex-col bg-[#05070b] sm:bg-[#061826] sm:top-auto sm:left-auto sm:bottom-24 sm:right-6 sm:w-[380px] sm:h-[500px] sm:max-h-[70vh] sm:rounded-2xl sm:border sm:border-white/10 sm:shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden overscroll-none touch-none sm:touch-auto sm:backdrop-blur-xl transition-all duration-300 animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="flex items-center gap-3 border-b border-white/10 bg-[#0d6084]/20 p-4">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0d6084] text-[#7ee7ff]">
@@ -378,11 +577,12 @@ export default function Chatbot() {
           </div>
 
           {/* Área de Mensagens */}
-          <div className="messages-container flex-1 overflow-y-auto overflow-x-hidden overscroll-contain touch-pan-y p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
+          <div ref={messagesContainerRef} className="messages-container flex-1 overflow-y-auto overflow-x-hidden overscroll-contain touch-pan-y p-4 space-y-4 bg-gradient-to-b from-transparent to-black/20">
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
+                data-role={msg.role}
+                className={`message-wrapper flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
               >
                 <div className={`flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-full ${msg.role === 'user' ? 'bg-[#7ee7ff]/20 text-[#7ee7ff]' : 'bg-[#0d6084] text-white'
                   }`}>
@@ -411,26 +611,115 @@ export default function Chatbot() {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Área de Input */}
-          <form onSubmit={handleSubmit} className="border-t border-white/10 bg-white/5 p-3">
-            <div className="relative flex items-center">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Digite sua dúvida..."
-                // text-[16px] é obrigatório no mobile para evitar que o iOS dê zoom automático ao focar no input
-                className="w-full rounded-full border border-white/10 bg-black/40 py-3 pl-4 pr-12 text-[16px] sm:text-sm text-white placeholder-gray-500 focus:border-[#7ee7ff]/50 focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]/50 disabled:opacity-50 transition-all"
-              />
+          {/* Área de Input ou Botões de Consentimento */}
+          {leadStep === 3 ? (
+            <div className="p-4 border-t border-white/10 bg-[#061826] flex flex-col gap-3">
               <button
-                type="submit"
-                disabled={!input.trim() || isLoading}
-                className="absolute right-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#0d6084] text-white transition-transform hover:scale-105 disabled:opacity-50 disabled:hover:scale-100"
+                onClick={() => {
+                  setLeadData(prev => ({ ...prev, consent: true }));
+                  setMessages(prev => [
+                    ...prev,
+                    { role: 'user', content: 'Sim, eu concordo.' },
+                    { role: 'assistant', content: 'Ótimo! Consentimento registrado. Sou o assistente de Inteligência Artificial da Bi2B. Como posso ajudar o seu negócio hoje?' }
+                  ]);
+                  setLeadStep(4);
+                }}
+                className="w-full bg-[#0d6084] hover:bg-[#0a4a62] text-white py-3 rounded-xl font-medium transition-colors"
               >
-                <Send size={16} className="mr-0.5" />
+                Sim, eu concordo
+              </button>
+              <button
+                onClick={() => {
+                  setMessages(prev => [
+                    ...prev,
+                    { role: 'user', content: 'Não concordo.' },
+                    { role: 'assistant', content: 'Compreendemos. Infelizmente não será possível prosseguir com o atendimento pelo Chatbot sem o seu consentimento. Agradecemos o contato!' }
+                  ]);
+                  setLeadStep(-1);
+                }}
+                className="w-full bg-transparent border border-white/20 hover:bg-white/5 text-gray-300 py-3 rounded-xl font-medium transition-colors"
+              >
+                Não concordo
               </button>
             </div>
-          </form>
+          ) : leadStep === -1 ? (
+            <div className="p-4 border-t border-white/10 bg-[#061826] text-center text-gray-400 text-sm">
+              Atendimento encerrado por falta de consentimento.
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="p-4 border-t border-white/10 bg-[#061826]">
+              <div className="relative flex items-center">
+                <input
+                  type={(leadStep === 1 || leadStep === 2) ? "tel" : "text"}
+                  inputMode={(leadStep === 1 || leadStep === 2) ? "numeric" : "text"}
+                  value={input}
+                  onChange={(e) => {
+                    let val = e.target.value;
+                    if (leadStep === 1) {
+                      val = maskPhone(val);
+                    } else if (leadStep === 2) {
+                      val = maskDocument(val);
+                    }
+                    setInput(val);
+                  }}
+                  placeholder={
+                    leadStep === 0 ? "Digite seu nome..." :
+                      leadStep === 1 ? "Digite seu número..." :
+                        leadStep === 2 ? "Digite seu CPF/CNPJ..." :
+                          "Digite sua dúvida..."
+                  }
+                  disabled={isLoading}
+                  className="w-full bg-white/5 border border-white/10 rounded-full pl-6 pr-12 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-[#0d6084] transition-colors text-[16px]"
+                />
+                <button
+                  type="submit"
+                  disabled={!input.trim() || isLoading}
+                  className="absolute right-2 p-2 text-[#7ee7ff] hover:text-white disabled:opacity-50 disabled:hover:text-[#7ee7ff] transition-colors"
+                >
+                  <Send size={20} />
+                </button>
+              </div>
+            </form>
+          )}
+
+          {/* Confirmação de Fechamento */}
+          {showCloseConfirm && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-6 animate-in fade-in duration-200">
+              <div className="bg-[#061826] border border-white/10 p-6 rounded-2xl w-full text-center shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+                <h3 className="text-xl font-bold text-white mb-2">Encerrar atendimento?</h3>
+                <p className="text-sm text-gray-300 mb-6">Ao encerrar, seu histórico de dúvidas será salvo e um especialista poderá entrar em contato.</p>
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => {
+                      // Envia os dados para o RD Station
+                      sendToRDStation(leadData);
+
+                      // Reseta o estado para a próxima vez que abrir
+                      setLeadStep(0);
+                      setLeadData({ name: '', phone: '', document: '', consent: false, questions: [] });
+                      setMessages([{ role: 'assistant', content: 'Olá! Para começarmos o atendimento, por favor, digite seu **nome completo**:' }]);
+                      setShowCloseConfirm(false);
+
+                      if (window.innerWidth < 640 && location.pathname === '/chatbot') {
+                        navigate(-1);
+                      } else {
+                        setIsOpen(false);
+                      }
+                    }}
+                    className="w-full bg-red-500/20 border border-red-500/30 text-red-400 hover:bg-red-500 hover:text-white py-3 rounded-xl font-medium transition-colors"
+                  >
+                    Sim, encerrar
+                  </button>
+                  <button
+                    onClick={() => setShowCloseConfirm(false)}
+                    className="w-full bg-[#0d6084] hover:bg-[#0a4a62] text-white py-3 rounded-xl font-medium transition-colors"
+                  >
+                    Não, continuar conversando
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </>
