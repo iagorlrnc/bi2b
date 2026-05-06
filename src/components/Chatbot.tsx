@@ -583,6 +583,9 @@ export default function Chatbot() {
         assistantText = assistantText.split(adIdentifier)[0];
       }
 
+      // Limpa rastros da propaganda ou formatações mortas no final (traços, asteriscos soltos e quebras de linha extras)
+      assistantText = assistantText.replace(/[\s\-\*]+$/, '');
+
       setMessages(prev => [...prev, { role: 'assistant', content: assistantText.trim() }]);
 
     } catch (error) {
