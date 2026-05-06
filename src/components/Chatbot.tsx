@@ -195,9 +195,9 @@ export default function Chatbot() {
         // A altura do viewport real (encolhe com o teclado)
         chatRef.current.style.height = `${window.visualViewport.height}px`;
         
-        // Se o navegador fizer pan na tela (iOS), o offsetTop diz quanto ele empurrou
-        // Ao aplicar isso no top, ancoramos a janela perfeitamente
-        chatRef.current.style.top = `${window.visualViewport.offsetTop}px`;
+        // Se o navegador fizer pan na tela (iOS), usamos transform (GPU acelerado) 
+        // ao invés de 'top' para evitar tremores (jitter)
+        chatRef.current.style.transform = `translateY(${window.visualViewport.offsetTop}px)`;
       }
     };
 
@@ -214,7 +214,7 @@ export default function Chatbot() {
       }
       if (chatRef.current) {
         chatRef.current.style.height = '';
-        chatRef.current.style.top = '';
+        chatRef.current.style.transform = '';
       }
     };
   }, [isOpen]);
