@@ -136,9 +136,66 @@ function CalculadoraIRPF() {
   )
 }
 
+//tabelas do Simples Nacional
+const tabelasSimples = {
+  anexoI: [
+    { limite: 180000, aliquota: 0.04, deducao: 0 },
+    { limite: 360000, aliquota: 0.073, deducao: 5940 },
+    { limite: 720000, aliquota: 0.095, deducao: 13860 },
+    { limite: 1800000, aliquota: 0.107, deducao: 22500 },
+    { limite: 3600000, aliquota: 0.143, deducao: 87300 },
+    { limite: 4800000, aliquota: 0.19, deducao: 378000 },
+  ],
+  anexoII: [
+    { limite: 180000, aliquota: 0.045, deducao: 0 },
+    { limite: 360000, aliquota: 0.078, deducao: 5940 },
+    { limite: 720000, aliquota: 0.10, deducao: 13860 },
+    { limite: 1800000, aliquota: 0.112, deducao: 22500 },
+    { limite: 3600000, aliquota: 0.147, deducao: 85500 },
+    { limite: 4800000, aliquota: 0.30, deducao: 720000 },
+  ],
+  anexoIII: [
+    { limite: 180000, aliquota: 0.06, deducao: 0 },
+    { limite: 360000, aliquota: 0.112, deducao: 9360 },
+    { limite: 720000, aliquota: 0.135, deducao: 17640 },
+    { limite: 1800000, aliquota: 0.16, deducao: 35640 },
+    { limite: 3600000, aliquota: 0.21, deducao: 125640 },
+    { limite: 4800000, aliquota: 0.33, deducao: 648000 },
+  ],
+  anexoIV: [
+    { limite: 180000, aliquota: 0.045, deducao: 0 },
+    { limite: 360000, aliquota: 0.09, deducao: 8100 },
+    { limite: 720000, aliquota: 0.102, deducao: 12420 },
+    { limite: 1800000, aliquota: 0.14, deducao: 39780 },
+    { limite: 3600000, aliquota: 0.22, deducao: 183780 },
+    { limite: 4800000, aliquota: 0.33, deducao: 828000 },
+  ],
+  anexoV: [
+    { limite: 180000, aliquota: 0.155, deducao: 0 },
+    { limite: 360000, aliquota: 0.18, deducao: 4500 },
+    { limite: 720000, aliquota: 0.195, deducao: 9900 },
+    { limite: 1800000, aliquota: 0.205, deducao: 17100 },
+    { limite: 3600000, aliquota: 0.23, deducao: 62100 },
+    { limite: 4800000, aliquota: 0.305, deducao: 540000 },
+  ]
+};
+
+function calcularAliquotaEfetivaSimples(rbt12: number, anexo: typeof tabelasSimples.anexoI) {
+  if (rbt12 === 0) return { aliquotaEfetiva: anexo[0].aliquota * 100 }; //primeira faixa se não houver faturamento anterior
+  
+  const faixa = anexo.find(f => rbt12 <= f.limite) || anexo[anexo.length - 1];
+  const aliquotaEfetiva = ((rbt12 * faixa.aliquota) - faixa.deducao) / rbt12;
+  
+  return {
+    aliquotaEfetiva: aliquotaEfetiva * 100 //porcentagem
+  };
+}
+
 function CalculadoraPJ() {
   const [faturamento, setFaturamento] = useState<number | "">("")
-  const [atividade, setAtividade] = useState("servicos")
+  const [rbt12, setRbt12] = useState<number | "">("")
+  const [anexoSelecionado, setAnexoSelecionado] = useState("anexoI")
+  
   const [resultado, setResultado] = useState<{
     simplesAliquota: number
     simplesTotal: number
@@ -150,34 +207,37 @@ function CalculadoraPJ() {
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val)
 
   const calcularPJ = () => {
-    const f = Number(faturamento) || 0
+    const fMensal = Number(faturamento) || 0;
+    // Se a empresa for nova, projeta-se o RBT12 com base no faturamento mensal
+    const r12 = Number(rbt12) > 0 ? Number(rbt12) : fMensal * 12;
 
-    // Estimativas super simplificadas (faixa inicial)
-    let simplesAliquota = 0
-    let lucroAliquota = 0
+    let tabelaAtiva = tabelasSimples.anexoIII;
+    if (anexoSelecionado === "anexoI") tabelaAtiva = tabelasSimples.anexoI;
+    if (anexoSelecionado === "anexoII") tabelaAtiva = tabelasSimples.anexoII;
+    if (anexoSelecionado === "anexoIV") tabelaAtiva = tabelasSimples.anexoIV;
+    if (anexoSelecionado === "anexoV") tabelaAtiva = tabelasSimples.anexoV;
 
-    if (atividade === "comercio") {
-      simplesAliquota = 4.0
-      lucroAliquota = 9.58 // IRPJ, CSLL, PIS, COFINS approx sem ICMS na estimativa
-    } else if (atividade === "industria") {
-      simplesAliquota = 4.5
-      lucroAliquota = 9.58
+    const calculoSimples = calcularAliquotaEfetivaSimples(r12, tabelaAtiva);
+    let simplesAliquotaEfetiva = calculoSimples.aliquotaEfetiva;
+    
+    // Lucro Presumido - Estimativas (PIS/COFINS, IRPJ, CSLL + ISS ou ICMS)
+    let lucroAliquota = 0;
+    if (anexoSelecionado === "anexoI") {
+      // PIS/COFINS (3.65%), IRPJ/CSLL (~2.28%), ICMS (Média ~18%) => ~23.93%
+      lucroAliquota = 23.93; 
+    } else if (anexoSelecionado === "anexoII") {
+      // Similiar ao comércio, mas pode variar dependendo do IPI
+      lucroAliquota = 23.93;
     } else {
-      // Servicos
-      simplesAliquota = 6.0 // Anexo III faixa inicial
-      lucroAliquota = 16.33 // IRPJ, CSLL, PIS, COFINS + ISS (aprox 5%)
+      // Serviços: PIS/COFINS (3.65%), IRPJ/CSLL (7.68%), ISS (Média ~5%) => ~16.33%
+      lucroAliquota = 16.33; 
     }
 
-    // Caso o faturamento seja alto, no Simples Nacional a alíquota sobe drasticamente (progressiva)
-    // Para fins de simulador básico, vamos aplicar uma pequena progressão simbólica
-    if (f > 150000) simplesAliquota *= 1.5
-    if (f > 300000) simplesAliquota *= 2.0
-
     setResultado({
-      simplesAliquota,
-      simplesTotal: f * (simplesAliquota / 100),
+      simplesAliquota: simplesAliquotaEfetiva,
+      simplesTotal: fMensal * (simplesAliquotaEfetiva / 100),
       lucroAliquota,
-      lucroTotal: f * (lucroAliquota / 100),
+      lucroTotal: fMensal * (lucroAliquota / 100),
     })
   }
 
@@ -199,17 +259,37 @@ function CalculadoraPJ() {
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2">
-            Atividade Principal
+            Receita Bruta 12 Meses (RBT12)
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={formatCurrencyInput(rbt12)}
+            onChange={(e) => setRbt12(parseCurrencyString(e.target.value))}
+            placeholder="Deixe 0 se empresa nova"
+            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Tipo de Atividade (Anexo)
           </label>
           <select
-            value={atividade}
-            onChange={(e) => setAtividade(e.target.value)}
+            value={anexoSelecionado}
+            onChange={(e) => setAnexoSelecionado(e.target.value)}
             className="w-full rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-3 text-white focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff] cursor-pointer"
           >
-            <option value="servicos" style={{ color: '#000', background: '#fff' }}>Serviços</option>
-            <option value="comercio" style={{ color: '#000', background: '#fff' }}>Comércio</option>
-            <option value="industria" style={{ color: '#000', background: '#fff' }}>Indústria</option>
+            <option value="anexoI" style={{ color: '#000', background: '#fff' }}>Anexo I</option>
+            <option value="anexoII" style={{ color: '#000', background: '#fff' }}>Anexo II</option>
+            <option value="anexoIII" style={{ color: '#000', background: '#fff' }}>Anexo III</option>
+            <option value="anexoIV" style={{ color: '#000', background: '#fff' }}>Anexo IV</option>
+            <option value="anexoV" style={{ color: '#000', background: '#fff' }}>Anexo V</option>
           </select>
+          {anexoSelecionado === "anexoV" && (
+            <p className="text-xs text-amber-300 mt-1">
+              * Se a folha de pagamento for &gt;= 28% da receita, o serviço pode ir para o Anexo III (Fator R). Escolha o Anexo III neste caso.
+            </p>
+          )}
         </div>
       </div>
       <button
@@ -222,36 +302,81 @@ function CalculadoraPJ() {
 
       {resultado && (
         <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <h3 className="text-lg font-medium text-white mb-4">Estimativa de Impostos (Comparativo Básico)</h3>
+          <h3 className="text-lg font-medium text-white mb-4">Estimativa de Impostos Mensais (Comparativo)</h3>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="rounded-lg bg-slate-800/50 p-4 border border-white/5">
+            <div className="rounded-lg bg-slate-800/50 p-4 border border-white/5 relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-2 bg-gradient-to-bl from-cyan-500/20 to-transparent rounded-bl-lg">
+                <Sparkles size={14} className="text-cyan-400" />
+              </div>
               <h4 className="text-md font-semibold text-cyan-300 mb-3">Simples Nacional</h4>
               <div className="flex justify-between text-sm mb-2 text-slate-300">
-                <span>Alíquota Efetiva Aprox.:</span>
-                <span className="text-white">{resultado.simplesAliquota.toFixed(2)}%</span>
+                <span>Alíquota Efetiva:</span>
+                <span className="text-white font-medium">{resultado.simplesAliquota.toFixed(2)}%</span>
               </div>
-              <div className="flex justify-between font-medium text-white pt-2 border-t border-white/10">
-                <span>Total Mensal Estimado:</span>
-                <span className="text-[#7ee7ff]">{formatCurrency(resultado.simplesTotal)}</span>
+              <div className="flex justify-between font-medium text-white pt-3 border-t border-white/10">
+                <span>Total Imposto Mensal:</span>
+                <span className="text-[#7ee7ff] text-lg">{formatCurrency(resultado.simplesTotal)}</span>
               </div>
             </div>
             <div className="rounded-lg bg-slate-800/50 p-4 border border-white/5">
-              <h4 className="text-md font-semibold text-cyan-300 mb-3">Lucro Presumido</h4>
+              <h4 className="text-md font-semibold text-slate-300 mb-3">Lucro Presumido</h4>
               <div className="flex justify-between text-sm mb-2 text-slate-300">
-                <span>Total Impostos Aprox.:</span>
-                <span className="text-white">{resultado.lucroAliquota.toFixed(2)}%</span>
+                <span>Alíquota Aprox. (Fed+Mun/Est):</span>
+                <span className="text-white font-medium">{resultado.lucroAliquota.toFixed(2)}%</span>
               </div>
-              <div className="flex justify-between font-medium text-white pt-2 border-t border-white/10">
-                <span>Total Mensal Estimado:</span>
-                <span className="text-[#7ee7ff]">{formatCurrency(resultado.lucroTotal)}</span>
+              <div className="flex justify-between font-medium text-white pt-3 border-t border-white/10">
+                <span>Total Imposto Mensal:</span>
+                <span className="text-slate-300 text-lg">{formatCurrency(resultado.lucroTotal)}</span>
               </div>
             </div>
           </div>
+          <div className="mt-4 p-3 bg-cyan-900/20 border border-cyan-500/20 rounded-lg">
+            <p className="text-sm text-cyan-100 flex items-start gap-2">
+              <span className="text-cyan-400 font-bold">Dica:</span> 
+              A alíquota efetiva do Simples Nacional é calculada sobre a receita bruta dos últimos 12 meses (RBT12). Com RBT12 de {formatCurrency(Number(rbt12) || Number(faturamento) * 12)}, sua empresa estaria nesta faixa de tributação.
+            </p>
+          </div>
           <p className="text-xs text-slate-500 pt-4 text-center">
-            *Estes são valores iniciais simplificados. Fatores como Fator R, ICMS estadual e ISS municipal alteram estes valores. Consulte-nos para um planejamento real.
+            *Estes são valores iniciais simplificados. Apenas uma contabilidade consultiva pode realizar um planejamento tributário oficial com Fator R, benefícios de ICMS e ISS corretos.
           </p>
         </div>
       )}
+
+      <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6 overflow-hidden">
+        <h3 className="text-lg font-medium text-white mb-4">Empresas que se encaixam em cada Anexo</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse text-sm text-slate-300">
+            <thead>
+              <tr className="border-b border-white/10 text-white">
+                <th className="p-3 font-medium whitespace-nowrap">Anexo</th>
+                <th className="p-3 font-medium">Atividades / Segmentos</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/10">
+              <tr className="hover:bg-white/5 transition-colors">
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo I</td>
+                <td className="p-3">Comércio: Revendedores em geral, restaurantes, padarias e afins.</td>
+              </tr>
+              <tr className="hover:bg-white/5 transition-colors">
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo II</td>
+                <td className="p-3">Indústria: Fábricas, indústrias e empresas industriais em geral.</td>
+              </tr>
+              <tr className="hover:bg-white/5 transition-colors">
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo III</td>
+                <td className="p-3">Serviços: Instalação, reparos e manutenção, agências de viagens, treinamentos e atividades sem responsabilidade técnica exigida.</td>
+              </tr>
+              <tr className="hover:bg-white/5 transition-colors">
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo IV</td>
+                <td className="p-3">Serviços: Limpeza, vigilância, obras, construção de imóveis, serviços advocatícios, entre outros.</td>
+              </tr>
+              <tr className="hover:bg-white/5 transition-colors">
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo V</td>
+                <td className="p-3">Serviços: Auditoria, jornalismo, tecnologia, publicidade, engenharia, entre outros.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   )
 }
