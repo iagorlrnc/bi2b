@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from "react"
+import { Link } from "react-router-dom"
 import logoMain from "../assets/img/logo.png"
+import logoPonto from "../assets/img/bponto.png"
 
 export default function Header() {
   const headerRef = useRef<HTMLElement>(null)
@@ -78,12 +80,12 @@ export default function Header() {
       }`}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between box-border gap-3">
-        {/* Esquerda: Logo */}
+        {/* Esquerda: Logo (tamanhos normais) */}
         <button
           type="button"
           onClick={() => scrollToSection("home")}
           aria-label="Ir para o início"
-          className="flex items-center justify-center z-[60] h-[48px] rounded-full border border-white/10 bg-white/5 px-4 backdrop-blur-md"
+          className="flex items-center justify-center min-[881px]:hidden lg:flex z-[60] h-[48px] rounded-full border border-white/10 bg-white/5 px-4 backdrop-blur-md"
         >
           <img
             src={logoMain}
@@ -92,10 +94,24 @@ export default function Header() {
           />
         </button>
 
+        {/* Esquerda: Logo B Ponto (somente 881px até lg) */}
+        <button
+          type="button"
+          onClick={() => scrollToSection("home")}
+          aria-label="Ir para o início"
+          className="hidden min-[881px]:flex lg:hidden items-center justify-center z-[60] h-[48px]"
+        >
+          <img
+            src={logoPonto}
+            alt="Logo Bi2B"
+            className="h-8 w-auto max-w-full"
+          />
+        </button>
+
         {/* Direita: Navegação Desktop + Botão + Hamburger */}
         <div className="flex items-center gap-3 lg:gap-4">
           {/* Navegação Desktop */}
-          <nav className="hidden md:flex md:items-center md:gap-1 lg:gap-2 h-[48px] rounded-full border border-white/10 bg-white/5 px-2 lg:px-3 backdrop-blur-md">
+          <nav className="hidden min-[881px]:flex min-[881px]:items-center min-[881px]:gap-1 lg:gap-2 h-[48px] rounded-full border border-white/10 bg-white/5 px-2 lg:px-3 backdrop-blur-md">
             {menuItems.map((item) => (
               <button
                 key={item.id}
@@ -108,17 +124,23 @@ export default function Header() {
             ))}
           </nav>
 
+          <Link
+            to="/ferramentas"
+            className="hidden min-[881px]:flex items-center justify-center h-[48px] px-6 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 transition-colors text-white text-sm font-medium whitespace-nowrap"
+          >
+            Ferramentas
+          </Link>
           <a
             href="https://share.google/ZDrIBH8t9kXoMq5nJ"
             target="_blank"
             rel="noopener noreferrer"
-            className="tech-button-primary hidden md:flex items-center justify-center h-[48px] bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-6 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] text-white text-sm rounded-full whitespace-nowrap"
+            className="tech-button-primary hidden min-[881px]:flex items-center justify-center h-[48px] bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-6 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] text-white text-sm rounded-full whitespace-nowrap"
           >
             Portal do Cliente
           </a>
 
           <button
-            className="md:hidden text-white focus:outline-none z-[60] rounded-full border border-white/10 bg-white/5 p-3 backdrop-blur-md"
+            className="min-[881px]:hidden text-white focus:outline-none z-[60] rounded-full border border-white/10 bg-white/5 p-3 backdrop-blur-md"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Abrir menu"
             aria-expanded={menuOpen}
@@ -158,7 +180,7 @@ export default function Header() {
         id="mobile-navigation"
         className={`
           fixed inset-0 z-[100]
-          md:hidden
+          min-[881px]:hidden
           h-[100dvh] w-screen bg-slate-950/95 border-t border-white/10 shadow-2xl backdrop-blur-xl
           transition-all duration-300 ease-in-out
           ${menuOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
@@ -198,6 +220,13 @@ export default function Header() {
                 {item.label}
               </button>
             ))}
+            <Link
+              to="/ferramentas"
+              onClick={() => setMenuOpen(false)}
+              className="mt-4 flex items-center justify-center rounded-full border border-white/20 bg-white/5 hover:bg-white/10 px-8 py-3 text-white w-full transition-colors font-medium"
+            >
+              Ferramentas
+            </Link>
             <a
               href="https://share.google/ZDrIBH8t9kXoMq5nJ"
               target="_blank"
