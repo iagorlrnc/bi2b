@@ -10,6 +10,36 @@ declare global {
 const ContactFormRD = () => {
   const [isFormReady, setIsFormReady] = useState(false)
   const [hasFormError, setHasFormError] = useState(false)
+  const [consent, setConsent] = useState(false)
+  const [showConsentError, setShowConsentError] = useState(false)
+
+  const triggerConsentError = () => {
+    setShowConsentError(true)
+    setTimeout(() => setShowConsentError(false), 500)
+  }
+
+  const handleConsentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked
+    setConsent(isChecked)
+
+    const container = document.getElementById("formulario-site-bi2b-0eaf6e225952b1af5d6b")
+    if (container) {
+      const btn = container.querySelector(
+        'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
+      ) as HTMLButtonElement | HTMLInputElement | null
+      if (btn) {
+        if (!isChecked) {
+          btn.disabled = true
+          btn.style.opacity = "0.5"
+          btn.style.cursor = "not-allowed"
+        } else {
+          btn.disabled = false
+          btn.style.opacity = "1"
+          btn.style.cursor = "pointer"
+        }
+      }
+    }
+  }
 
   useEffect(() => {
     const scriptId = "rdstation-forms-script"
@@ -229,6 +259,22 @@ const ContactFormRD = () => {
             if (container.querySelector("form")) {
               setIsFormReady(true)
             }
+
+            const formObj = container.querySelector("form")
+            if (formObj) {
+              const submitBtn = formObj.querySelector(
+                'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
+              ) as HTMLButtonElement | HTMLInputElement | null
+              if (submitBtn) {
+                const checkbox = document.getElementById("rdcontact-consent-checkbox") as HTMLInputElement | null
+                const isChecked = checkbox ? checkbox.checked : false
+                if (!isChecked) {
+                  submitBtn.disabled = true
+                  submitBtn.style.opacity = "0.5"
+                  submitBtn.style.cursor = "not-allowed"
+                }
+              }
+            }
           })
 
           mutationObserver.observe(container, {
@@ -350,6 +396,7 @@ const ContactFormRD = () => {
                 width: 100% !important;
                 min-width: 0 !important;
                 box-sizing: border-box !important;
+                color: #000000 !important;
               }
 
               #formulario-site-bi2b-0eaf6e225952b1af5d6b .bricks-form,
@@ -458,14 +505,70 @@ const ContactFormRD = () => {
                   max-width: 360px !important;
                 }
               }
+
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b.consent-not-checked button.bricks-form__submit,
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b.consent-not-checked button[type="submit"],
+              #formulario-site-bi2b-0eaf6e225952b1af5d6b.consent-not-checked input[type="submit"] {
+                opacity: 0.5 !important;
+                filter: brightness(0.6) grayscale(0.5) !important;
+                cursor: not-allowed !important;
+              }
+
+              @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20% { transform: translateX(-6px); }
+                40% { transform: translateX(6px); }
+                60% { transform: translateX(-4px); }
+                80% { transform: translateX(4px); }
+              }
+              .animate-shake {
+                animation: shake 0.4s ease-in-out;
+              }
             `}
           </style>
 
           <div
             role="main"
             id="formulario-site-bi2b-0eaf6e225952b1af5d6b"
-            className="min-h-[420px]"
+            className={`min-h-[420px] transition-all duration-300 ${!consent ? "consent-not-checked" : ""}`}
+            onClickCapture={(e) => {
+              if (!consent) {
+                const target = e.target as HTMLElement;
+                if (target.closest('button[type="submit"], input[type="submit"], .bricks-form__submit')) {
+                  e.stopPropagation();
+                  e.preventDefault();
+                  triggerConsentError();
+                }
+              }
+            }}
+            onSubmitCapture={(e) => {
+              if (!consent) {
+                e.stopPropagation();
+                e.preventDefault();
+                triggerConsentError();
+              }
+            }}
+            onKeyDownCapture={(e) => {
+              if (!consent && e.key === 'Enter') {
+                e.stopPropagation();
+                e.preventDefault();
+                triggerConsentError();
+              }
+            }}
           ></div>
+
+          <div className={`-mt-0.5 mx-auto w-fit flex items-center justify-center gap-3 p-3 rounded-xl border transition-all duration-300 ${showConsentError ? "border-red-500 bg-red-500/10 animate-shake" : "border-white/5 bg-[#0d6084]/10"}`}>
+            <input
+              type="checkbox"
+              id="rdcontact-consent-checkbox"
+              checked={consent}
+              onChange={handleConsentChange}
+              className="flex-shrink-0 w-5 h-5 rounded border-gray-300 text-[#0d6084] focus:ring-[#7ee7ff] cursor-pointer"
+            />
+            <label htmlFor="rdcontact-consent-checkbox" className="text-xs text-slate-300 cursor-pointer leading-tight text-center">
+              Concordo em receber comunicações e aceito que meus dados sejam utilizados para fins de marketing e personalização de ofertas.
+            </label>
+          </div>
         </div>
       </div>
 

@@ -22,6 +22,36 @@ export default function Campanha() {
   const location = useLocation()
   const [isFormSubmitted, setIsFormSubmitted] = useState(false)
   const [showModal, setShowModal] = useState(false)
+  const [consent, setConsent] = useState(false)
+  const [showConsentError, setShowConsentError] = useState(false)
+
+  const triggerConsentError = () => {
+    setShowConsentError(true)
+    setTimeout(() => setShowConsentError(false), 500)
+  }
+
+  const handleConsentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked
+    setConsent(isChecked)
+    
+    const container = document.getElementById("formulario-pag-abertura-de-empresa-060ce9f639cf1704454e")
+    if (container) {
+      const btn = container.querySelector(
+        'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
+      ) as HTMLButtonElement | HTMLInputElement | null
+      if (btn) {
+        if (!isChecked) {
+          btn.disabled = true
+          btn.style.opacity = "0.5"
+          btn.style.cursor = "not-allowed"
+        } else {
+          btn.disabled = false
+          btn.style.opacity = "1"
+          btn.style.cursor = "pointer"
+        }
+      }
+    }
+  }
 
   const handleBack = () => {
     if (location.state?.fromInternalLink) {
@@ -99,6 +129,20 @@ export default function Campanha() {
             const formObj = container.querySelector("form")
             if (formObj && !formObj.dataset.btnListener) {
               formObj.dataset.btnListener = "true"
+              
+              const submitBtn = formObj.querySelector(
+                'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
+              ) as HTMLButtonElement | HTMLInputElement | null
+              if (submitBtn) {
+                const checkbox = document.getElementById("consent-checkbox") as HTMLInputElement | null
+                const isChecked = checkbox ? checkbox.checked : false
+                if (!isChecked) {
+                  submitBtn.disabled = true
+                  submitBtn.style.opacity = "0.5"
+                  submitBtn.style.cursor = "not-allowed"
+                }
+              }
+
               formObj.addEventListener("submit", () => {
                 const btn = formObj.querySelector(
                   'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
@@ -397,6 +441,7 @@ export default function Campanha() {
                   #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e select,
                   #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e textarea {
                     border-radius: 12px !important;
+                    color: #000000 !important;
                   }
 
                   /* Container da Bandeira do Telefone */
@@ -427,14 +472,72 @@ export default function Campanha() {
                   #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__arrow {
                     margin-left: 6px !important;
                   }
+
+                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked button.bricks-form__submit,
+                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked button[type="submit"],
+                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked input[type="submit"] {
+                    opacity: 0.5 !important;
+                    filter: brightness(0.6) grayscale(0.5) !important;
+                    cursor: not-allowed !important;
+                  }
+
+                  @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    20% { transform: translateX(-6px); }
+                    40% { transform: translateX(6px); }
+                    60% { transform: translateX(-4px); }
+                    80% { transform: translateX(4px); }
+                  }
+                  .animate-shake {
+                    animation: shake 0.4s ease-in-out;
+                  }
                 `}
               </style>
               <div
                 role="main"
                 id="formulario-pag-abertura-de-empresa-060ce9f639cf1704454e"
-                className={` py-0 w-full transition-all duration-300 ${isFormSubmitted ? "opacity-60 pointer-events-none grayscale-[20%]" : ""}`}
+                className={` py-0 w-full transition-all duration-300 ${isFormSubmitted ? "opacity-60 pointer-events-none grayscale-[20%]" : ""} ${!consent ? "consent-not-checked" : ""}`}
                 style={{ paddingLeft: "0px", paddingRight: "0px" }}
+                onClickCapture={(e) => {
+                  if (!consent) {
+                    const target = e.target as HTMLElement;
+                    if (target.closest('button[type="submit"], input[type="submit"], .bricks-form__submit')) {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      triggerConsentError();
+                    }
+                  }
+                }}
+                onSubmitCapture={(e) => {
+                  if (!consent) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    triggerConsentError();
+                  }
+                }}
+                onKeyDownCapture={(e) => {
+                  if (!consent && e.key === 'Enter') {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    triggerConsentError();
+                  }
+                }}
               ></div>
+
+              {!isFormSubmitted && (
+                <div className={`mt-4 flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${showConsentError ? "border-red-500 bg-red-500/10 animate-shake" : "border-white/5 bg-[#0d6084]/10"}`}>
+                  <input
+                    type="checkbox"
+                    id="consent-checkbox"
+                    checked={consent}
+                    onChange={handleConsentChange}
+                    className="flex-shrink-0 w-5 h-5 rounded border-gray-300 text-[#0d6084] focus:ring-[#7ee7ff] cursor-pointer"
+                  />
+                  <label htmlFor="consent-checkbox" className="text-xs text-slate-300 cursor-pointer leading-tight">
+                    Concordo em receber comunicações e aceito que meus dados sejam utilizados para fins de marketing e personalização de ofertas.
+                  </label>
+                </div>
+              )}
 
               <div className="mt-8 border-t border-white/20 pb-4 pt-6">
                 {!isFormSubmitted ? (

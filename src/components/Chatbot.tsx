@@ -12,7 +12,7 @@ Pilares: Excelência, Comprometimento e Resultado.
 Links Úteis: 
 - WhatsApp: https://wa.me/556392812239
 - Portal do Cliente: https://share.google/ZDrIBH8t9kXoMq5nJ
-- Abrir Minha Empresa: https://www.bi2bconsultoria.com.br/abrir-minha-empresa
+- Abrir Minha Empresa: https://abrirminhaempresa.bi2bconsultoria.com.br
 
 
 SERVIÇOS OFERECIDOS:

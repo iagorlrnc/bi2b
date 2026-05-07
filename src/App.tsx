@@ -58,19 +58,39 @@ function AppRoutes() {
       <Routes location={backgroundLocation}>
         <Route path="/" element={<Home />} />
         <Route path="/obrigado" element={<Obrigado />} />
-        <Route path="/abrir-minha-empresa" element={<Campanha />} />
         <Route path="/faturamento" element={<Faturamento />} />
         <Route path="/performance" element={<Performance />} />
         <Route path="/estrategia" element={<Estrategia />} />
-        <Route path="/ferramentas" element={<Ferramentas />} />
+        <Route path="/ferramentas" element={    <Ferramentas />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {location.pathname !== "/ferramentas" && <Chatbot />}
+      {["/", "/obrigado", "/faturamento", "/performance", "/estrategia"].includes(location.pathname) && <Chatbot />}
     </div>
   )
 }
 
+export const getCampanhaUrl = () => {
+  const host = window.location.hostname.replace(/^www\./, "")
+  const port = window.location.port ? `:${window.location.port}` : ""
+  return `${window.location.protocol}//abrirminhaempresa.${host}${port}`
+}
+
 function App() {
+  const isCampanhaSubdomain = window.location.hostname.startsWith('abrirminhaempresa.')
+
+  if (isCampanhaSubdomain) {
+    return (
+      <Router>
+        <div className="relative min-h-screen overflow-x-hidden bg-transparent text-white">
+          <Routes>
+            <Route path="*" element={<Campanha />} />
+          </Routes>
+          <Chatbot />
+        </div>
+      </Router>
+    )
+  }
+
   return (
     <Router>
       <AppRoutes />

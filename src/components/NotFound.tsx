@@ -1,6 +1,7 @@
 import { ArrowRight, Home } from "lucide-react"
 import { Link } from "react-router-dom"
 import bpontoImg from "../assets/img/bponto.png"
+import { getCampanhaUrl } from "../App"
 
 export default function NotFound() {
   return (
@@ -35,13 +36,23 @@ export default function NotFound() {
               Início
             </Link>
 
-            <Link
-              to="/abrir-minha-empresa"
+            <a
+              href="https://share.google/ZDrIBH8t9kXoMq5nJ"
+              target="_blank"
+              rel="noopener noreferrer"
               className="tech-button-primary justify-center border border-white/15 bg-white/6 px-6 py-3 hover:bg-white/10"
             >
               <ArrowRight size={18} />
+              Portal do Cliente
+            </a>
+
+            <a
+              href={getCampanhaUrl()}
+              className="tech-button-primary justify-center border border-white/15 bg-white/6 px-6 py-3 hover:bg-white/10 sm:col-span-2"
+            >
+              <ArrowRight size={18} />
               Abrir minha empresa
-            </Link>
+            </a>
           </div>
         </div>
       </div>

@@ -437,9 +437,17 @@ export default function Ferramentas() {
           <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:hidden">
             {/* Mobile Layout */}
             <div className="mb-8 max-w-4xl mx-auto text-center">
-              <div className="section-label mb-5 w-fit mx-auto">
-                <Sparkles size={14} />
-                Calculadoras e Simuladores
+              <div className="flex items-center justify-center gap-3 mb-5 flex-nowrap">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all shrink-0"
+                >
+                  <ArrowLeft size={20} />
+                </button>
+                <div className="section-label w-fit m-0 shrink h-auto min-h-[38px] py-2">
+                  <Sparkles size={14} className="shrink-0" />
+                  <span className="whitespace-normal leading-tight text-center">Calculadoras e Simuladores</span>
+                </div>
               </div>
               <h2 className="section-title mb-4">Ferramentas de Gestão</h2>
               <p className="section-copy max-w-2xl mx-auto">

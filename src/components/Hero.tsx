@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { DatabaseZap, ShieldCheck, Sparkles } from "lucide-react"
 import logoMain from "../assets/img/logo.png"
+import { getCampanhaUrl } from "../App"
 
 export default function Hero() {
   const scrollToServices = () => {
@@ -53,29 +54,28 @@ export default function Hero() {
                 href="https://share.google/ZDrIBH8t9kXoMq5nJ"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)]"
+                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] order-1 sm:order-1"
               >
                 Portal do Cliente
               </a>
               <Link
                 to="/ferramentas"
-                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10"
+                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 order-3 sm:order-2"
               >
                 Ferramentas
               </Link>
               <button
                 onClick={scrollToServices}
-                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] order-4 sm:order-3"
+                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] order-2 sm:order-3"
               >
                 Conheça nossas soluções
               </button>
-              <Link
-                to="/abrir-minha-empresa"
-                state={{ fromInternalLink: true }}
-                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 order-3 sm:order-4"
+              <a
+                href={getCampanhaUrl()}
+                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 order-4 sm:order-4"
               >
                 Abrir minha empresa
-              </Link>
+              </a>
             </div>
 
             <div className="mt-10 hidden gap-4 sm:grid sm:grid-cols-3">

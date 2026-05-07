@@ -9,7 +9,8 @@ import {
 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { FaWhatsapp } from "react-icons/fa"
-import { Link } from "react-router-dom"
+
+import { getCampanhaUrl } from "../App"
 
 interface ServiceCardProps {
   icon: React.ReactNode
@@ -131,13 +132,12 @@ export default function Services() {
             <FaWhatsapp className="text-2xl" />
             Fale com um especialista
           </a>
-          <Link
-            to="/abrir-minha-empresa"
-            state={{ fromInternalLink: true }}
+          <a
+            href={getCampanhaUrl()}
             className="tech-button-primary border border-white/15 bg-white/6 px-10 py-4 text-lg text-white hover:bg-white/10 text-center w-full justify-center"
           >
             Abrir minha empresa
-          </Link>
+          </a>
         </div>
       </div>
     </section>
