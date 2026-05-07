@@ -11,7 +11,6 @@ import {
   ArrowRight
 } from "lucide-react"
 
-// --- Helpers for Currency Mask ---
 const parseCurrencyString = (value: string): number | "" => {
   const onlyDigits = value.replace(/\D/g, "")
   if (!onlyDigits) return ""
@@ -22,8 +21,6 @@ const formatCurrencyInput = (value: number | ""): string => {
   if (value === "") return ""
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
 }
-
-// --- Subcomponents for Calculators ---
 
 function CalculadoraIRPF() {
   const [rendimento, setRendimento] = useState<number | "">("")
@@ -184,10 +181,9 @@ function calcularAliquotaEfetivaSimples(rbt12: number, anexo: typeof tabelasSimp
   if (rbt12 === 0) return { aliquotaEfetiva: anexo[0].aliquota * 100 }; //primeira faixa se não houver faturamento anterior
   
   const faixa = anexo.find(f => rbt12 <= f.limite) || anexo[anexo.length - 1];
-  const aliquotaEfetiva = ((rbt12 * faixa.aliquota) - faixa.deducao) / rbt12;
   
   return {
-    aliquotaEfetiva: aliquotaEfetiva * 100 //porcentagem
+    aliquotaEfetiva: faixa.aliquota * 100 //porcentagem
   };
 }
 
@@ -199,8 +195,6 @@ function CalculadoraPJ() {
   const [resultado, setResultado] = useState<{
     simplesAliquota: number
     simplesTotal: number
-    lucroAliquota: number
-    lucroTotal: number
   } | null>(null)
 
   const formatCurrency = (val: number) =>
@@ -208,7 +202,7 @@ function CalculadoraPJ() {
 
   const calcularPJ = () => {
     const fMensal = Number(faturamento) || 0;
-    // Se a empresa for nova, projeta-se o RBT12 com base no faturamento mensal
+    //se a empresa for nova, o rbt12 é feito com base no faturamento mensal
     const r12 = Number(rbt12) > 0 ? Number(rbt12) : fMensal * 12;
 
     let tabelaAtiva = tabelasSimples.anexoIII;
@@ -220,24 +214,9 @@ function CalculadoraPJ() {
     const calculoSimples = calcularAliquotaEfetivaSimples(r12, tabelaAtiva);
     let simplesAliquotaEfetiva = calculoSimples.aliquotaEfetiva;
     
-    // Lucro Presumido - Estimativas (PIS/COFINS, IRPJ, CSLL + ISS ou ICMS)
-    let lucroAliquota = 0;
-    if (anexoSelecionado === "anexoI") {
-      // PIS/COFINS (3.65%), IRPJ/CSLL (~2.28%), ICMS (Média ~18%) => ~23.93%
-      lucroAliquota = 23.93; 
-    } else if (anexoSelecionado === "anexoII") {
-      // Similiar ao comércio, mas pode variar dependendo do IPI
-      lucroAliquota = 23.93;
-    } else {
-      // Serviços: PIS/COFINS (3.65%), IRPJ/CSLL (7.68%), ISS (Média ~5%) => ~16.33%
-      lucroAliquota = 16.33; 
-    }
-
     setResultado({
       simplesAliquota: simplesAliquotaEfetiva,
-      simplesTotal: fMensal * (simplesAliquotaEfetiva / 100),
-      lucroAliquota,
-      lucroTotal: fMensal * (lucroAliquota / 100),
+      simplesTotal: fMensal * (simplesAliquotaEfetiva / 100)
     })
   }
 
@@ -266,9 +245,12 @@ function CalculadoraPJ() {
             inputMode="numeric"
             value={formatCurrencyInput(rbt12)}
             onChange={(e) => setRbt12(parseCurrencyString(e.target.value))}
-            placeholder="Deixe 0 se empresa nova"
+            placeholder="R$ 0,00"
             className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
           />
+          <p className="text-xs text-slate-400 mt-2">
+            Deixe R$ 0,00 se a empresa não tiver 12 meses de criação
+          </p>
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -296,44 +278,33 @@ function CalculadoraPJ() {
         onClick={calcularPJ}
         className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
       >
-        Comparar Regimes
+        Simular Impostos
         <ArrowRight size={18} />
       </button>
 
       {resultado && (
         <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <h3 className="text-lg font-medium text-white mb-4">Estimativa de Impostos Mensais (Comparativo)</h3>
-          <div className="grid md:grid-cols-2 gap-6">
+          <h3 className="text-lg font-medium text-white mb-4">Estimativa de Impostos Mensais</h3>
+          <div className="max-w-xl mx-auto">
             <div className="rounded-lg bg-slate-800/50 p-4 border border-white/5 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-2 bg-gradient-to-bl from-cyan-500/20 to-transparent rounded-bl-lg">
                 <Sparkles size={14} className="text-cyan-400" />
               </div>
               <h4 className="text-md font-semibold text-cyan-300 mb-3">Simples Nacional</h4>
               <div className="flex justify-between text-sm mb-2 text-slate-300">
-                <span>Alíquota Efetiva:</span>
+                <span>Alíquota (Porcentagem da Faixa):</span>
                 <span className="text-white font-medium">{resultado.simplesAliquota.toFixed(2)}%</span>
               </div>
               <div className="flex justify-between font-medium text-white pt-3 border-t border-white/10">
-                <span>Total Imposto Mensal:</span>
+                <span>Total Imposto Mensal Estimado:</span>
                 <span className="text-[#7ee7ff] text-lg">{formatCurrency(resultado.simplesTotal)}</span>
-              </div>
-            </div>
-            <div className="rounded-lg bg-slate-800/50 p-4 border border-white/5">
-              <h4 className="text-md font-semibold text-slate-300 mb-3">Lucro Presumido</h4>
-              <div className="flex justify-between text-sm mb-2 text-slate-300">
-                <span>Alíquota Aprox. (Fed+Mun/Est):</span>
-                <span className="text-white font-medium">{resultado.lucroAliquota.toFixed(2)}%</span>
-              </div>
-              <div className="flex justify-between font-medium text-white pt-3 border-t border-white/10">
-                <span>Total Imposto Mensal:</span>
-                <span className="text-slate-300 text-lg">{formatCurrency(resultado.lucroTotal)}</span>
               </div>
             </div>
           </div>
           <div className="mt-4 p-3 bg-cyan-900/20 border border-cyan-500/20 rounded-lg">
             <p className="text-sm text-cyan-100 flex items-start gap-2">
               <span className="text-cyan-400 font-bold">Dica:</span> 
-              A alíquota efetiva do Simples Nacional é calculada sobre a receita bruta dos últimos 12 meses (RBT12). Com RBT12 de {formatCurrency(Number(rbt12) || Number(faturamento) * 12)}, sua empresa estaria nesta faixa de tributação.
+              A alíquota do Simples Nacional considera a receita bruta dos últimos 12 meses (RBT12). Com RBT12 de {formatCurrency(Number(rbt12) || Number(faturamento) * 12)}, sua empresa estaria nesta faixa de tributação.
             </p>
           </div>
           <p className="text-xs text-slate-500 pt-4 text-center">
@@ -404,8 +375,8 @@ function CalculadoraFuncionario() {
     const fgts = (s + feriasMensal + decimoTerceiroMensal) * 0.08
     
     let inssPatronal = 0
-    if (regime === "lucro" || regime === "simples-iv") {
-      // Aprox 27.8% (20% patronal + rat/terceiros)
+    if (regime === "simples-iv") {
+      //27.8% (20% patronal + rat + terceiros)
       inssPatronal = (s + feriasMensal + decimoTerceiroMensal) * 0.278
     }
 
@@ -448,7 +419,6 @@ function CalculadoraFuncionario() {
           >
             <option value="simples" style={{ color: '#000', background: '#fff' }}>Simples Nacional (Anexos I, II, III, V)</option>
             <option value="simples-iv" style={{ color: '#000', background: '#fff' }}>Simples Nacional (Anexo IV)</option>
-            <option value="lucro" style={{ color: '#000', background: '#fff' }}>Lucro Presumido / Real</option>
           </select>
         </div>
       </div>
@@ -500,8 +470,6 @@ function CalculadoraFuncionario() {
   )
 }
 
-// --- Main Page ---
-
 export default function Ferramentas() {
   const navigate = useNavigate()
 
@@ -520,10 +488,10 @@ export default function Ferramentas() {
     },
     {
       id: "tributario-pj",
-      title: "Tributos PJ",
+      title: "Alíquota Efetiva",
       icon: Building2,
-      heading: "Planejamento Tributário (PJ)",
-      subtitle: "Compare Simples Nacional x Lucro Presumido.",
+      heading: "Calculadora Alíquota Efetiva",
+      subtitle: "Calcule a alíquota efetiva do Simples Nacional.",
       content: <CalculadoraPJ />
     },
     {
@@ -582,7 +550,6 @@ export default function Ferramentas() {
             </div>
 
             <div className="space-y-4">
-              {/* Top Bar */}
               <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950/40 to-slate-900/20 p-4 backdrop-blur-lg">
                 <button
                   onClick={handlePrevMenu}
@@ -605,7 +572,6 @@ export default function Ferramentas() {
                 </button>
               </div>
 
-              {/* Main Container */}
               <div className="space-y-3">
                 <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
                   <h2 className="mb-2 text-xl font-semibold tracking-tight text-slate-100">
@@ -620,7 +586,6 @@ export default function Ferramentas() {
             </div>
           </div>
 
-          {/* Desktop Layout */}
           <div className="mx-auto hidden w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:block">
             <div className="mb-12 max-w-4xl mx-auto text-center md:text-left md:mx-0">
               <div className="flex gap-4 items-center">
