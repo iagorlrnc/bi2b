@@ -9,7 +9,7 @@ import {
   ChevronRight,
   ArrowLeft,
   ArrowRight,
-  Info
+  Info,
 } from "lucide-react"
 
 const parseCurrencyString = (value: string): number | "" => {
@@ -20,7 +20,10 @@ const parseCurrencyString = (value: string): number | "" => {
 
 const formatCurrencyInput = (value: number | ""): string => {
   if (value === "") return ""
-  return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value)
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(value)
 }
 
 function CalculadoraIRPF() {
@@ -34,11 +37,14 @@ function CalculadoraIRPF() {
     imposto: number
     redutor?: number
   } | null>(null)
-  
+
   const [erro, setErro] = useState("")
 
   const formatCurrency = (val: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val)
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(val)
 
   const calcularIRPF = () => {
     const r = Number(rendimento) || 0
@@ -55,7 +61,7 @@ function CalculadoraIRPF() {
     let aliquota = 0
     let parcela = 0
 
-    if (base <= 2428.80) {
+    if (base <= 2428.8) {
       aliquota = 0
       parcela = 0
     } else if (base <= 2826.65) {
@@ -72,23 +78,30 @@ function CalculadoraIRPF() {
       parcela = 908.73
     }
 
-    let impostoBruto = Math.max(0, base * (aliquota / 100) - parcela)
-    let impostoFinal = impostoBruto;
-    let redutorAplicado = 0;
+    const impostoBruto = Math.max(0, base * (aliquota / 100) - parcela)
+    let impostoFinal = impostoBruto
+    let redutorAplicado = 0
 
     if (base <= 5000) {
-      aliquota = 0;
-      parcela = 0;
-      impostoFinal = 0;
-      redutorAplicado = 0;
+      aliquota = 0
+      parcela = 0
+      impostoFinal = 0
+      redutorAplicado = 0
     } else if (base > 5000 && base <= 7350) {
-      redutorAplicado = Math.max(0, 978.62 - (0.133145 * base));
-      impostoFinal = Math.max(0, impostoBruto - redutorAplicado);
+      redutorAplicado = Math.max(0, 978.62 - 0.133145 * base)
+      impostoFinal = Math.max(0, impostoBruto - redutorAplicado)
     }
 
-    const aliquotaEfetiva = base > 0 ? (impostoFinal / base) * 100 : 0;
+    const aliquotaEfetiva = base > 0 ? (impostoFinal / base) * 100 : 0
 
-    setResultado({ base, aliquota, aliquotaEfetiva, parcela, imposto: impostoFinal, redutor: redutorAplicado })
+    setResultado({
+      base,
+      aliquota,
+      aliquotaEfetiva,
+      parcela,
+      imposto: impostoFinal,
+      redutor: redutorAplicado,
+    })
   }
 
   return (
@@ -139,107 +152,169 @@ function CalculadoraIRPF() {
         <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
             <Calculator className="text-[#7ee7ff]" size={24} />
-            <h3 className="text-xl font-medium text-white">Resumo do Imposto</h3>
+            <h3 className="text-xl font-medium text-white">
+              Resumo do Imposto
+            </h3>
           </div>
-          
+
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div className="bg-[#0a4a62]/30 border border-[#7ee7ff]/20 rounded-lg p-5">
               <div className="group relative flex items-center gap-1 cursor-help mb-2">
-                <span className="text-sm text-cyan-200">O que você vai pagar (IRRF):</span>
-                <Info size={14} className="text-cyan-400 hover:text-cyan-300 transition-colors" />
+                <span className="text-sm text-cyan-200">
+                  O que você vai pagar (IRRF):
+                </span>
+                <Info
+                  size={14}
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  O valor final, em reais, que você de fato terá que pagar ou que será retido na fonte.
+                  O valor final, em reais, que você de fato terá que pagar ou
+                  que será retido na fonte.
                 </div>
               </div>
-              <span className="text-3xl font-bold text-[#7ee7ff]">{formatCurrency(resultado.imposto)}</span>
+              <span className="text-3xl font-bold text-[#7ee7ff]">
+                {formatCurrency(resultado.imposto)}
+              </span>
             </div>
-            
+
             <div className="bg-emerald-900/20 border border-emerald-500/20 rounded-lg p-5">
               <div className="group relative flex items-center gap-1 cursor-help mb-2">
-                <span className="text-sm text-emerald-200">Peso real do imposto:</span>
-                <Info size={14} className="text-emerald-400 hover:text-emerald-300 transition-colors" />
+                <span className="text-sm text-emerald-200">
+                  Peso real do imposto:
+                </span>
+                <Info
+                  size={14}
+                  className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  A porcentagem verdadeira que o imposto representa em relação ao seu salário. Como o imposto é progressivo, o peso real no seu bolso (Alíquota Efetiva) é sempre menor que a tabela.
+                  A porcentagem verdadeira que o imposto representa em relação
+                  ao seu salário. Como o imposto é progressivo, o peso real no
+                  seu bolso (Alíquota Efetiva) é sempre menor que a tabela.
                 </div>
               </div>
-              <span className="text-3xl font-bold text-emerald-400">{resultado.aliquotaEfetiva.toFixed(2)}%</span>
+              <span className="text-3xl font-bold text-emerald-400">
+                {resultado.aliquotaEfetiva.toFixed(2)}%
+              </span>
             </div>
           </div>
 
           <div className="space-y-3 text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-white/5">
-            <h4 className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">Como chegamos nesse valor? (Cálculo Técnico)</h4>
-            
+            <h4 className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">
+              Como chegamos nesse valor? (Cálculo Técnico)
+            </h4>
+
             <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
                 <span>Base de Cálculo:</span>
-                <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                <Info
+                  size={14}
+                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  Rendimento bruto menos as deduções informadas. É o valor sobre o qual o imposto será calculado.
+                  Rendimento bruto menos as deduções informadas. É o valor sobre
+                  o qual o imposto será calculado.
                 </div>
               </div>
-              <span className="font-medium text-white">{formatCurrency(resultado.base)}</span>
+              <span className="font-medium text-white">
+                {formatCurrency(resultado.base)}
+              </span>
             </div>
-            
+
             <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
                 <span>Parcela a Deduzir:</span>
-                <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                <Info
+                  size={14}
+                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  Valor fixo subtraído para garantir que a alíquota nominal seja cobrada apenas sobre a parte do salário que ultrapassou a faixa anterior.
+                  Valor fixo subtraído para garantir que a alíquota nominal seja
+                  cobrada apenas sobre a parte do salário que ultrapassou a
+                  faixa anterior.
                 </div>
               </div>
-              <span className="font-medium text-white">{formatCurrency(resultado.parcela)}</span>
+              <span className="font-medium text-white">
+                {formatCurrency(resultado.parcela)}
+              </span>
             </div>
-            
+
             <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
                 <span>Alíquota Nominal:</span>
-                <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                <Info
+                  size={14}
+                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  A porcentagem oficial da tabela da Receita Federal na qual a sua Base de Cálculo se enquadrou.
+                  A porcentagem oficial da tabela da Receita Federal na qual a
+                  sua Base de Cálculo se enquadrou.
                 </div>
               </div>
-              <span className="font-medium text-white">{resultado.aliquota}%</span>
+              <span className="font-medium text-white">
+                {resultado.aliquota}%
+              </span>
             </div>
-            
+
             {resultado.redutor !== undefined && resultado.redutor > 0 && (
               <div className="flex justify-between border-b border-white/5 pb-2 text-emerald-400 text-sm">
                 <div className="group relative flex items-center gap-1 cursor-help">
                   <span>Desconto Linear (Redutor 2026):</span>
-                  <Info size={14} className="text-emerald-500/70 hover:text-emerald-400 transition-colors" />
+                  <Info
+                    size={14}
+                    className="text-emerald-500/70 hover:text-emerald-400 transition-colors"
+                  />
                   <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                    Benefício da Lei 15.270/2025. Desconto matemático aplicado diretamente no imposto bruto para rendas entre R$ 5.000,01 e R$ 7.350,00.
+                    Benefício da Lei 15.270/2025. Desconto matemático aplicado
+                    diretamente no imposto bruto para rendas entre R$ 5.000,01 e
+                    R$ 7.350,00.
                   </div>
                 </div>
-                <span className="font-medium">- {formatCurrency(resultado.redutor)}</span>
+                <span className="font-medium">
+                  - {formatCurrency(resultado.redutor)}
+                </span>
               </div>
             )}
-            
+
             <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
                 <span>Alíquota Efetiva Real:</span>
-                <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                <Info
+                  size={14}
+                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  A porcentagem verdadeira que você está pagando no fim das contas. O peso real do imposto no seu bolso.
+                  A porcentagem verdadeira que você está pagando no fim das
+                  contas. O peso real do imposto no seu bolso.
                 </div>
               </div>
-              <span className="font-medium text-emerald-400">{resultado.aliquotaEfetiva.toFixed(2)}%</span>
+              <span className="font-medium text-emerald-400">
+                {resultado.aliquotaEfetiva.toFixed(2)}%
+              </span>
             </div>
-            
+
             <div className="flex justify-between pt-1 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
-                <span className="font-semibold text-[#7ee7ff]">Imposto Devido:</span>
-                <Info size={14} className="text-[#7ee7ff]/70 hover:text-[#7ee7ff] transition-colors" />
+                <span className="font-semibold text-[#7ee7ff]">
+                  Imposto Devido:
+                </span>
+                <Info
+                  size={14}
+                  className="text-[#7ee7ff]/70 hover:text-[#7ee7ff] transition-colors"
+                />
                 <div className="absolute bottom-full right-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  O valor final, em reais, que você de fato terá que pagar ou que será retido na fonte.
+                  O valor final, em reais, que você de fato terá que pagar ou
+                  que será retido na fonte.
                 </div>
               </div>
-              <span className="font-semibold text-[#7ee7ff]">{formatCurrency(resultado.imposto)}</span>
+              <span className="font-semibold text-[#7ee7ff]">
+                {formatCurrency(resultado.imposto)}
+              </span>
             </div>
           </div>
-          
+
           <p className="text-xs text-slate-500 pt-4 text-center">
-            *Tabela IRPF 2026 (Lei nº 15.270/2025). Consulte o contador para dados exatos.
+            *Tabela IRPF 2026 (Lei nº 15.270/2025). Consulte o contador para
+            dados exatos.
           </p>
         </div>
       )}
@@ -260,10 +335,10 @@ const tabelasSimples = {
   anexoII: [
     { limite: 180000, aliquota: 0.045, deducao: 0 },
     { limite: 360000, aliquota: 0.078, deducao: 5940 },
-    { limite: 720000, aliquota: 0.10, deducao: 13860 },
+    { limite: 720000, aliquota: 0.1, deducao: 13860 },
     { limite: 1800000, aliquota: 0.112, deducao: 22500 },
     { limite: 3600000, aliquota: 0.147, deducao: 85500 },
-    { limite: 4800000, aliquota: 0.30, deducao: 720000 },
+    { limite: 4800000, aliquota: 0.3, deducao: 720000 },
   ],
   anexoIII: [
     { limite: 180000, aliquota: 0.06, deducao: 0 },
@@ -288,17 +363,20 @@ const tabelasSimples = {
     { limite: 1800000, aliquota: 0.205, deducao: 17100 },
     { limite: 3600000, aliquota: 0.23, deducao: 62100 },
     { limite: 4800000, aliquota: 0.305, deducao: 540000 },
-  ]
-};
+  ],
+}
 
-function calcularAliquotaEfetivaSimples(rbt12: number, anexo: typeof tabelasSimples.anexoI) {
-  if (rbt12 === 0) return { aliquotaEfetiva: anexo[0].aliquota * 100 }; //primeira faixa se não houver faturamento anterior
+function calcularAliquotaEfetivaSimples(
+  rbt12: number,
+  anexo: typeof tabelasSimples.anexoI,
+) {
+  if (rbt12 === 0) return { aliquotaEfetiva: anexo[0].aliquota * 100 } //primeira faixa se não houver faturamento anterior
 
-  const faixa = anexo.find(f => rbt12 <= f.limite) || anexo[anexo.length - 1];
+  const faixa = anexo.find((f) => rbt12 <= f.limite) || anexo[anexo.length - 1]
 
   return {
-    aliquotaEfetiva: faixa.aliquota * 100 //porcentagem
-  };
+    aliquotaEfetiva: faixa.aliquota * 100, //porcentagem
+  }
 }
 
 function CalculadoraPJ() {
@@ -320,75 +398,107 @@ function CalculadoraPJ() {
       csllPerc: number
     }
   } | null>(null)
-  
+
   const [erro, setErro] = useState("")
 
   const formatCurrency = (val: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val)
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(val)
+
+  const getFaixaSimplesNacional = (rbt12Valor: number) => {
+    let tabelaAtiva = tabelasSimples.anexoIII
+    if (anexoSelecionado === "anexoI") tabelaAtiva = tabelasSimples.anexoI
+    if (anexoSelecionado === "anexoII") tabelaAtiva = tabelasSimples.anexoII
+    if (anexoSelecionado === "anexoIV") tabelaAtiva = tabelasSimples.anexoIV
+    if (anexoSelecionado === "anexoV") tabelaAtiva = tabelasSimples.anexoV
+
+    const faixaIndex = tabelaAtiva.findIndex(
+      (faixa) => rbt12Valor <= faixa.limite,
+    )
+    const faixaNum = faixaIndex >= 0 ? faixaIndex + 1 : tabelaAtiva.length
+    const faixaOrdinal: Record<number, string> = {
+      1: "1ª",
+      2: "2ª",
+      3: "3ª",
+      4: "4ª",
+      5: "5ª",
+      6: "6ª",
+    }
+
+    return faixaOrdinal[faixaNum] || `${faixaNum}ª`
+  }
 
   const calcularPJ = () => {
-    const fMensal = Number(faturamento) || 0;
-    const r12 = Number(rbt12) || 0;
-    
+    const fMensal = Number(faturamento) || 0
+    const r12 = Number(rbt12) || 0
+
     if (fMensal <= 0 && r12 <= 0) {
-      setErro("Por favor, insira o faturamento mensal ou a receita bruta dos últimos 12 meses.")
+      setErro(
+        "Por favor, insira o faturamento mensal ou a receita bruta dos últimos 12 meses.",
+      )
       setResultado(null)
       setTimeout(() => setErro(""), 5000)
       return
     }
     setErro("")
     //se a empresa for nova, o rbt12 é feito com base no faturamento mensal
-    const rbt12Final = r12 > 0 ? r12 : fMensal * 12;
+    const rbt12Final = r12 > 0 ? r12 : fMensal * 12
 
-    let tabelaAtiva = tabelasSimples.anexoIII;
-    if (anexoSelecionado === "anexoI") tabelaAtiva = tabelasSimples.anexoI;
-    if (anexoSelecionado === "anexoII") tabelaAtiva = tabelasSimples.anexoII;
-    if (anexoSelecionado === "anexoIV") tabelaAtiva = tabelasSimples.anexoIV;
-    if (anexoSelecionado === "anexoV") tabelaAtiva = tabelasSimples.anexoV;
+    let tabelaAtiva = tabelasSimples.anexoIII
+    if (anexoSelecionado === "anexoI") tabelaAtiva = tabelasSimples.anexoI
+    if (anexoSelecionado === "anexoII") tabelaAtiva = tabelasSimples.anexoII
+    if (anexoSelecionado === "anexoIV") tabelaAtiva = tabelasSimples.anexoIV
+    if (anexoSelecionado === "anexoV") tabelaAtiva = tabelasSimples.anexoV
 
-    const calculoSimples = calcularAliquotaEfetivaSimples(rbt12Final, tabelaAtiva);
-    let simplesAliquotaEfetiva = calculoSimples.aliquotaEfetiva;
+    const calculoSimples = calcularAliquotaEfetivaSimples(
+      rbt12Final,
+      tabelaAtiva,
+    )
+    const simplesAliquotaEfetiva = calculoSimples.aliquotaEfetiva
 
-    const fMensalBase = fMensal > 0 ? fMensal : (rbt12Final / 12);
+    const fMensalBase = fMensal > 0 ? fMensal : rbt12Final / 12
 
     // Lucro Presumido - Estimativas Realistas
-    let lucroTotal = 0;
-    let lucroAliquota = 0;
-    let lucroBreakdown = undefined;
+    let lucroTotal = 0
+    let lucroAliquota = 0
+    let lucroBreakdown = undefined
 
     if (fMensalBase > 0) {
-      const pisCofins = fMensalBase * 0.0365; // PIS/COFINS (Cumulativo: 0.65% + 3%)
+      const pisCofins = fMensalBase * 0.0365 // PIS/COFINS (Cumulativo: 0.65% + 3%)
 
-      let presuncaoIRPJ = 0;
-      let presuncaoCSLL = 0;
+      let presuncaoIRPJ = 0
+      let presuncaoCSLL = 0
 
       if (anexoSelecionado === "anexoI" || anexoSelecionado === "anexoII") {
         // Comércio / Indústria
-        presuncaoIRPJ = fMensalBase * 0.08;
-        presuncaoCSLL = fMensalBase * 0.12;
+        presuncaoIRPJ = fMensalBase * 0.08
+        presuncaoCSLL = fMensalBase * 0.12
       } else {
         // Serviços (Anexo III, IV, V)
-        presuncaoIRPJ = fMensalBase * 0.32;
-        presuncaoCSLL = fMensalBase * 0.32;
+        presuncaoIRPJ = fMensalBase * 0.32
+        presuncaoCSLL = fMensalBase * 0.32
       }
 
-      const irpjBase = presuncaoIRPJ * 0.15;
-      const irpjAdicional = presuncaoIRPJ > 20000 ? (presuncaoIRPJ - 20000) * 0.10 : 0;
-      const irpjTotal = irpjBase + irpjAdicional;
+      const irpjBase = presuncaoIRPJ * 0.15
+      const irpjAdicional =
+        presuncaoIRPJ > 20000 ? (presuncaoIRPJ - 20000) * 0.1 : 0
+      const irpjTotal = irpjBase + irpjAdicional
 
-      const csllTotal = presuncaoCSLL * 0.09;
+      const csllTotal = presuncaoCSLL * 0.09
 
-      lucroTotal = pisCofins + irpjTotal + csllTotal;
-      lucroAliquota = (lucroTotal / fMensalBase) * 100;
-      
+      lucroTotal = pisCofins + irpjTotal + csllTotal
+      lucroAliquota = (lucroTotal / fMensalBase) * 100
+
       lucroBreakdown = {
         pisCofins,
         irpj: irpjTotal,
         csll: csllTotal,
         pisCofinsPerc: (pisCofins / fMensalBase) * 100,
         irpjPerc: (irpjTotal / fMensalBase) * 100,
-        csllPerc: (csllTotal / fMensalBase) * 100
-      };
+        csllPerc: (csllTotal / fMensalBase) * 100,
+      }
     }
 
     setResultado({
@@ -396,7 +506,7 @@ function CalculadoraPJ() {
       simplesTotal: fMensalBase * (simplesAliquotaEfetiva / 100),
       lucroAliquota,
       lucroTotal,
-      lucroBreakdown
+      lucroBreakdown,
     })
   }
 
@@ -411,7 +521,9 @@ function CalculadoraPJ() {
             type="text"
             inputMode="numeric"
             value={formatCurrencyInput(faturamento)}
-            onChange={(e) => setFaturamento(parseCurrencyString(e.target.value))}
+            onChange={(e) =>
+              setFaturamento(parseCurrencyString(e.target.value))
+            }
             placeholder="R$ 0,00"
             className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
           />
@@ -441,11 +553,36 @@ function CalculadoraPJ() {
             onChange={(e) => setAnexoSelecionado(e.target.value)}
             className="w-full rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-3 text-white focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff] cursor-pointer"
           >
-            <option value="anexoI" style={{ color: '#000', background: '#fff' }}>Anexo I</option>
-            <option value="anexoII" style={{ color: '#000', background: '#fff' }}>Anexo II</option>
-            <option value="anexoIII" style={{ color: '#000', background: '#fff' }}>Anexo III</option>
-            <option value="anexoIV" style={{ color: '#000', background: '#fff' }}>Anexo IV</option>
-            <option value="anexoV" style={{ color: '#000', background: '#fff' }}>Anexo V</option>
+            <option
+              value="anexoI"
+              style={{ color: "#000", background: "#fff" }}
+            >
+              Anexo I
+            </option>
+            <option
+              value="anexoII"
+              style={{ color: "#000", background: "#fff" }}
+            >
+              Anexo II
+            </option>
+            <option
+              value="anexoIII"
+              style={{ color: "#000", background: "#fff" }}
+            >
+              Anexo III
+            </option>
+            <option
+              value="anexoIV"
+              style={{ color: "#000", background: "#fff" }}
+            >
+              Anexo IV
+            </option>
+            <option
+              value="anexoV"
+              style={{ color: "#000", background: "#fff" }}
+            >
+              Anexo V
+            </option>
           </select>
         </div>
       </div>
@@ -465,8 +602,10 @@ function CalculadoraPJ() {
       {resultado && (
         <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
-            <Building2 className="text-[#7ee7ff]" size={24} />
-            <h3 className="text-xl font-medium text-white">Comparativo de Impostos Mensais</h3>
+            <Calculator className="text-[#7ee7ff]" size={24} />
+            <h3 className="text-xl font-medium text-white">
+              Comparativo de Impostos Mensais
+            </h3>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -475,88 +614,145 @@ function CalculadoraPJ() {
                 <Sparkles size={14} className="text-cyan-400" />
               </div>
               <div className="group relative flex items-center gap-1 cursor-help mb-2">
-                <span className="text-sm font-semibold text-cyan-300">Simples Nacional (Imposto Devido):</span>
-                <Info size={14} className="text-cyan-400 hover:text-cyan-300 transition-colors" />
+                <span className="text-sm font-semibold text-cyan-300">
+                  Simples Nacional:
+                </span>
+                <Info
+                  size={14}
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
                   O valor pago na guia única (DAS) do Simples Nacional.
                 </div>
               </div>
-              <span className="text-3xl font-bold text-[#7ee7ff]">{formatCurrency(resultado.simplesTotal)}</span>
+              <span className="text-3xl font-bold text-[#7ee7ff]">
+                {formatCurrency(resultado.simplesTotal)}
+              </span>
             </div>
-            
+
             <div className="bg-slate-800/50 border border-white/10 rounded-lg p-5 flex flex-col justify-between">
               <div>
                 <div className="group relative flex items-center gap-1 cursor-help mb-2">
-                  <span className="text-sm font-semibold text-slate-300">Lucro Presumido (Imposto Devido):</span>
-                  <Info size={14} className="text-slate-500 hover:text-slate-400 transition-colors" />
+                  <span className="text-sm font-semibold text-slate-300">
+                    Lucro Presumido:
+                  </span>
+                  <Info
+                    size={14}
+                    className="text-slate-500 hover:text-slate-400 transition-colors"
+                  />
                   <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                    O valor somado das guias federais (DARFs) no Lucro Presumido.
+                    O valor somado das guias federais (DARFs) no Lucro
+                    Presumido.
                   </div>
                 </div>
-                <span className="text-3xl font-bold text-slate-200">{formatCurrency(resultado.lucroTotal)}</span>
+                <span className="text-3xl font-bold text-slate-200">
+                  {formatCurrency(resultado.lucroTotal)}
+                </span>
               </div>
               <p className="text-[10px] leading-tight text-slate-500 pt-3 mt-3 border-t border-white/10 text-center">
-                *Os impostos ICMS, IPI e ISS não foram incluídos nos cálculos pois variam em cada situação, mas podem ser contabilizados no valor final.
+                *Os impostos ICMS, IPI e ISS não foram incluídos nos cálculos
+                pois variam em cada situação, mas podem ser contabilizados no
+                valor final.
               </p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="space-y-3 text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-white/5">
-              <h4 className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">Detalhamento: Simples Nacional</h4>
+              <h4 className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">
+                Detalhamento: Simples Nacional
+              </h4>
               <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
                 <div className="group relative flex items-center gap-1 cursor-help">
                   <span>Alíquota Efetiva:</span>
-                  <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                  <Info
+                    size={14}
+                    className="text-slate-500 hover:text-cyan-400 transition-colors"
+                  />
                   <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                    A alíquota calculada com base na receita dos últimos 12 meses (RBT12), já considerando o valor a deduzir.
+                    A alíquota calculada com base na receita dos últimos 12
+                    meses (RBT12), já considerando o valor a deduzir.
                   </div>
                 </div>
-                <span className="text-white font-medium">{resultado.simplesAliquota.toFixed(2)}%</span>
+                <span className="text-white font-medium">
+                  {resultado.simplesAliquota.toFixed(2)}%
+                </span>
               </div>
               <div className="flex justify-between pt-1 text-sm">
                 <div className="group relative flex items-center gap-1 cursor-help">
-                  <span className="font-semibold text-[#7ee7ff]">Total Imposto Mensal:</span>
-                  <Info size={14} className="text-[#7ee7ff]/70 hover:text-[#7ee7ff] transition-colors" />
+                  <span className="font-semibold text-[#7ee7ff]">
+                    Total Imposto Mensal:
+                  </span>
+                  <Info
+                    size={14}
+                    className="text-[#7ee7ff]/70 hover:text-[#7ee7ff] transition-colors"
+                  />
                   <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
                     O valor pago na guia única (DAS) do Simples Nacional.
                   </div>
                 </div>
-                <span className="font-semibold text-[#7ee7ff]">{formatCurrency(resultado.simplesTotal)}</span>
+                <span className="font-semibold text-[#7ee7ff]">
+                  {formatCurrency(resultado.simplesTotal)}
+                </span>
               </div>
             </div>
 
             <div className="space-y-3 text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-white/5 flex flex-col">
-              <h4 className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">Detalhamento: Lucro Presumido</h4>
-              
+              <h4 className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">
+                Detalhamento: Lucro Presumido
+              </h4>
+
               {resultado.lucroBreakdown && (
                 <div className="space-y-2 mb-4 pb-3 border-b border-white/10 text-xs text-slate-400">
                   <div className="flex justify-between">
                     <div className="group relative flex items-center gap-1 cursor-help">
-                      <span>PIS/COFINS ({resultado.lucroBreakdown.pisCofinsPerc.toFixed(2)}%):</span>
-                      <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                      <span>
+                        PIS/COFINS (
+                        {resultado.lucroBreakdown.pisCofinsPerc.toFixed(2)}%):
+                      </span>
+                      <Info
+                        size={14}
+                        className="text-slate-500 hover:text-cyan-400 transition-colors"
+                      />
                       <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                        Impostos federais sobre a receita bruta (regime cumulativo de 3,65%).
+                        Impostos federais sobre a receita bruta (regime
+                        cumulativo de 3,65%).
                       </div>
                     </div>
-                    <span>{formatCurrency(resultado.lucroBreakdown.pisCofins)}</span>
+                    <span>
+                      {formatCurrency(resultado.lucroBreakdown.pisCofins)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <div className="group relative flex items-center gap-1 cursor-help">
-                      <span>IRPJ (com Adic.) ({resultado.lucroBreakdown.irpjPerc.toFixed(2)}%):</span>
-                      <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                      <span>
+                        IRPJ (com Adic.) (
+                        {resultado.lucroBreakdown.irpjPerc.toFixed(2)}%):
+                      </span>
+                      <Info
+                        size={14}
+                        className="text-slate-500 hover:text-cyan-400 transition-colors"
+                      />
                       <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                        Imposto de Renda da Pessoa Jurídica, somado ao adicional de 10% cobrado sobre o lucro presumido que exceder R$ 20.000/mês.
+                        Imposto de Renda da Pessoa Jurídica, somado ao adicional
+                        de 10% cobrado sobre o lucro presumido que exceder R$
+                        20.000/mês.
                       </div>
                     </div>
                     <span>{formatCurrency(resultado.lucroBreakdown.irpj)}</span>
                   </div>
                   <div className="flex justify-between">
                     <div className="group relative flex items-center gap-1 cursor-help">
-                      <span>CSLL ({resultado.lucroBreakdown.csllPerc.toFixed(2)}%):</span>
-                      <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                      <span>
+                        CSLL ({resultado.lucroBreakdown.csllPerc.toFixed(2)}%):
+                      </span>
+                      <Info
+                        size={14}
+                        className="text-slate-500 hover:text-cyan-400 transition-colors"
+                      />
                       <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                        Contribuição Social sobre o Lucro Líquido (alíquota de 9% sobre a base de presunção).
+                        Contribuição Social sobre o Lucro Líquido (alíquota de
+                        9% sobre a base de presunção).
                       </div>
                     </div>
                     <span>{formatCurrency(resultado.lucroBreakdown.csll)}</span>
@@ -567,38 +763,62 @@ function CalculadoraPJ() {
                 <div className="flex justify-between text-sm mb-2 text-slate-300">
                   <div className="group relative flex items-center gap-1 cursor-help">
                     <span>Alíquota Efetiva Aprox:</span>
-                    <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                    <Info
+                      size={14}
+                      className="text-slate-500 hover:text-cyan-400 transition-colors"
+                    />
                     <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                      O peso percentual total dos impostos federais sobre o seu faturamento bruto.
+                      O peso percentual total dos impostos federais sobre o seu
+                      faturamento bruto.
                     </div>
                   </div>
-                  <span className="text-white font-medium">{resultado.lucroAliquota.toFixed(2)}%</span>
+                  <span className="text-white font-medium">
+                    {resultado.lucroAliquota.toFixed(2)}%
+                  </span>
                 </div>
                 <div className="flex justify-between font-medium text-white pt-2 border-t border-white/10">
                   <div className="group relative flex items-center gap-1 cursor-help">
                     <span>Total Imposto Mensal:</span>
-                    <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                    <Info
+                      size={14}
+                      className="text-slate-500 hover:text-cyan-400 transition-colors"
+                    />
                     <div className="absolute bottom-full right-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                      O valor somado das guias federais (DARFs) no Lucro Presumido.
+                      O valor somado das guias federais (DARFs) no Lucro
+                      Presumido.
                     </div>
                   </div>
-                  <span className="text-slate-300 text-lg">{formatCurrency(resultado.lucroTotal)}</span>
+                  <span className="text-slate-300 text-lg">
+                    {formatCurrency(resultado.lucroTotal)}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-          
+
           <div className="mt-4 p-3 bg-cyan-900/20 border border-cyan-500/20 rounded-lg">
-            <p className="text-sm text-cyan-100 flex items-start gap-2">
-              <span className="text-cyan-400 font-bold">Dica:</span>
-              A alíquota do Simples Nacional considera a receita bruta dos últimos 12 meses (RBT12). Com RBT12 de {formatCurrency(Number(rbt12) || Number(faturamento) * 12)}, sua empresa estaria nesta faixa de tributação.
+            <p className="text-sm text-cyan-100">
+              <span className="text-cyan-400 font-bold">Dica:</span> No Simples
+              Nacional, a faixa da tabela é definida pelo faturamento acumulado
+              dos últimos 12 meses. Considerando o faturamento informado de{" "}
+              {formatCurrency(Number(rbt12) || Number(faturamento) * 12)}, sua
+              empresa se enquadra na{" "}
+              <strong>
+                {getFaixaSimplesNacional(
+                  Number(rbt12) || Number(faturamento) * 12,
+                )}{" "}
+                faixa
+              </strong>{" "}
+              da tabela do Simples Nacional.
             </p>
           </div>
         </div>
       )}
 
       <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6 overflow-hidden">
-        <h3 className="text-lg font-medium text-white mb-4">Empresas que se encaixam em cada Anexo</h3>
+        <h3 className="text-lg font-medium text-white mb-4">
+          Empresas que se encaixam em cada Anexo
+        </h3>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse text-sm text-slate-300">
             <thead>
@@ -609,24 +829,50 @@ function CalculadoraPJ() {
             </thead>
             <tbody className="divide-y divide-white/10">
               <tr className="hover:bg-white/5 transition-colors">
-                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo I</td>
-                <td className="p-3">Comércio: Revendedores em geral, restaurantes, padarias e afins.</td>
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">
+                  Anexo I
+                </td>
+                <td className="p-3">
+                  Comércio: Revendedores em geral, restaurantes, padarias e
+                  afins.
+                </td>
               </tr>
               <tr className="hover:bg-white/5 transition-colors">
-                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo II</td>
-                <td className="p-3">Indústria: Fábricas, indústrias e empresas industriais em geral.</td>
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">
+                  Anexo II
+                </td>
+                <td className="p-3">
+                  Indústria: Fábricas, indústrias e empresas industriais em
+                  geral.
+                </td>
               </tr>
               <tr className="hover:bg-white/5 transition-colors">
-                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo III</td>
-                <td className="p-3">Serviços: Instalação, reparos e manutenção, agências de viagens, treinamentos e atividades sem responsabilidade técnica exigida.</td>
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">
+                  Anexo III
+                </td>
+                <td className="p-3">
+                  Serviços: Instalação, reparos e manutenção, agências de
+                  viagens, treinamentos e atividades sem responsabilidade
+                  técnica exigida.
+                </td>
               </tr>
               <tr className="hover:bg-white/5 transition-colors">
-                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo IV</td>
-                <td className="p-3">Serviços: Limpeza, vigilância, obras, construção de imóveis, serviços advocatícios, entre outros.</td>
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">
+                  Anexo IV
+                </td>
+                <td className="p-3">
+                  Serviços: Limpeza, vigilância, obras, construção de imóveis,
+                  serviços advocatícios, entre outros.
+                </td>
               </tr>
               <tr className="hover:bg-white/5 transition-colors">
-                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">Anexo V</td>
-                <td className="p-3">Serviços: Auditoria, jornalismo, tecnologia, publicidade, engenharia, entre outros.</td>
+                <td className="p-3 font-medium text-[#7ee7ff] whitespace-nowrap">
+                  Anexo V
+                </td>
+                <td className="p-3">
+                  Serviços: Auditoria, jornalismo, tecnologia, publicidade,
+                  engenharia, entre outros.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -647,11 +893,14 @@ function CalculadoraFuncionario() {
     inssPatronal: number
     total: number
   } | null>(null)
-  
+
   const [erro, setErro] = useState("")
 
   const formatCurrency = (val: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(val)
+    new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(val)
 
   const calcularFuncionario = () => {
     const s = Number(salario) || 0
@@ -663,11 +912,12 @@ function CalculadoraFuncionario() {
     }
     setErro("")
 
-    const feriasMensal = s / 12 + (s / 12) / 3
+    const feriasMensal = s / 12 + s / 12 / 3
     const decimoTerceiroMensal = s / 12
     const fgts = (s + feriasMensal + decimoTerceiroMensal) * 0.08
-    
-    const inssPatronal = regime === "simples" ? 0 : (s + feriasMensal + decimoTerceiroMensal) * 0.20
+
+    const inssPatronal =
+      regime === "simples" ? 0 : (s + feriasMensal + decimoTerceiroMensal) * 0.2
 
     const total = s + feriasMensal + decimoTerceiroMensal + fgts + inssPatronal
 
@@ -706,8 +956,18 @@ function CalculadoraFuncionario() {
             onChange={(e) => setRegime(e.target.value)}
             className="w-full rounded-xl border border-white/10 bg-white/5 backdrop-blur-md p-3 text-white focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff] cursor-pointer"
           >
-            <option value="simples" style={{ color: '#000', background: '#fff' }}>Simples Nacional (Anexos I, II, III, V)</option>
-            <option value="simples-iv" style={{ color: '#000', background: '#fff' }}>Simples Nacional (Anexo IV)</option>
+            <option
+              value="simples"
+              style={{ color: "#000", background: "#fff" }}
+            >
+              Simples Nacional (Anexos I, II, III, V)
+            </option>
+            <option
+              value="simples-iv"
+              style={{ color: "#000", background: "#fff" }}
+            >
+              Simples Nacional (Anexo IV)
+            </option>
           </select>
         </div>
       </div>
@@ -728,108 +988,169 @@ function CalculadoraFuncionario() {
       {resultado && (
         <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex items-center gap-2 mb-6 border-b border-white/10 pb-4">
-            <Briefcase className="text-[#7ee7ff]" size={24} />
-            <h3 className="text-xl font-medium text-white">Resumo de Custos Mensais</h3>
+            <Calculator className="text-[#7ee7ff]" size={24} />
+            <h3 className="text-xl font-medium text-white">
+              Resumo de Custos Mensais
+            </h3>
           </div>
-          
+
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div className="bg-[#0a4a62]/30 border border-[#7ee7ff]/20 rounded-lg p-5">
               <div className="group relative flex items-center gap-1 cursor-help mb-2">
-                <span className="text-sm text-cyan-200">Custo Total para a Empresa:</span>
-                <Info size={14} className="text-cyan-400 hover:text-cyan-300 transition-colors" />
+                <span className="text-sm text-cyan-200">
+                  Custo Total para a Empresa:
+                </span>
+                <Info
+                  size={14}
+                  className="text-cyan-400 hover:text-cyan-300 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  O valor contábil real que o funcionário custa mensalmente para a empresa, somando salário e encargos trabalhistas básicos.
+                  O valor contábil real que o funcionário custa mensalmente para
+                  a empresa, somando salário e encargos trabalhistas básicos.
                 </div>
               </div>
-              <span className="text-3xl font-bold text-[#7ee7ff]">{formatCurrency(resultado.total)}</span>
+              <span className="text-3xl font-bold text-[#7ee7ff]">
+                {formatCurrency(resultado.total)}
+              </span>
             </div>
-            
+
             <div className="bg-emerald-900/20 border border-emerald-500/20 rounded-lg p-5">
               <div className="group relative flex items-center gap-1 cursor-help mb-2">
-                <span className="text-sm text-emerald-200">Acréscimo de Encargos:</span>
-                <Info size={14} className="text-emerald-400 hover:text-emerald-300 transition-colors" />
+                <span className="text-sm text-emerald-200">
+                  Acréscimo de Encargos:
+                </span>
+                <Info
+                  size={14}
+                  className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  O valor extra provisionado mensalmente além do salário bruto para arcar com FGTS, Férias e 13º.
+                  O valor extra provisionado mensalmente além do salário bruto
+                  para arcar com FGTS, Férias e 13º.
                 </div>
               </div>
-              <span className="text-3xl font-bold text-emerald-400">+ {formatCurrency(resultado.total - resultado.bruto)}</span>
+              <span className="text-3xl font-bold text-emerald-400">
+                + {formatCurrency(resultado.total - resultado.bruto)}
+              </span>
             </div>
           </div>
 
           <div className="space-y-3 text-slate-300 bg-slate-900/50 p-4 rounded-lg border border-white/5">
-            <h4 className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">Detalhamento das Provisões (Cálculo Técnico)</h4>
-            
+            <h4 className="text-xs font-medium text-slate-400 mb-3 uppercase tracking-wider">
+              Detalhamento das Provisões (Cálculo Técnico)
+            </h4>
+
             <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
                 <span>Salário Bruto Mensal:</span>
-                <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                <Info
+                  size={14}
+                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  O valor registrado na carteira de trabalho (CLT) antes de qualquer desconto.
+                  O valor registrado na carteira de trabalho (CLT) antes de
+                  qualquer desconto.
                 </div>
               </div>
-              <span className="font-medium text-white">{formatCurrency(resultado.bruto)}</span>
+              <span className="font-medium text-white">
+                {formatCurrency(resultado.bruto)}
+              </span>
             </div>
-            
+
             <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
                 <span>Férias + 1/3 (Provisão Mensal):</span>
-                <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                <Info
+                  size={14}
+                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  Valor mensal que a empresa deve guardar (provisionar) para o pagamento das férias anuais acrescidas do terço constitucional.
+                  Valor mensal que a empresa deve guardar (provisionar) para o
+                  pagamento das férias anuais acrescidas do terço
+                  constitucional.
                 </div>
               </div>
-              <span className="font-medium text-white">{formatCurrency(resultado.ferias)}</span>
+              <span className="font-medium text-white">
+                {formatCurrency(resultado.ferias)}
+              </span>
             </div>
-            
+
             <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
                 <span>13º Salário (Provisão Mensal):</span>
-                <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                <Info
+                  size={14}
+                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  Fração do salário (1/12) que a empresa deve guardar mensalmente para pagar o 13º no final do ano.
+                  Fração do salário (1/12) que a empresa deve guardar
+                  mensalmente para pagar o 13º no final do ano.
                 </div>
               </div>
-              <span className="font-medium text-white">{formatCurrency(resultado.decimoTerceiro)}</span>
+              <span className="font-medium text-white">
+                {formatCurrency(resultado.decimoTerceiro)}
+              </span>
             </div>
-            
+
             <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
                 <span>FGTS Mensal + Provisões (8%):</span>
-                <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                <Info
+                  size={14}
+                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  Depósito compulsório de 8% sobre o salário, férias e 13º, que a empresa recolhe para a conta vinculada do funcionário.
+                  Depósito compulsório de 8% sobre o salário, férias e 13º, que
+                  a empresa recolhe para a conta vinculada do funcionário.
                 </div>
               </div>
-              <span className="font-medium text-white">{formatCurrency(resultado.fgts)}</span>
+              <span className="font-medium text-white">
+                {formatCurrency(resultado.fgts)}
+              </span>
             </div>
-            
+
             {resultado.inssPatronal > 0 && (
               <div className="flex justify-between border-b border-white/5 pb-2 text-sm">
                 <div className="group relative flex items-center gap-1 cursor-help">
                   <span>INSS Patronal (20%):</span>
-                  <Info size={14} className="text-slate-500 hover:text-cyan-400 transition-colors" />
+                  <Info
+                    size={14}
+                    className="text-slate-500 hover:text-cyan-400 transition-colors"
+                  />
                   <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                    Encargo obrigatório de 20% pago pela empresa sobre a folha de pagamento (Salário + Férias + 13º). Não aplicável para Simples Nacional (exceto Anexo IV).
+                    Encargo obrigatório de 20% pago pela empresa sobre a folha
+                    de pagamento (Salário + Férias + 13º). Não aplicável para
+                    Simples Nacional (exceto Anexo IV).
                   </div>
                 </div>
-                <span className="font-medium text-white">{formatCurrency(resultado.inssPatronal)}</span>
+                <span className="font-medium text-white">
+                  {formatCurrency(resultado.inssPatronal)}
+                </span>
               </div>
             )}
-            
+
             <div className="flex justify-between pt-1 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
-                <span className="font-semibold text-[#7ee7ff]">Custo Total Mensal para a Empresa:</span>
-                <Info size={14} className="text-[#7ee7ff]/70 hover:text-[#7ee7ff] transition-colors" />
+                <span className="font-semibold text-[#7ee7ff]">
+                  Custo Total Mensal para a Empresa:
+                </span>
+                <Info
+                  size={14}
+                  className="text-[#7ee7ff]/70 hover:text-[#7ee7ff] transition-colors"
+                />
                 <div className="absolute bottom-full right-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                  O valor contábil real que o funcionário custa mensalmente para a empresa, somando salário e encargos trabalhistas básicos.
+                  O valor contábil real que o funcionário custa mensalmente para
+                  a empresa, somando salário e encargos trabalhistas básicos.
                 </div>
               </div>
-              <span className="font-semibold text-[#7ee7ff]">{formatCurrency(resultado.total)}</span>
+              <span className="font-semibold text-[#7ee7ff]">
+                {formatCurrency(resultado.total)}
+              </span>
             </div>
           </div>
-          
+
           <p className="text-xs text-slate-500 pt-4 text-center">
-            *Valores contábeis. Não considera VR, VA, VT, adicionais (periculosidade/insalubridade) nem custos rescisórios.
+            *Valores contábeis. Não considera VR, VA, VT, adicionais
+            (periculosidade/insalubridade) nem custos rescisórios.
           </p>
         </div>
       )}
@@ -851,7 +1172,7 @@ export default function Ferramentas() {
       icon: Building2,
       heading: "Calculadora Alíquota Efetiva",
       subtitle: "Calcule a alíquota efetiva do Simples Nacional.",
-      content: <CalculadoraPJ />
+      content: <CalculadoraPJ />,
     },
     {
       id: "imposto-renda",
@@ -859,7 +1180,7 @@ export default function Ferramentas() {
       icon: Calculator,
       heading: "Calculadora de Imposto de Renda",
       subtitle: "Simule o seu imposto de renda da pessoa física (IRPF).",
-      content: <CalculadoraIRPF />
+      content: <CalculadoraIRPF />,
     },
     {
       id: "custo-funcionario",
@@ -867,11 +1188,12 @@ export default function Ferramentas() {
       icon: Briefcase,
       heading: "Calculadora Custo de Funcionário",
       subtitle: "Descubra o custo real de um funcionário para a empresa.",
-      content: <CalculadoraFuncionario />
-    }
+      content: <CalculadoraFuncionario />,
+    },
   ] as const
 
-  const [activeMenuId, setActiveMenuId] = useState<(typeof menus)[number]["id"]>("tributario-pj")
+  const [activeMenuId, setActiveMenuId] =
+    useState<(typeof menus)[number]["id"]>("tributario-pj")
 
   const activeMenu = menus.find((menu) => menu.id === activeMenuId) ?? menus[0]
 
@@ -894,7 +1216,7 @@ export default function Ferramentas() {
   return (
     <div className="min-h-screen relative pt-12 bg-transparent text-white">
       <section className="section-shell pb-32">
-        <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:hidden">
+        <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 min-[1050px]:hidden">
           {/* Mobile Layout */}
           <div className="mb-8 max-w-4xl mx-auto text-center">
             <div className="flex items-center justify-center gap-3 mb-5 flex-nowrap">
@@ -906,7 +1228,9 @@ export default function Ferramentas() {
               </button>
               <div className="section-label w-fit m-0 shrink h-auto min-h-[38px] py-2">
                 <Sparkles size={14} className="shrink-0" />
-                <span className="whitespace-normal leading-tight text-center">Calculadoras e Simuladores</span>
+                <span className="whitespace-normal leading-tight text-center">
+                  Calculadoras e Simuladores
+                </span>
               </div>
             </div>
             <h2 className="section-title mb-4">Ferramentas de Gestão</h2>
@@ -927,7 +1251,8 @@ export default function Ferramentas() {
               </button>
 
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
-                {activeMenu.title}<br />({currentIndex + 1} de {menus.length})
+                {activeMenu.title}
+                <br />({currentIndex + 1} de {menus.length})
               </span>
 
               <button
@@ -937,6 +1262,26 @@ export default function Ferramentas() {
               >
                 <ChevronRight size={20} />
               </button>
+            </div>
+
+            <div className="hidden min-[600px]:grid min-[600px]:grid-cols-3 min-[600px]:gap-2 min-[1050px]:hidden">
+              {menus.map((menu) => {
+                const isActive = activeMenuId === menu.id
+                return (
+                  <button
+                    key={`quick-${menu.id}`}
+                    type="button"
+                    onClick={() => setActiveMenuId(menu.id)}
+                    className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-all duration-200 ${
+                      isActive
+                        ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+                        : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:bg-white/10 hover:text-slate-100"
+                    }`}
+                  >
+                    {menu.title}
+                  </button>
+                )
+              })}
             </div>
 
             <div className="space-y-3">
@@ -953,7 +1298,7 @@ export default function Ferramentas() {
           </div>
         </div>
 
-        <div className="mx-auto hidden w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:block">
+        <div className="mx-auto hidden w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 min-[1050px]:block">
           <div className="mb-12 max-w-4xl mx-auto text-center md:text-left md:mx-0">
             <div className="flex gap-4 items-center">
               <button
@@ -974,7 +1319,7 @@ export default function Ferramentas() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-[280px_minmax(0,1fr)] md:items-stretch">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-stretch">
             <aside className="h-full w-full rounded-[20px] border border-white/10 bg-gradient-to-b from-slate-950/40 to-slate-900/20 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl">
               <p className="mb-6 px-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">
                 Calculadoras
@@ -989,17 +1334,19 @@ export default function Ferramentas() {
                       key={menu.title}
                       type="button"
                       onClick={() => setActiveMenuId(menu.id)}
-                      className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-sm font-medium transition-all duration-200 ${isActive
+                      className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-sm font-medium transition-all duration-200 ${
+                        isActive
                           ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.16),0_0_24px_rgba(255,255,255,0.18),inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-md"
                           : "border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 hover:text-slate-100 hover:shadow-[0_0_18px_rgba(255,255,255,0.12)]"
-                        }`}
+                      }`}
                     >
                       <Icon
                         size={18}
-                        className={`${isActive
+                        className={`${
+                          isActive
                             ? "text-slate-300"
                             : "text-slate-500 group-hover:text-slate-300"
-                          } transition-colors duration-200`}
+                        } transition-colors duration-200`}
                       />
                       <span>{menu.title}</span>
                     </button>
