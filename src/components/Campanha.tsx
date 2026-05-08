@@ -24,6 +24,16 @@ export default function Campanha() {
   const [showModal, setShowModal] = useState(false)
 
   const handleBack = () => {
+    const hostname = window.location.hostname
+    
+    // Se está no subdomínio abrirminhaempresa, redireciona para o domínio principal
+    if (hostname.startsWith('abrirminhaempresa.')) {
+      const mainDomain = hostname.replace(/^abrirminhaempresa\./, '')
+      const port = window.location.port ? `:${window.location.port}` : ""
+      window.location.href = `${window.location.protocol}//${mainDomain}${port}`
+      return
+    }
+
     if (location.state?.fromInternalLink) {
       navigate(-1)
       return

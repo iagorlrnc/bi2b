@@ -1,6 +1,6 @@
-import { Link } from "react-router-dom"
 import { ArrowRight, DatabaseZap, ShieldCheck, Sparkles } from "lucide-react"
 import logoMain from "../assets/img/logo.png"
+import { getCampanhaUrl } from "../App"
 
 export default function Hero() {
   const scrollToServices = () => {
@@ -54,13 +54,12 @@ export default function Hero() {
                 Conheça nossas soluções
                 <ArrowRight size={18} />
               </button>
-              <Link
-                to="/abrir-minha-empresa"
-                state={{ fromInternalLink: true }}
+              <a
+                href={getCampanhaUrl()}
                 className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 sm:w-auto"
               >
                 Abrir minha empresa
-              </Link>
+              </a>
             </div>
 
             <div className="mt-10 hidden gap-4 sm:grid sm:grid-cols-3">
