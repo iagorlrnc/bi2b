@@ -197,6 +197,17 @@ function CalculadoraPJ() {
     simplesTotal: number
     lucroAliquota: number
     lucroTotal: number
+    lucroBreakdown?: {
+      pisCofins: number
+      irpj: number
+      csll: number
+      issIcms: number
+      issIcmsLabel: string
+      pisCofinsPerc: number
+      irpjPerc: number
+      csllPerc: number
+      issIcmsPerc: number
+    }
   } | null>(null)
 
   const formatCurrency = (val: number) =>
@@ -221,6 +232,7 @@ function CalculadoraPJ() {
     // Lucro Presumido - Estimativas Realistas
     let lucroTotal = 0;
     let lucroAliquota = 0;
+    let lucroBreakdown = undefined;
 
     if (fMensalBase > 0) {
       const pisCofins = fMensalBase * 0.0365; // PIS/COFINS (Cumulativo: 0.65% + 3%)
@@ -228,17 +240,20 @@ function CalculadoraPJ() {
       let presuncaoIRPJ = 0;
       let presuncaoCSLL = 0;
       let impostoEstadualMunicipal = 0;
+      let issIcmsLabel = "";
 
       if (anexoSelecionado === "anexoI" || anexoSelecionado === "anexoII") {
         // Comércio / Indústria
         presuncaoIRPJ = fMensalBase * 0.08;
         presuncaoCSLL = fMensalBase * 0.12;
         impostoEstadualMunicipal = fMensalBase * 0.18; // Média ICMS 18%
+        issIcmsLabel = "ICMS/IPI (Est)";
       } else {
         // Serviços (Anexo III, IV, V)
         presuncaoIRPJ = fMensalBase * 0.32;
         presuncaoCSLL = fMensalBase * 0.32;
         impostoEstadualMunicipal = fMensalBase * 0.05; // Média ISS 5%
+        issIcmsLabel = "ISS (Est)";
       }
 
       const irpjBase = presuncaoIRPJ * 0.15;
@@ -249,6 +264,18 @@ function CalculadoraPJ() {
 
       lucroTotal = pisCofins + irpjTotal + csllTotal + impostoEstadualMunicipal;
       lucroAliquota = (lucroTotal / fMensalBase) * 100;
+      
+      lucroBreakdown = {
+        pisCofins,
+        irpj: irpjTotal,
+        csll: csllTotal,
+        issIcms: impostoEstadualMunicipal,
+        issIcmsLabel,
+        pisCofinsPerc: (pisCofins / fMensalBase) * 100,
+        irpjPerc: (irpjTotal / fMensalBase) * 100,
+        csllPerc: (csllTotal / fMensalBase) * 100,
+        issIcmsPerc: (impostoEstadualMunicipal / fMensalBase) * 100
+      };
     }
 
     setResultado({
@@ -256,6 +283,7 @@ function CalculadoraPJ() {
       simplesTotal: fMensalBase * (simplesAliquotaEfetiva / 100),
       lucroAliquota,
       lucroTotal,
+      lucroBreakdown
     })
   }
 
@@ -339,15 +367,39 @@ function CalculadoraPJ() {
                 <span className="text-[#7ee7ff] text-lg">{formatCurrency(resultado.simplesTotal)}</span>
               </div>
             </div>
-            <div className="rounded-lg bg-slate-800/50 p-4 border border-white/5">
+            <div className="rounded-lg bg-slate-800/50 p-4 border border-white/5 flex flex-col">
               <h4 className="text-md font-semibold text-slate-300 mb-3">Lucro Presumido</h4>
-              <div className="flex justify-between text-sm mb-2 text-slate-300">
-                <span>Alíquota Aprox. (Fed+Mun/Est):</span>
-                <span className="text-white font-medium">{resultado.lucroAliquota.toFixed(2)}%</span>
-              </div>
-              <div className="flex justify-between font-medium text-white pt-3 border-t border-white/10">
-                <span>Total Imposto Mensal:</span>
-                <span className="text-slate-300 text-lg">{formatCurrency(resultado.lucroTotal)}</span>
+              
+              {resultado.lucroBreakdown && (
+                <div className="space-y-1.5 mb-4 pb-3 border-b border-white/10 text-xs text-slate-400">
+                  <div className="flex justify-between">
+                    <span>PIS/COFINS ({resultado.lucroBreakdown.pisCofinsPerc.toFixed(2)}%):</span>
+                    <span>{formatCurrency(resultado.lucroBreakdown.pisCofins)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>IRPJ (com Adicional) ({resultado.lucroBreakdown.irpjPerc.toFixed(2)}%):</span>
+                    <span>{formatCurrency(resultado.lucroBreakdown.irpj)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>CSLL ({resultado.lucroBreakdown.csllPerc.toFixed(2)}%):</span>
+                    <span>{formatCurrency(resultado.lucroBreakdown.csll)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{resultado.lucroBreakdown.issIcmsLabel} ({resultado.lucroBreakdown.issIcmsPerc.toFixed(2)}%):</span>
+                    <span>{formatCurrency(resultado.lucroBreakdown.issIcms)}</span>
+                  </div>
+                </div>
+              )}
+
+              <div className="mt-auto">
+                <div className="flex justify-between text-sm mb-2 text-slate-300">
+                  <span>Alíquota Efetiva Aprox:</span>
+                  <span className="text-white font-medium">{resultado.lucroAliquota.toFixed(2)}%</span>
+                </div>
+                <div className="flex justify-between font-medium text-white pt-2 border-t border-white/10">
+                  <span>Total Imposto Mensal:</span>
+                  <span className="text-slate-300 text-lg">{formatCurrency(resultado.lucroTotal)}</span>
+                </div>
               </div>
             </div>
           </div>
