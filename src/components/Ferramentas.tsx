@@ -179,9 +179,9 @@ const tabelasSimples = {
 
 function calcularAliquotaEfetivaSimples(rbt12: number, anexo: typeof tabelasSimples.anexoI) {
   if (rbt12 === 0) return { aliquotaEfetiva: anexo[0].aliquota * 100 }; //primeira faixa se não houver faturamento anterior
-  
+
   const faixa = anexo.find(f => rbt12 <= f.limite) || anexo[anexo.length - 1];
-  
+
   return {
     aliquotaEfetiva: faixa.aliquota * 100 //porcentagem
   };
@@ -191,10 +191,12 @@ function CalculadoraPJ() {
   const [faturamento, setFaturamento] = useState<number | "">("")
   const [rbt12, setRbt12] = useState<number | "">("")
   const [anexoSelecionado, setAnexoSelecionado] = useState("anexoI")
-  
+
   const [resultado, setResultado] = useState<{
     simplesAliquota: number
     simplesTotal: number
+    lucroAliquota: number
+    lucroTotal: number
   } | null>(null)
 
   const formatCurrency = (val: number) =>
@@ -213,10 +215,47 @@ function CalculadoraPJ() {
 
     const calculoSimples = calcularAliquotaEfetivaSimples(r12, tabelaAtiva);
     let simplesAliquotaEfetiva = calculoSimples.aliquotaEfetiva;
-    
+
+    const fMensalBase = fMensal > 0 ? fMensal : (r12 / 12);
+
+    // Lucro Presumido - Estimativas Realistas
+    let lucroTotal = 0;
+    let lucroAliquota = 0;
+
+    if (fMensalBase > 0) {
+      const pisCofins = fMensalBase * 0.0365; // PIS/COFINS (Cumulativo: 0.65% + 3%)
+
+      let presuncaoIRPJ = 0;
+      let presuncaoCSLL = 0;
+      let impostoEstadualMunicipal = 0;
+
+      if (anexoSelecionado === "anexoI" || anexoSelecionado === "anexoII") {
+        // Comércio / Indústria
+        presuncaoIRPJ = fMensalBase * 0.08;
+        presuncaoCSLL = fMensalBase * 0.12;
+        impostoEstadualMunicipal = fMensalBase * 0.18; // Média ICMS 18%
+      } else {
+        // Serviços (Anexo III, IV, V)
+        presuncaoIRPJ = fMensalBase * 0.32;
+        presuncaoCSLL = fMensalBase * 0.32;
+        impostoEstadualMunicipal = fMensalBase * 0.05; // Média ISS 5%
+      }
+
+      const irpjBase = presuncaoIRPJ * 0.15;
+      const irpjAdicional = presuncaoIRPJ > 20000 ? (presuncaoIRPJ - 20000) * 0.10 : 0;
+      const irpjTotal = irpjBase + irpjAdicional;
+
+      const csllTotal = presuncaoCSLL * 0.09;
+
+      lucroTotal = pisCofins + irpjTotal + csllTotal + impostoEstadualMunicipal;
+      lucroAliquota = (lucroTotal / fMensalBase) * 100;
+    }
+
     setResultado({
       simplesAliquota: simplesAliquotaEfetiva,
-      simplesTotal: fMensal * (simplesAliquotaEfetiva / 100)
+      simplesTotal: fMensalBase * (simplesAliquotaEfetiva / 100),
+      lucroAliquota,
+      lucroTotal,
     })
   }
 
@@ -278,14 +317,14 @@ function CalculadoraPJ() {
         onClick={calcularPJ}
         className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
       >
-        Simular Impostos
+        Comparar Regimes
         <ArrowRight size={18} />
       </button>
 
       {resultado && (
         <div className="mt-8 rounded-xl border border-white/10 bg-white/5 p-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <h3 className="text-lg font-medium text-white mb-4">Estimativa de Impostos Mensais</h3>
-          <div className="max-w-xl mx-auto">
+          <h3 className="text-lg font-medium text-white mb-4">Estimativa de Impostos Mensais (Comparativo)</h3>
+          <div className="grid md:grid-cols-2 gap-6">
             <div className="rounded-lg bg-slate-800/50 p-4 border border-white/5 relative overflow-hidden">
               <div className="absolute top-0 right-0 p-2 bg-gradient-to-bl from-cyan-500/20 to-transparent rounded-bl-lg">
                 <Sparkles size={14} className="text-cyan-400" />
@@ -296,14 +335,25 @@ function CalculadoraPJ() {
                 <span className="text-white font-medium">{resultado.simplesAliquota.toFixed(2)}%</span>
               </div>
               <div className="flex justify-between font-medium text-white pt-3 border-t border-white/10">
-                <span>Total Imposto Mensal Estimado:</span>
+                <span>Total Imposto Mensal:</span>
                 <span className="text-[#7ee7ff] text-lg">{formatCurrency(resultado.simplesTotal)}</span>
+              </div>
+            </div>
+            <div className="rounded-lg bg-slate-800/50 p-4 border border-white/5">
+              <h4 className="text-md font-semibold text-slate-300 mb-3">Lucro Presumido</h4>
+              <div className="flex justify-between text-sm mb-2 text-slate-300">
+                <span>Alíquota Aprox. (Fed+Mun/Est):</span>
+                <span className="text-white font-medium">{resultado.lucroAliquota.toFixed(2)}%</span>
+              </div>
+              <div className="flex justify-between font-medium text-white pt-3 border-t border-white/10">
+                <span>Total Imposto Mensal:</span>
+                <span className="text-slate-300 text-lg">{formatCurrency(resultado.lucroTotal)}</span>
               </div>
             </div>
           </div>
           <div className="mt-4 p-3 bg-cyan-900/20 border border-cyan-500/20 rounded-lg">
             <p className="text-sm text-cyan-100 flex items-start gap-2">
-              <span className="text-cyan-400 font-bold">Dica:</span> 
+              <span className="text-cyan-400 font-bold">Dica:</span>
               A alíquota do Simples Nacional considera a receita bruta dos últimos 12 meses (RBT12). Com RBT12 de {formatCurrency(Number(rbt12) || Number(faturamento) * 12)}, sua empresa estaria nesta faixa de tributação.
             </p>
           </div>
@@ -373,7 +423,7 @@ function CalculadoraFuncionario() {
     const feriasMensal = s / 12 + (s / 12) / 3
     const decimoTerceiroMensal = s / 12
     const fgts = (s + feriasMensal + decimoTerceiroMensal) * 0.08
-    
+
     let inssPatronal = 0
     if (regime === "simples-iv") {
       //27.8% (20% patronal + rat + terceiros)
@@ -479,20 +529,20 @@ export default function Ferramentas() {
 
   const menus = [
     {
-      id: "imposto-renda",
-      title: "Imposto de Renda",
-      icon: Calculator,
-      heading: "Calculadora de Imposto de Renda",
-      subtitle: "Simule o seu imposto de renda da pessoa física (IRPF).",
-      content: <CalculadoraIRPF />
-    },
-    {
       id: "tributario-pj",
       title: "Alíquota Efetiva",
       icon: Building2,
       heading: "Calculadora Alíquota Efetiva",
       subtitle: "Calcule a alíquota efetiva do Simples Nacional.",
       content: <CalculadoraPJ />
+    },
+    {
+      id: "imposto-renda",
+      title: "Imposto de Renda",
+      icon: Calculator,
+      heading: "Calculadora de Imposto de Renda",
+      subtitle: "Simule o seu imposto de renda da pessoa física (IRPF).",
+      content: <CalculadoraIRPF />
     },
     {
       id: "custo-funcionario",
@@ -504,7 +554,7 @@ export default function Ferramentas() {
     }
   ] as const
 
-  const [activeMenuId, setActiveMenuId] = useState<(typeof menus)[number]["id"]>("imposto-renda")
+  const [activeMenuId, setActiveMenuId] = useState<(typeof menus)[number]["id"]>("tributario-pj")
 
   const activeMenu = menus.find((menu) => menu.id === activeMenuId) ?? menus[0]
 
@@ -527,139 +577,137 @@ export default function Ferramentas() {
   return (
     <div className="min-h-screen relative pt-12 bg-transparent text-white">
       <section className="section-shell pb-32">
-          <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:hidden">
-            {/* Mobile Layout */}
-            <div className="mb-8 max-w-4xl mx-auto text-center">
-              <div className="flex items-center justify-center gap-3 mb-5 flex-nowrap">
-                <button
-                  onClick={() => navigate(-1)}
-                  className="rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all shrink-0"
-                >
-                  <ArrowLeft size={20} />
-                </button>
-                <div className="section-label w-fit m-0 shrink h-auto min-h-[38px] py-2">
-                  <Sparkles size={14} className="shrink-0" />
-                  <span className="whitespace-normal leading-tight text-center">Calculadoras e Simuladores</span>
-                </div>
-              </div>
-              <h2 className="section-title mb-4">Ferramentas de Gestão</h2>
-              <p className="section-copy max-w-2xl mx-auto">
-                Simule cenários tributários e custos operacionais de forma rápida
-                para apoiar a tomada de decisão.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950/40 to-slate-900/20 p-4 backdrop-blur-lg">
-                <button
-                  onClick={handlePrevMenu}
-                  disabled={currentIndex === 0}
-                  className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronLeft size={20} />
-                </button>
-
-                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
-                  {activeMenu.title}<br/>({currentIndex + 1} de {menus.length})
-                </span>
-
-                <button
-                  onClick={handleNextMenu}
-                  disabled={currentIndex === menus.length - 1}
-                  className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <ChevronRight size={20} />
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
-                  <h2 className="mb-2 text-xl font-semibold tracking-tight text-slate-100">
-                    {activeMenu.heading}
-                  </h2>
-                  <p className="mb-6 text-sm text-slate-400">
-                    {activeMenu.subtitle}
-                  </p>
-                  {activeMenu.content}
-                </div>
+        <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:hidden">
+          {/* Mobile Layout */}
+          <div className="mb-8 max-w-4xl mx-auto text-center">
+            <div className="flex items-center justify-center gap-3 mb-5 flex-nowrap">
+              <button
+                onClick={() => navigate(-1)}
+                className="rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all shrink-0"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <div className="section-label w-fit m-0 shrink h-auto min-h-[38px] py-2">
+                <Sparkles size={14} className="shrink-0" />
+                <span className="whitespace-normal leading-tight text-center">Calculadoras e Simuladores</span>
               </div>
             </div>
+            <h2 className="section-title mb-4">Ferramentas de Gestão</h2>
+            <p className="section-copy max-w-2xl mx-auto">
+              Simule cenários tributários e custos operacionais de forma rápida
+              para apoiar a tomada de decisão.
+            </p>
           </div>
 
-          <div className="mx-auto hidden w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:block">
-            <div className="mb-12 max-w-4xl mx-auto text-center md:text-left md:mx-0">
-              <div className="flex gap-4 items-center">
-                <button
-                  onClick={() => navigate(-1)}
-                  className="rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all mb-5"
-                >
-                  <ArrowLeft size={20} />
-                </button>
-                <div className="section-label mb-5 w-fit">
-                  <Sparkles size={14} />
-                  Calculadoras e Simuladores
-                </div>
-              </div>
-              <h2 className="section-title mb-4">Ferramentas de Gestão</h2>
-              <p className="section-copy max-w-2xl mx-auto md:mx-0">
-                Simule cenários tributários e custos operacionais de forma rápida
-                para apoiar a tomada de decisão.
-              </p>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950/40 to-slate-900/20 p-4 backdrop-blur-lg">
+              <button
+                onClick={handlePrevMenu}
+                disabled={currentIndex === 0}
+                className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft size={20} />
+              </button>
+
+              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
+                {activeMenu.title}<br />({currentIndex + 1} de {menus.length})
+              </span>
+
+              <button
+                onClick={handleNextMenu}
+                disabled={currentIndex === menus.length - 1}
+                className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ChevronRight size={20} />
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 gap-3 md:grid-cols-[280px_minmax(0,1fr)] md:items-stretch">
-              <aside className="h-full w-full rounded-[20px] border border-white/10 bg-gradient-to-b from-slate-950/40 to-slate-900/20 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl">
-                <p className="mb-6 px-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">
-                  Calculadoras
+            <div className="space-y-3">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
+                <h2 className="mb-2 text-xl font-semibold tracking-tight text-slate-100">
+                  {activeMenu.heading}
+                </h2>
+                <p className="mb-6 text-sm text-slate-400">
+                  {activeMenu.subtitle}
                 </p>
-
-                <nav className="space-y-3">
-                  {menus.map((menu) => {
-                    const Icon = menu.icon
-                    const isActive = activeMenuId === menu.id
-                    return (
-                      <button
-                        key={menu.title}
-                        type="button"
-                        onClick={() => setActiveMenuId(menu.id)}
-                        className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-sm font-medium transition-all duration-200 ${
-                          isActive
-                            ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.16),0_0_24px_rgba(255,255,255,0.18),inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-md"
-                            : "border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 hover:text-slate-100 hover:shadow-[0_0_18px_rgba(255,255,255,0.12)]"
-                        }`}
-                      >
-                        <Icon
-                          size={18}
-                          className={`${
-                            isActive
-                              ? "text-slate-300"
-                              : "text-slate-500 group-hover:text-slate-300"
-                          } transition-colors duration-200`}
-                        />
-                        <span>{menu.title}</span>
-                      </button>
-                    )
-                  })}
-                </nav>
-              </aside>
-
-              <main className="rounded-[20px] border border-white/10 bg-gradient-to-br from-slate-950/40 to-slate-900/20 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl sm:p-10">
-                <header className="mb-8">
-                  <h2 className="text-2xl font-semibold tracking-tight text-slate-100 md:text-3xl">
-                    {activeMenu.heading}
-                  </h2>
-                  <p className="mt-2 text-sm text-slate-400 md:text-base">
-                    {activeMenu.subtitle}
-                  </p>
-                </header>
-
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
-                  {activeMenu.content}
-                </div>
-              </main>
+                {activeMenu.content}
+              </div>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+
+        <div className="mx-auto hidden w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 md:block">
+          <div className="mb-12 max-w-4xl mx-auto text-center md:text-left md:mx-0">
+            <div className="flex gap-4 items-center">
+              <button
+                onClick={() => navigate(-1)}
+                className="rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all mb-5"
+              >
+                <ArrowLeft size={20} />
+              </button>
+              <div className="section-label mb-5 w-fit">
+                <Sparkles size={14} />
+                Calculadoras e Simuladores
+              </div>
+            </div>
+            <h2 className="section-title mb-4">Ferramentas de Gestão</h2>
+            <p className="section-copy max-w-2xl mx-auto md:mx-0">
+              Simule cenários tributários e custos operacionais de forma rápida
+              para apoiar a tomada de decisão.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-[280px_minmax(0,1fr)] md:items-stretch">
+            <aside className="h-full w-full rounded-[20px] border border-white/10 bg-gradient-to-b from-slate-950/40 to-slate-900/20 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl">
+              <p className="mb-6 px-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                Calculadoras
+              </p>
+
+              <nav className="space-y-3">
+                {menus.map((menu) => {
+                  const Icon = menu.icon
+                  const isActive = activeMenuId === menu.id
+                  return (
+                    <button
+                      key={menu.title}
+                      type="button"
+                      onClick={() => setActiveMenuId(menu.id)}
+                      className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-sm font-medium transition-all duration-200 ${isActive
+                          ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.16),0_0_24px_rgba(255,255,255,0.18),inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-md"
+                          : "border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 hover:text-slate-100 hover:shadow-[0_0_18px_rgba(255,255,255,0.12)]"
+                        }`}
+                    >
+                      <Icon
+                        size={18}
+                        className={`${isActive
+                            ? "text-slate-300"
+                            : "text-slate-500 group-hover:text-slate-300"
+                          } transition-colors duration-200`}
+                      />
+                      <span>{menu.title}</span>
+                    </button>
+                  )
+                })}
+              </nav>
+            </aside>
+
+            <main className="rounded-[20px] border border-white/10 bg-gradient-to-br from-slate-950/40 to-slate-900/20 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl sm:p-10">
+              <header className="mb-8">
+                <h2 className="text-2xl font-semibold tracking-tight text-slate-100 md:text-3xl">
+                  {activeMenu.heading}
+                </h2>
+                <p className="mt-2 text-sm text-slate-400 md:text-base">
+                  {activeMenu.subtitle}
+                </p>
+              </header>
+
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
+                {activeMenu.content}
+              </div>
+            </main>
+          </div>
+        </div>
+      </section>
+    </div>
   )
 }
