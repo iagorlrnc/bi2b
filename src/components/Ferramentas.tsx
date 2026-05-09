@@ -883,7 +883,13 @@ function CalculadoraPJ() {
 }
 
 function CalculadoraFuncionario() {
+  const [faturamentoEmpresa, setFaturamentoEmpresa] = useState<number | "">("")
+  const [caixaEmpresa, setCaixaEmpresa] = useState<number | "">("")
   const [salario, setSalario] = useState<number | "">("")
+  const [valeTransporte, setValeTransporte] = useState<number | "">("")
+  const [valeRefeicao, setValeRefeicao] = useState<number | "">("")
+  const [ajudaCusto, setAjudaCusto] = useState<number | "">("")
+  const [outroBeneficio, setOutroBeneficio] = useState<number | "">("")
   const [regime, setRegime] = useState("simples")
   const [resultado, setResultado] = useState<{
     bruto: number
@@ -891,6 +897,7 @@ function CalculadoraFuncionario() {
     decimoTerceiro: number
     fgts: number
     inssPatronal: number
+    beneficiosTotais: number
     total: number
   } | null>(null)
 
@@ -912,14 +919,26 @@ function CalculadoraFuncionario() {
     }
     setErro("")
 
+    const vt = Number(valeTransporte) || 0
+    const vr = Number(valeRefeicao) || 0
+    const ac = Number(ajudaCusto) || 0
+    const ob = Number(outroBeneficio) || 0
+    const beneficiosTotais = vt + vr + ac + ob
+
     const feriasMensal = s / 12 + s / 12 / 3
     const decimoTerceiroMensal = s / 12
     const fgts = (s + feriasMensal + decimoTerceiroMensal) * 0.08
 
-    const inssPatronal =
-      regime === "simples" ? 0 : (s + feriasMensal + decimoTerceiroMensal) * 0.2
+    let inssPatronal = 0
+    if (regime === "simples") {
+      inssPatronal = 0
+    } else if (regime === "mei") {
+      inssPatronal = (s + feriasMensal + decimoTerceiroMensal) * 0.03
+    } else {
+      inssPatronal = (s + feriasMensal + decimoTerceiroMensal) * 0.2
+    }
 
-    const total = s + feriasMensal + decimoTerceiroMensal + fgts + inssPatronal
+    const total = s + feriasMensal + decimoTerceiroMensal + fgts + inssPatronal + beneficiosTotais
 
     setResultado({
       bruto: s,
@@ -927,6 +946,7 @@ function CalculadoraFuncionario() {
       decimoTerceiro: decimoTerceiroMensal,
       fgts,
       inssPatronal,
+      beneficiosTotais,
       total,
     })
   }
@@ -934,6 +954,37 @@ function CalculadoraFuncionario() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2">
+        <div className="md:col-span-2 mb-2">
+          <h3 className="text-lg font-semibold text-white border-b border-white/10 pb-2">
+            Dados da Empresa
+          </h3>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Faturamento Mensal (R$)
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={formatCurrencyInput(faturamentoEmpresa)}
+            onChange={(e) => setFaturamentoEmpresa(parseCurrencyString(e.target.value))}
+            placeholder="R$ 0,00"
+            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Caixa da Empresa (R$)
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={formatCurrencyInput(caixaEmpresa)}
+            onChange={(e) => setCaixaEmpresa(parseCurrencyString(e.target.value))}
+            placeholder="R$ 0,00"
+            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
+          />
+        </div>
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2">
             Salário Base Bruto (R$)
@@ -968,7 +1019,78 @@ function CalculadoraFuncionario() {
             >
               Simples Nacional (Anexo IV)
             </option>
+            <option
+              value="mei"
+              style={{ color: "#000", background: "#fff" }}
+            >
+              MEI
+            </option>
+            <option
+              value="lucro-presumido"
+              style={{ color: "#000", background: "#fff" }}
+            >
+              Lucro Presumido
+            </option>
           </select>
+        </div>
+
+        <div className="md:col-span-2 mt-4 mb-2">
+          <h3 className="text-lg font-semibold text-white border-b border-white/10 pb-2">
+            Dados do Funcionário
+          </h3>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Vale Transporte Mensal (R$)
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={formatCurrencyInput(valeTransporte)}
+            onChange={(e) => setValeTransporte(parseCurrencyString(e.target.value))}
+            placeholder="R$ 0,00"
+            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Vale Refeição Mensal (R$)
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={formatCurrencyInput(valeRefeicao)}
+            onChange={(e) => setValeRefeicao(parseCurrencyString(e.target.value))}
+            placeholder="R$ 0,00"
+            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Ajuda de Custo (R$)
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={formatCurrencyInput(ajudaCusto)}
+            onChange={(e) => setAjudaCusto(parseCurrencyString(e.target.value))}
+            placeholder="R$ 0,00"
+            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-slate-300 mb-2">
+            Outros Benefícios (R$)
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            value={formatCurrencyInput(outroBeneficio)}
+            onChange={(e) => setOutroBeneficio(parseCurrencyString(e.target.value))}
+            placeholder="R$ 0,00"
+            className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
+          />
         </div>
       </div>
       <button
@@ -1017,7 +1139,7 @@ function CalculadoraFuncionario() {
             <div className="bg-emerald-900/20 border border-emerald-500/20 rounded-lg p-5">
               <div className="group relative flex items-center gap-1 cursor-help mb-2">
                 <span className="text-sm text-emerald-200">
-                  Acréscimo de Encargos:
+                  Acréscimo de Encargos e Benefícios:
                 </span>
                 <Info
                   size={14}
@@ -1025,7 +1147,7 @@ function CalculadoraFuncionario() {
                 />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
                   O valor extra provisionado mensalmente além do salário bruto
-                  para arcar com FGTS, Férias e 13º.
+                  para arcar com encargos (FGTS, Férias, 13º, INSS) e benefícios.
                 </div>
               </div>
               <span className="text-3xl font-bold text-emerald-400">
@@ -1128,6 +1250,40 @@ function CalculadoraFuncionario() {
               </div>
             )}
 
+            <div className="flex justify-between border-b border-white/5 pb-2 text-sm pt-2">
+              <div className="group relative flex items-center gap-1 cursor-help">
+                <span className="font-medium text-emerald-300">Total de Impostos e Provisões:</span>
+                <Info
+                  size={14}
+                  className="text-slate-500 hover:text-cyan-400 transition-colors"
+                />
+                <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
+                  Soma de Férias, 13º Salário, FGTS e INSS Patronal.
+                </div>
+              </div>
+              <span className="font-medium text-emerald-300">
+                {formatCurrency(resultado.ferias + resultado.decimoTerceiro + resultado.fgts + resultado.inssPatronal)}
+              </span>
+            </div>
+
+            {resultado.beneficiosTotais > 0 && (
+              <div className="flex justify-between border-b border-white/5 pb-2 text-sm pt-2">
+                <div className="group relative flex items-center gap-1 cursor-help">
+                  <span className="font-medium text-emerald-300">Total de Benefícios:</span>
+                  <Info
+                    size={14}
+                    className="text-slate-500 hover:text-cyan-400 transition-colors"
+                  />
+                  <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
+                    Soma de Vale Transporte, Vale Refeição, Ajuda de Custo e Outros Benefícios.
+                  </div>
+                </div>
+                <span className="font-medium text-emerald-300">
+                  {formatCurrency(resultado.beneficiosTotais)}
+                </span>
+              </div>
+            )}
+
             <div className="flex justify-between pt-1 text-sm">
               <div className="group relative flex items-center gap-1 cursor-help">
                 <span className="font-semibold text-[#7ee7ff]">
@@ -1139,7 +1295,7 @@ function CalculadoraFuncionario() {
                 />
                 <div className="absolute bottom-full right-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
                   O valor contábil real que o funcionário custa mensalmente para
-                  a empresa, somando salário e encargos trabalhistas básicos.
+                  a empresa, somando salário, encargos trabalhistas e benefícios.
                 </div>
               </div>
               <span className="font-semibold text-[#7ee7ff]">
@@ -1149,7 +1305,7 @@ function CalculadoraFuncionario() {
           </div>
 
           <p className="text-xs text-slate-500 pt-4 text-center">
-            *Valores contábeis. Não considera VR, VA, VT, adicionais
+            *Valores contábeis. Não considera adicionais
             (periculosidade/insalubridade) nem custos rescisórios.
           </p>
         </div>
@@ -1272,11 +1428,10 @@ export default function Ferramentas() {
                     key={`quick-${menu.id}`}
                     type="button"
                     onClick={() => setActiveMenuId(menu.id)}
-                    className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-all duration-200 ${
-                      isActive
+                    className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-all duration-200 ${isActive
                         ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
                         : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:bg-white/10 hover:text-slate-100"
-                    }`}
+                      }`}
                   >
                     {menu.title}
                   </button>
@@ -1334,19 +1489,17 @@ export default function Ferramentas() {
                       key={menu.title}
                       type="button"
                       onClick={() => setActiveMenuId(menu.id)}
-                      className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-sm font-medium transition-all duration-200 ${
-                        isActive
+                      className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-sm font-medium transition-all duration-200 ${isActive
                           ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.16),0_0_24px_rgba(255,255,255,0.18),inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-md"
                           : "border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 hover:text-slate-100 hover:shadow-[0_0_18px_rgba(255,255,255,0.12)]"
-                      }`}
+                        }`}
                     >
                       <Icon
                         size={18}
-                        className={`${
-                          isActive
+                        className={`${isActive
                             ? "text-slate-300"
                             : "text-slate-500 group-hover:text-slate-300"
-                        } transition-colors duration-200`}
+                          } transition-colors duration-200`}
                       />
                       <span>{menu.title}</span>
                     </button>
