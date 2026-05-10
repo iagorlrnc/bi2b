@@ -1524,23 +1524,24 @@ export default function Ferramentas() {
       <section className="section-shell pb-32">
         <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8">
           {/* Mobile Layout Header */}
-          <div className="mb-8 max-w-4xl mx-auto text-center min-[1050px]:hidden">
-            <div className="flex items-center justify-center gap-3 mb-5 flex-nowrap">
+          <div className="mb-8 max-w-4xl mx-auto text-center">
+            <div className="mb-5 flex items-center justify-center gap-3 flex-nowrap md:grid md:w-full md:grid-cols-[56px_1fr_56px] md:items-center md:gap-0">
               <button
                 onClick={() => navigate(-1)}
-                className="rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all shrink-0"
+                className="shrink-0 rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 transition-all hover:bg-white/10 hover:text-white md:justify-self-start"
               >
                 <ArrowLeft size={20} />
               </button>
-              <div className="section-label w-fit m-0 shrink h-auto min-h-[38px] py-2">
+              <div className="section-label m-0 flex h-auto min-h-[38px] w-fit shrink py-2 md:justify-self-center">
                 <Sparkles size={14} className="shrink-0" />
                 <span className="whitespace-normal leading-tight text-center">
                   Calculadoras e Simuladores
                 </span>
               </div>
+              <div className="hidden md:block" />
             </div>
             <h2 className="section-title mb-4">Ferramentas de Gestão</h2>
-            <p className="section-copy max-w-2xl mx-auto">
+            <p className="section-copy w-full max-w-none text-center">
               Simule cenários tributários e custos operacionais de forma rápida
               para apoiar a tomada de decisão.
             </p>
