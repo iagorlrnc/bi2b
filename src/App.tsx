@@ -64,7 +64,7 @@ function AppRoutes() {
         <Route path="/ferramentas" element={    <Ferramentas />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {["/", "/obrigado", "/faturamento", "/performance", "/estrategia"].includes(location.pathname) && <Chatbot />}
+      {["/", "/obrigado", "/faturamento", "/performance", "/estrategia", "/ferramentas", "/chatbot"].includes(location.pathname) && <Chatbot />}
     </div>
   )
 }
