@@ -20,6 +20,7 @@ import Estrategia from "./components/Estrategia"
 import NotFound from "./components/NotFound"
 import Chatbot from "./components/Chatbot"
 import Ferramentas from "./components/Ferramentas"
+import { ReportProvider } from "./contexts/ReportContext"
 
 function Home() {
   const location = useLocation()
@@ -64,7 +65,14 @@ function AppRoutes() {
         <Route path="/ferramentas" element={<Ferramentas />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {["/", "/obrigado", "/faturamento", "/performance", "/estrategia", "/chatbot"].includes(location.pathname) && <Chatbot />}
+      {[
+        "/",
+        "/obrigado",
+        "/faturamento",
+        "/performance",
+        "/estrategia",
+        "/chatbot",
+      ].includes(location.pathname) && <Chatbot />}
     </div>
   )
 }
@@ -76,25 +84,30 @@ export const getCampanhaUrl = () => {
 }
 
 function App() {
-  const isCampanhaSubdomain = window.location.hostname.startsWith('abrirminhaempresa.')
+  const isCampanhaSubdomain =
+    window.location.hostname.startsWith("abrirminhaempresa.")
 
   if (isCampanhaSubdomain) {
     return (
-      <Router>
-        <div className="relative min-h-screen overflow-x-hidden bg-transparent text-white">
-          <Routes>
-            <Route path="*" element={<Campanha />} />
-          </Routes>
-          <Chatbot />
-        </div>
-      </Router>
+      <ReportProvider>
+        <Router>
+          <div className="relative min-h-screen overflow-x-hidden bg-transparent text-white">
+            <Routes>
+              <Route path="*" element={<Campanha />} />
+            </Routes>
+            <Chatbot />
+          </div>
+        </Router>
+      </ReportProvider>
     )
   }
 
   return (
-    <Router>
-      <AppRoutes />
-    </Router>
+    <ReportProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </ReportProvider>
   )
 }
 

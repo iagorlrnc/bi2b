@@ -10,7 +10,10 @@ import {
   ArrowLeft,
   ArrowRight,
   Info,
+  FileText,
 } from "lucide-react"
+import ReportModal from "./ReportModal"
+import { useReportContext } from "../contexts/ReportContext"
 
 const parseCurrencyString = (value: string): number | "" => {
   const onlyDigits = value.replace(/\D/g, "")
@@ -27,6 +30,7 @@ const formatCurrencyInput = (value: number | ""): string => {
 }
 
 function CalculadoraIRPF() {
+  const { setIrpfData } = useReportContext()
   const [rendimento, setRendimento] = useState<number | "">("")
   const [deducoes, setDeducoes] = useState<number | "">("")
   const [resultado, setResultado] = useState<{
@@ -40,7 +44,10 @@ function CalculadoraIRPF() {
 
   const [erro, setErro] = useState("")
 
-  const hasValue = String(rendimento).trim() !== "" || String(deducoes).trim() !== "" || resultado !== null
+  const hasValue =
+    String(rendimento).trim() !== "" ||
+    String(deducoes).trim() !== "" ||
+    resultado !== null
   const limparFormulario = () => {
     setRendimento("")
     setDeducoes("")
@@ -110,6 +117,19 @@ function CalculadoraIRPF() {
       imposto: impostoFinal,
       redutor: redutorAplicado,
     })
+
+    setIrpfData({
+      rendimento: r,
+      deducoes: d,
+      resultado: {
+        base,
+        aliquota,
+        aliquotaEfetiva,
+        parcela,
+        imposto: impostoFinal,
+        redutor: redutorAplicado,
+      },
+    })
   }
 
   return (
@@ -144,12 +164,12 @@ function CalculadoraIRPF() {
       </div>
       <div className="flex flex-col sm:flex-row gap-3">
         <button
-        onClick={calcularIRPF}
-        className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
-      >
-        Calcular IRPF
-        <ArrowRight size={18} />
-      </button>
+          onClick={calcularIRPF}
+          className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
+        >
+          Calcular IRPF
+          <ArrowRight size={18} />
+        </button>
         <button
           onClick={limparFormulario}
           disabled={!hasValue}
@@ -397,6 +417,7 @@ function calcularAliquotaEfetivaSimples(
 }
 
 function CalculadoraPJ() {
+  const { setPjData } = useReportContext()
   const [faturamento, setFaturamento] = useState<number | "">("")
   const [rbt12, setRbt12] = useState<number | "">("")
   const [anexoSelecionado, setAnexoSelecionado] = useState("anexoI")
@@ -424,7 +445,10 @@ function CalculadoraPJ() {
       currency: "BRL",
     }).format(val)
 
-  const hasValue = String(faturamento).trim() !== "" || String(rbt12).trim() !== "" || resultado !== null
+  const hasValue =
+    String(faturamento).trim() !== "" ||
+    String(rbt12).trim() !== "" ||
+    resultado !== null
   const limparFormulario = () => {
     setFaturamento("")
     setRbt12("")
@@ -534,6 +558,19 @@ function CalculadoraPJ() {
       lucroTotal,
       lucroBreakdown,
     })
+
+    setPjData({
+      faturamento: fMensal,
+      rbt12: rbt12Final,
+      anexoSelecionado,
+      resultado: {
+        simplesAliquota: simplesAliquotaEfetiva,
+        simplesTotal: fMensalBase * (simplesAliquotaEfetiva / 100),
+        lucroAliquota,
+        lucroTotal,
+        lucroBreakdown,
+      },
+    })
   }
 
   return (
@@ -614,11 +651,11 @@ function CalculadoraPJ() {
       </div>
       <div className="flex flex-col sm:flex-row gap-3">
         <button
-        onClick={calcularPJ}
-        className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
-      >
-        Comparar Regimes
-      </button>
+          onClick={calcularPJ}
+          className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
+        >
+          Comparar Regimes
+        </button>
         <button
           onClick={limparFormulario}
           disabled={!hasValue}
@@ -918,6 +955,7 @@ function CalculadoraPJ() {
 }
 
 function CalculadoraFuncionario() {
+  const { setFuncionarioData } = useReportContext()
   const [faturamentoEmpresa, setFaturamentoEmpresa] = useState<number | "">("")
   const [caixaEmpresa, setCaixaEmpresa] = useState<number | "">("")
   const [salario, setSalario] = useState<number | "">("")
@@ -938,8 +976,15 @@ function CalculadoraFuncionario() {
 
   const [erro, setErro] = useState("")
 
-  
-  const hasValue = String(faturamentoEmpresa).trim() !== "" || String(caixaEmpresa).trim() !== "" || String(salario).trim() !== "" || String(valeTransporte).trim() !== "" || String(valeRefeicao).trim() !== "" || String(ajudaCusto).trim() !== "" || String(outroBeneficio).trim() !== "" || resultado !== null
+  const hasValue =
+    String(faturamentoEmpresa).trim() !== "" ||
+    String(caixaEmpresa).trim() !== "" ||
+    String(salario).trim() !== "" ||
+    String(valeTransporte).trim() !== "" ||
+    String(valeRefeicao).trim() !== "" ||
+    String(ajudaCusto).trim() !== "" ||
+    String(outroBeneficio).trim() !== "" ||
+    resultado !== null
   const limparFormulario = () => {
     setFaturamentoEmpresa("")
     setCaixaEmpresa("")
@@ -988,7 +1033,13 @@ function CalculadoraFuncionario() {
       inssPatronal = (s + feriasMensal + decimoTerceiroMensal) * 0.2
     }
 
-    const total = s + feriasMensal + decimoTerceiroMensal + fgts + inssPatronal + beneficiosTotais
+    const total =
+      s +
+      feriasMensal +
+      decimoTerceiroMensal +
+      fgts +
+      inssPatronal +
+      beneficiosTotais
 
     setResultado({
       bruto: s,
@@ -998,6 +1049,26 @@ function CalculadoraFuncionario() {
       inssPatronal,
       beneficiosTotais,
       total,
+    })
+
+    setFuncionarioData({
+      faturamentoEmpresa: Number(faturamentoEmpresa) || 0,
+      caixaEmpresa: Number(caixaEmpresa) || 0,
+      salario: s,
+      regime,
+      valeTransporte: vt,
+      valeRefeicao: vr,
+      ajudaCusto: ac,
+      outroBeneficio: ob,
+      resultado: {
+        bruto: s,
+        ferias: feriasMensal,
+        decimoTerceiro: decimoTerceiroMensal,
+        fgts,
+        inssPatronal,
+        beneficiosTotais,
+        total,
+      },
     })
   }
 
@@ -1017,7 +1088,9 @@ function CalculadoraFuncionario() {
             type="text"
             inputMode="numeric"
             value={formatCurrencyInput(faturamentoEmpresa)}
-            onChange={(e) => setFaturamentoEmpresa(parseCurrencyString(e.target.value))}
+            onChange={(e) =>
+              setFaturamentoEmpresa(parseCurrencyString(e.target.value))
+            }
             placeholder="R$ 0,00"
             className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
           />
@@ -1030,7 +1103,9 @@ function CalculadoraFuncionario() {
             type="text"
             inputMode="numeric"
             value={formatCurrencyInput(caixaEmpresa)}
-            onChange={(e) => setCaixaEmpresa(parseCurrencyString(e.target.value))}
+            onChange={(e) =>
+              setCaixaEmpresa(parseCurrencyString(e.target.value))
+            }
             placeholder="R$ 0,00"
             className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
           />
@@ -1069,10 +1144,7 @@ function CalculadoraFuncionario() {
             >
               Simples Nacional (Anexo IV)
             </option>
-            <option
-              value="mei"
-              style={{ color: "#000", background: "#fff" }}
-            >
+            <option value="mei" style={{ color: "#000", background: "#fff" }}>
               MEI
             </option>
             <option
@@ -1098,7 +1170,9 @@ function CalculadoraFuncionario() {
             type="text"
             inputMode="numeric"
             value={formatCurrencyInput(valeTransporte)}
-            onChange={(e) => setValeTransporte(parseCurrencyString(e.target.value))}
+            onChange={(e) =>
+              setValeTransporte(parseCurrencyString(e.target.value))
+            }
             placeholder="R$ 0,00"
             className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
           />
@@ -1111,7 +1185,9 @@ function CalculadoraFuncionario() {
             type="text"
             inputMode="numeric"
             value={formatCurrencyInput(valeRefeicao)}
-            onChange={(e) => setValeRefeicao(parseCurrencyString(e.target.value))}
+            onChange={(e) =>
+              setValeRefeicao(parseCurrencyString(e.target.value))
+            }
             placeholder="R$ 0,00"
             className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
           />
@@ -1137,7 +1213,9 @@ function CalculadoraFuncionario() {
             type="text"
             inputMode="numeric"
             value={formatCurrencyInput(outroBeneficio)}
-            onChange={(e) => setOutroBeneficio(parseCurrencyString(e.target.value))}
+            onChange={(e) =>
+              setOutroBeneficio(parseCurrencyString(e.target.value))
+            }
             placeholder="R$ 0,00"
             className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
           />
@@ -1145,12 +1223,12 @@ function CalculadoraFuncionario() {
       </div>
       <div className="flex flex-col sm:flex-row gap-3">
         <button
-        onClick={calcularFuncionario}
-        className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
-      >
-        Calcular Custo Total
-        <ArrowRight size={18} />
-      </button>
+          onClick={calcularFuncionario}
+          className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
+        >
+          Calcular Custo Total
+          <ArrowRight size={18} />
+        </button>
         <button
           onClick={limparFormulario}
           disabled={!hasValue}
@@ -1206,7 +1284,8 @@ function CalculadoraFuncionario() {
                 />
                 <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
                   O valor extra provisionado mensalmente além do salário bruto
-                  para arcar com encargos (FGTS, Férias, 13º, INSS) e benefícios.
+                  para arcar com encargos (FGTS, Férias, 13º, INSS) e
+                  benefícios.
                 </div>
               </div>
               <span className="text-3xl font-bold text-emerald-400">
@@ -1311,7 +1390,9 @@ function CalculadoraFuncionario() {
 
             <div className="flex justify-between border-b border-white/5 pb-2 text-sm pt-2">
               <div className="group relative flex items-center gap-1 cursor-help">
-                <span className="font-medium text-emerald-300">Total de Impostos e Provisões:</span>
+                <span className="font-medium text-emerald-300">
+                  Total de Impostos e Provisões:
+                </span>
                 <Info
                   size={14}
                   className="text-slate-500 hover:text-cyan-400 transition-colors"
@@ -1321,20 +1402,28 @@ function CalculadoraFuncionario() {
                 </div>
               </div>
               <span className="font-medium text-emerald-300">
-                {formatCurrency(resultado.ferias + resultado.decimoTerceiro + resultado.fgts + resultado.inssPatronal)}
+                {formatCurrency(
+                  resultado.ferias +
+                    resultado.decimoTerceiro +
+                    resultado.fgts +
+                    resultado.inssPatronal,
+                )}
               </span>
             </div>
 
             {resultado.beneficiosTotais > 0 && (
               <div className="flex justify-between border-b border-white/5 pb-2 text-sm pt-2">
                 <div className="group relative flex items-center gap-1 cursor-help">
-                  <span className="font-medium text-emerald-300">Total de Benefícios:</span>
+                  <span className="font-medium text-emerald-300">
+                    Total de Benefícios:
+                  </span>
                   <Info
                     size={14}
                     className="text-slate-500 hover:text-cyan-400 transition-colors"
                   />
                   <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
-                    Soma de Vale Transporte, Vale Refeição, Ajuda de Custo e Outros Benefícios.
+                    Soma de Vale Transporte, Vale Refeição, Ajuda de Custo e
+                    Outros Benefícios.
                   </div>
                 </div>
                 <span className="font-medium text-emerald-300">
@@ -1354,7 +1443,8 @@ function CalculadoraFuncionario() {
                 />
                 <div className="absolute bottom-full right-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
                   O valor contábil real que o funcionário custa mensalmente para
-                  a empresa, somando salário, encargos trabalhistas e benefícios.
+                  a empresa, somando salário, encargos trabalhistas e
+                  benefícios.
                 </div>
               </div>
               <span className="font-semibold text-[#7ee7ff]">
@@ -1375,6 +1465,7 @@ function CalculadoraFuncionario() {
 
 export default function Ferramentas() {
   const navigate = useNavigate()
+  const [isReportOpen, setIsReportOpen] = useState(false)
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" })
@@ -1432,7 +1523,6 @@ export default function Ferramentas() {
     <div className="min-h-screen relative pt-12 bg-transparent text-white">
       <section className="section-shell pb-32">
         <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8">
-          
           {/* Mobile Layout Header */}
           <div className="mb-8 max-w-4xl mx-auto text-center min-[1050px]:hidden">
             <div className="flex items-center justify-center gap-3 mb-5 flex-nowrap">
@@ -1456,29 +1546,7 @@ export default function Ferramentas() {
             </p>
           </div>
 
-          {/* Desktop Layout Header */}
-          <div className="hidden min-[1050px]:block mb-12 max-w-4xl mx-auto text-left md:mx-0">
-            <div className="flex gap-4 items-center mb-5">
-              <button
-                onClick={() => navigate(-1)}
-                className="rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
-              >
-                <ArrowLeft size={20} />
-              </button>
-              <div className="section-label w-fit m-0">
-                <Sparkles size={14} />
-                Calculadoras e Simuladores
-              </div>
-            </div>
-            <h2 className="section-title mb-4">Ferramentas de Gestão</h2>
-            <p className="section-copy max-w-2xl">
-              Simule cenários tributários e custos operacionais de forma rápida
-              para apoiar a tomada de decisão.
-            </p>
-          </div>
-
           <div className="flex flex-col gap-4 min-[1050px]:grid min-[1050px]:grid-cols-[280px_minmax(0,1fr)] min-[1050px]:gap-3 min-[1050px]:items-stretch">
-            
             {/* Mobile Navigation */}
             <div className="space-y-4 min-[1050px]:hidden">
               <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950/40 to-slate-900/20 p-4 backdrop-blur-lg">
@@ -1512,10 +1580,11 @@ export default function Ferramentas() {
                       key={`quick-${menu.id}`}
                       type="button"
                       onClick={() => setActiveMenuId(menu.id)}
-                      className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-all duration-200 ${isActive
+                      className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-all duration-200 ${
+                        isActive
                           ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
                           : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:bg-white/10 hover:text-slate-100"
-                        }`}
+                      }`}
                     >
                       {menu.title}
                     </button>
@@ -1539,17 +1608,19 @@ export default function Ferramentas() {
                       key={menu.title}
                       type="button"
                       onClick={() => setActiveMenuId(menu.id)}
-                      className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-sm font-medium transition-all duration-200 ${isActive
+                      className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-4 text-left text-sm font-medium transition-all duration-200 ${
+                        isActive
                           ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.16),0_0_24px_rgba(255,255,255,0.18),inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-md"
                           : "border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 hover:text-slate-100 hover:shadow-[0_0_18px_rgba(255,255,255,0.12)]"
-                        }`}
+                      }`}
                     >
                       <Icon
                         size={18}
-                        className={`${isActive
+                        className={`${
+                          isActive
                             ? "text-slate-300"
                             : "text-slate-500 group-hover:text-slate-300"
-                          } transition-colors duration-200`}
+                        } transition-colors duration-200`}
                       />
                       <span>{menu.title}</span>
                     </button>
@@ -1560,7 +1631,6 @@ export default function Ferramentas() {
 
             {/* Shared Content Area */}
             <main className="min-[1050px]:rounded-[20px] min-[1050px]:border min-[1050px]:border-white/10 min-[1050px]:bg-gradient-to-br min-[1050px]:from-slate-950/40 min-[1050px]:to-slate-900/20 min-[1050px]:p-8 min-[1050px]:shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] min-[1050px]:backdrop-blur-2xl">
-              
               {/* Desktop Component Header */}
               <header className="hidden min-[1050px]:block mb-8">
                 <h2 className="text-2xl font-semibold tracking-tight text-slate-100 md:text-3xl">
@@ -1571,24 +1641,54 @@ export default function Ferramentas() {
                 </p>
               </header>
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
-                {/* Mobile Component Header (inside the card) */}
-                <div className="min-[1050px]:hidden mb-6">
-                  <h2 className="mb-2 text-xl font-semibold tracking-tight text-slate-100">
-                    {activeMenu.heading}
-                  </h2>
-                  <p className="text-sm text-slate-400">
-                    {activeMenu.subtitle}
-                  </p>
-                </div>
-                
-                {/* Single shared instance of the calculator */}
-                {activeMenu.content}
+              <div className="space-y-4">
+                {menus.map((menu) => {
+                  const isActive = activeMenuId === menu.id
+
+                  return (
+                    <div
+                      key={menu.id}
+                      className={`${isActive ? "block" : "hidden"} rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg`}
+                    >
+                      <div className="min-[1050px]:hidden mb-6">
+                        <h2 className="mb-2 text-xl font-semibold tracking-tight text-slate-100">
+                          {menu.heading}
+                        </h2>
+                        <p className="text-sm text-slate-400">
+                          {menu.subtitle}
+                        </p>
+                      </div>
+
+                      {menu.content}
+                    </div>
+                  )
+                })}
               </div>
             </main>
           </div>
         </div>
       </section>
+
+      <button
+        type="button"
+        onClick={() => setIsReportOpen(true)}
+        className="fixed bottom-6 left-6 z-40 flex items-center gap-3 rounded-full border border-cyan-300/20 bg-[#071723]/90 px-5 py-4 text-sm font-semibold text-white shadow-[0_18px_50px_rgba(0,0,0,0.35)] backdrop-blur-xl transition-all hover:-translate-y-1 hover:border-cyan-300/40 hover:bg-[#0b2231] hover:shadow-[0_22px_70px_rgba(13,96,132,0.28)]"
+      >
+        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#7ee7ff]/20 to-[#0d6084]/20 text-[#7ee7ff]">
+          <FileText size={18} />
+        </span>
+        <span className="flex flex-col items-start leading-tight">
+          <span className="uppercase tracking-[0.18em] text-[10px] text-cyan-200/70">
+            Relatório
+          </span>
+          <span>Gerar relatório</span>
+        </span>
+      </button>
+
+      <ReportModal
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+      />
     </div>
   )
 }
