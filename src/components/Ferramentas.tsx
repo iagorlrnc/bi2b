@@ -168,7 +168,6 @@ function CalculadoraIRPF() {
           className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
         >
           Calcular IRPF
-          <ArrowRight size={18} />
         </button>
         <button
           onClick={limparFormulario}
@@ -778,14 +777,14 @@ function CalculadoraPJ() {
                 <div className="space-y-2 mb-4 pb-3 border-b border-white/10 text-xs text-slate-400">
                   <div className="flex justify-between">
                     <div className="group relative flex items-center gap-2 cursor-help">
-                        <Info
-                          size={14}
-                          className="shrink-0 text-slate-500 hover:text-cyan-400 transition-colors"
-                        />
-                        <span>
-                          PIS/COFINS (
-                          {resultado.lucroBreakdown.pisCofinsPerc.toFixed(2)}%):
-                        </span>
+                      <Info
+                        size={14}
+                        className="shrink-0 text-slate-500 hover:text-cyan-400 transition-colors"
+                      />
+                      <span>
+                        PIS/COFINS (
+                        {resultado.lucroBreakdown.pisCofinsPerc.toFixed(2)}%):
+                      </span>
                       <div className="absolute bottom-full left-0 mb-2 w-64 rounded-lg bg-slate-800 p-3 text-xs text-slate-200 opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-10 shadow-xl border border-white/10">
                         Impostos federais sobre a receita bruta (regime
                         cumulativo de 3,65%).
@@ -1227,7 +1226,6 @@ function CalculadoraFuncionario() {
           className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
         >
           Calcular Custo Total
-          <ArrowRight size={18} />
         </button>
         <button
           onClick={limparFormulario}
