@@ -40,6 +40,14 @@ function CalculadoraIRPF() {
 
   const [erro, setErro] = useState("")
 
+  const hasValue = String(rendimento).trim() !== "" || String(deducoes).trim() !== "" || resultado !== null
+  const limparFormulario = () => {
+    setRendimento("")
+    setDeducoes("")
+    setResultado(null)
+    setErro("")
+  }
+
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -134,13 +142,22 @@ function CalculadoraIRPF() {
           />
         </div>
       </div>
-      <button
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
         onClick={calcularIRPF}
         className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
       >
         Calcular IRPF
         <ArrowRight size={18} />
       </button>
+        <button
+          onClick={limparFormulario}
+          disabled={!hasValue}
+          className="rounded-full border border-white/20 bg-white/5 px-8 py-3 text-sm font-medium text-slate-300 transition-all hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+        >
+          Limpar
+        </button>
+      </div>
 
       {erro && (
         <div className="mt-4 p-3 bg-red-900/20 border border-red-500/20 rounded-lg text-center animate-in fade-in">
@@ -407,6 +424,15 @@ function CalculadoraPJ() {
       currency: "BRL",
     }).format(val)
 
+  const hasValue = String(faturamento).trim() !== "" || String(rbt12).trim() !== "" || resultado !== null
+  const limparFormulario = () => {
+    setFaturamento("")
+    setRbt12("")
+    setAnexoSelecionado("anexoI")
+    setResultado(null)
+    setErro("")
+  }
+
   const getFaixaSimplesNacional = (rbt12Valor: number) => {
     let tabelaAtiva = tabelasSimples.anexoIII
     if (anexoSelecionado === "anexoI") tabelaAtiva = tabelasSimples.anexoI
@@ -586,12 +612,21 @@ function CalculadoraPJ() {
           </select>
         </div>
       </div>
-      <button
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
         onClick={calcularPJ}
         className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
       >
         Comparar Regimes
       </button>
+        <button
+          onClick={limparFormulario}
+          disabled={!hasValue}
+          className="rounded-full border border-white/20 bg-white/5 px-8 py-3 text-sm font-medium text-slate-300 transition-all hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+        >
+          Limpar
+        </button>
+      </div>
 
       {erro && (
         <div className="mt-4 p-3 bg-red-900/20 border border-red-500/20 rounded-lg text-center animate-in fade-in">
@@ -903,6 +938,21 @@ function CalculadoraFuncionario() {
 
   const [erro, setErro] = useState("")
 
+  
+  const hasValue = String(faturamentoEmpresa).trim() !== "" || String(caixaEmpresa).trim() !== "" || String(salario).trim() !== "" || String(valeTransporte).trim() !== "" || String(valeRefeicao).trim() !== "" || String(ajudaCusto).trim() !== "" || String(outroBeneficio).trim() !== "" || resultado !== null
+  const limparFormulario = () => {
+    setFaturamentoEmpresa("")
+    setCaixaEmpresa("")
+    setSalario("")
+    setValeTransporte("")
+    setValeRefeicao("")
+    setAjudaCusto("")
+    setOutroBeneficio("")
+    setRegime("simples")
+    setResultado(null)
+    setErro("")
+  }
+
   const formatCurrency = (val: number) =>
     new Intl.NumberFormat("pt-BR", {
       style: "currency",
@@ -1093,13 +1143,22 @@ function CalculadoraFuncionario() {
           />
         </div>
       </div>
-      <button
+      <div className="flex flex-col sm:flex-row gap-3">
+        <button
         onClick={calcularFuncionario}
         className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-3 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 sm:w-auto"
       >
         Calcular Custo Total
         <ArrowRight size={18} />
       </button>
+        <button
+          onClick={limparFormulario}
+          disabled={!hasValue}
+          className="rounded-full border border-white/20 bg-white/5 px-8 py-3 text-sm font-medium text-slate-300 transition-all hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
+        >
+          Limpar
+        </button>
+      </div>
 
       {erro && (
         <div className="mt-4 p-3 bg-red-900/20 border border-red-500/20 rounded-lg text-center animate-in fade-in">
@@ -1372,9 +1431,10 @@ export default function Ferramentas() {
   return (
     <div className="min-h-screen relative pt-12 bg-transparent text-white">
       <section className="section-shell pb-32">
-        <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 min-[1050px]:hidden">
-          {/* Mobile Layout */}
-          <div className="mb-8 max-w-4xl mx-auto text-center">
+        <div className="mx-auto w-full max-w-[1300px] px-4 sm:px-6 lg:px-8">
+          
+          {/* Mobile Layout Header */}
+          <div className="mb-8 max-w-4xl mx-auto text-center min-[1050px]:hidden">
             <div className="flex items-center justify-center gap-3 mb-5 flex-nowrap">
               <button
                 onClick={() => navigate(-1)}
@@ -1396,86 +1456,76 @@ export default function Ferramentas() {
             </p>
           </div>
 
-          <div className="space-y-4">
-            <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950/40 to-slate-900/20 p-4 backdrop-blur-lg">
-              <button
-                onClick={handlePrevMenu}
-                disabled={currentIndex === 0}
-                className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronLeft size={20} />
-              </button>
-
-              <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
-                {activeMenu.title}
-                <br />({currentIndex + 1} de {menus.length})
-              </span>
-
-              <button
-                onClick={handleNextMenu}
-                disabled={currentIndex === menus.length - 1}
-                className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-
-            <div className="hidden min-[600px]:grid min-[600px]:grid-cols-3 min-[600px]:gap-2 min-[1050px]:hidden">
-              {menus.map((menu) => {
-                const isActive = activeMenuId === menu.id
-                return (
-                  <button
-                    key={`quick-${menu.id}`}
-                    type="button"
-                    onClick={() => setActiveMenuId(menu.id)}
-                    className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-all duration-200 ${isActive
-                        ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
-                        : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:bg-white/10 hover:text-slate-100"
-                      }`}
-                  >
-                    {menu.title}
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="space-y-3">
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
-                <h2 className="mb-2 text-xl font-semibold tracking-tight text-slate-100">
-                  {activeMenu.heading}
-                </h2>
-                <p className="mb-6 text-sm text-slate-400">
-                  {activeMenu.subtitle}
-                </p>
-                {activeMenu.content}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="mx-auto hidden w-full max-w-[1300px] px-4 sm:px-6 lg:px-8 min-[1050px]:block">
-          <div className="mb-12 max-w-4xl mx-auto text-center md:text-left md:mx-0">
-            <div className="flex gap-4 items-center">
+          {/* Desktop Layout Header */}
+          <div className="hidden min-[1050px]:block mb-12 max-w-4xl mx-auto text-left md:mx-0">
+            <div className="flex gap-4 items-center mb-5">
               <button
                 onClick={() => navigate(-1)}
-                className="rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all mb-5"
+                className="rounded-full border border-white/20 bg-white/5 p-3 text-slate-300 hover:bg-white/10 hover:text-white transition-all"
               >
                 <ArrowLeft size={20} />
               </button>
-              <div className="section-label mb-5 w-fit">
+              <div className="section-label w-fit m-0">
                 <Sparkles size={14} />
                 Calculadoras e Simuladores
               </div>
             </div>
             <h2 className="section-title mb-4">Ferramentas de Gestão</h2>
-            <p className="section-copy max-w-2xl mx-auto md:mx-0">
+            <p className="section-copy max-w-2xl">
               Simule cenários tributários e custos operacionais de forma rápida
               para apoiar a tomada de decisão.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 lg:grid-cols-[280px_minmax(0,1fr)] lg:items-stretch">
-            <aside className="h-full w-full rounded-[20px] border border-white/10 bg-gradient-to-b from-slate-950/40 to-slate-900/20 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl">
+          <div className="flex flex-col gap-4 min-[1050px]:grid min-[1050px]:grid-cols-[280px_minmax(0,1fr)] min-[1050px]:gap-3 min-[1050px]:items-stretch">
+            
+            {/* Mobile Navigation */}
+            <div className="space-y-4 min-[1050px]:hidden">
+              <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950/40 to-slate-900/20 p-4 backdrop-blur-lg">
+                <button
+                  onClick={handlePrevMenu}
+                  disabled={currentIndex === 0}
+                  className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+
+                <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
+                  {activeMenu.title}
+                  <br />({currentIndex + 1} de {menus.length})
+                </span>
+
+                <button
+                  onClick={handleNextMenu}
+                  disabled={currentIndex === menus.length - 1}
+                  className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+
+              <div className="hidden min-[600px]:grid min-[600px]:grid-cols-3 min-[600px]:gap-2">
+                {menus.map((menu) => {
+                  const isActive = activeMenuId === menu.id
+                  return (
+                    <button
+                      key={`quick-${menu.id}`}
+                      type="button"
+                      onClick={() => setActiveMenuId(menu.id)}
+                      className={`rounded-lg border px-3 py-2 text-center text-xs font-semibold transition-all duration-200 ${isActive
+                          ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.12)]"
+                          : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:bg-white/10 hover:text-slate-100"
+                        }`}
+                    >
+                      {menu.title}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* Desktop Navigation */}
+            <aside className="hidden min-[1050px]:block h-full w-full rounded-[20px] border border-white/10 bg-gradient-to-b from-slate-950/40 to-slate-900/20 p-6 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl">
               <p className="mb-6 px-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-slate-500">
                 Calculadoras
               </p>
@@ -1508,8 +1558,11 @@ export default function Ferramentas() {
               </nav>
             </aside>
 
-            <main className="rounded-[20px] border border-white/10 bg-gradient-to-br from-slate-950/40 to-slate-900/20 p-8 shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] backdrop-blur-2xl sm:p-10">
-              <header className="mb-8">
+            {/* Shared Content Area */}
+            <main className="min-[1050px]:rounded-[20px] min-[1050px]:border min-[1050px]:border-white/10 min-[1050px]:bg-gradient-to-br min-[1050px]:from-slate-950/40 min-[1050px]:to-slate-900/20 min-[1050px]:p-8 min-[1050px]:shadow-[0_8px_32px_rgba(0,0,0,0.15),inset_0_1px_1px_rgba(255,255,255,0.1)] min-[1050px]:backdrop-blur-2xl">
+              
+              {/* Desktop Component Header */}
+              <header className="hidden min-[1050px]:block mb-8">
                 <h2 className="text-2xl font-semibold tracking-tight text-slate-100 md:text-3xl">
                   {activeMenu.heading}
                 </h2>
@@ -1518,7 +1571,18 @@ export default function Ferramentas() {
                 </p>
               </header>
 
-              <div className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:p-6 md:p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
+                {/* Mobile Component Header (inside the card) */}
+                <div className="min-[1050px]:hidden mb-6">
+                  <h2 className="mb-2 text-xl font-semibold tracking-tight text-slate-100">
+                    {activeMenu.heading}
+                  </h2>
+                  <p className="text-sm text-slate-400">
+                    {activeMenu.subtitle}
+                  </p>
+                </div>
+                
+                {/* Single shared instance of the calculator */}
                 {activeMenu.content}
               </div>
             </main>

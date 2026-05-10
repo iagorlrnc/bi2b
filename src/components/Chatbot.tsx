@@ -196,8 +196,8 @@ export default function Chatbot() {
         return
       }
 
-      // O RD Station OBRIGA a existência de um campo "email" para criar o lead.
-      // Como não pedimos email no funil, geramos um email fictício baseado no telefone.
+      // RD Station OBRIGA um campo "email" para criar o lead.
+      // como não é solicitado email, é gerado um email fictício.
       const telefoneNumeros = data.phone.replace(/\D/g, "")
       const dummyEmail = `cliente.${telefoneNumeros}@chatbot.com`
 
