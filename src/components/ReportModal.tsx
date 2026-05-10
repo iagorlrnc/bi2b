@@ -67,7 +67,7 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
         return
       }
 
-      let calculadoras = []
+      const calculadoras = []
       if (includeIrpf) calculadoras.push("IRPF")
       if (includePj) calculadoras.push("PJ")
       if (includeFuncionario) calculadoras.push("Custo de Funcionário")
