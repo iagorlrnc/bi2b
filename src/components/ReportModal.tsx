@@ -38,7 +38,12 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
 
   const hasAnyCalculator = irpfData || pjData || funcionarioData
   const hasSelectedCalculators = includeIrpf || includePj || includeFuncionario
-  const isFormValid = name.trim() !== "" && phone.trim() !== "" && email.trim() !== "" && lgpd && hasSelectedCalculators
+  const isFormValid =
+    name.trim() !== "" &&
+    phone.trim() !== "" &&
+    email.trim() !== "" &&
+    lgpd &&
+    hasSelectedCalculators
 
   const maskPhone = (value: string) => {
     let v = value.replace(/\D/g, "")
@@ -79,7 +84,7 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
         nome: name,
         telefone: phone,
         cf_consentimento_lgpd: "Sim",
-        cf_calculadoras_utilizadas: calculadoras.join(", ")
+        cf_calculadoras_utilizadas: calculadoras.join(", "),
       }
 
       await fetch("https://www.rdstation.com.br/api/1.2/conversions", {
@@ -113,15 +118,22 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
         // Centraliza a logo: (210 - largura) / 2
         doc.addImage(img, "PNG", (210 - 25) / 2, 10, 25, 10)
       }
-      
+
       doc.setFontSize(22)
       doc.setTextColor(13, 96, 132)
-      doc.text("Relatório de Simulação Tributária", 105, 30, { align: "center" })
-      
+      doc.text("Relatório de Simulação Tributária", 105, 30, {
+        align: "center",
+      })
+
       doc.setFontSize(12)
       doc.setTextColor(100, 100, 100)
       doc.text(`Solicitante: ${name}`, 105, 38, { align: "center" })
-      doc.text(`Data: ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}`, 105, 44, { align: "center" })
+      doc.text(
+        `Data: ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}`,
+        105,
+        44,
+        { align: "center" },
+      )
 
       let currentY = 55
 
@@ -141,13 +153,22 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
             ["Base de Cálculo", formatCurrency(irpfData.resultado.base)],
             ["Alíquota Nominal", `${irpfData.resultado.aliquota}%`],
             ["Parcela a Deduzir", formatCurrency(irpfData.resultado.parcela)],
-            ...(irpfData.resultado.redutor ? [["Desconto Linear (Redutor)", `- ${formatCurrency(irpfData.resultado.redutor)}`]] : []),
-            ["Alíquota Efetiva Real", `${irpfData.resultado.aliquotaEfetiva.toFixed(2)}%`],
+            ...(irpfData.resultado.redutor
+              ? [
+                  [
+                    "Desconto Linear (Redutor)",
+                    `- ${formatCurrency(irpfData.resultado.redutor)}`,
+                  ],
+                ]
+              : []),
+            [
+              "Alíquota Efetiva Real",
+              `${irpfData.resultado.aliquotaEfetiva.toFixed(2)}%`,
+            ],
             ["Imposto Devido", formatCurrency(irpfData.resultado.imposto)],
-            
           ],
-          theme: 'striped',
-          headStyles: { fillColor: [13, 96, 132] }
+          theme: "striped",
+          headStyles: { fillColor: [13, 96, 132] },
         })
         currentY = (doc as any).lastAutoTable.finalY + 15
       }
@@ -169,12 +190,24 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
           startY: currentY,
           head: [["Descrição", "Simples Nacional", "Lucro Presumido"]],
           body: [
-            ["Faturamento Mensal", formatCurrency(pjData.faturamento || pjData.rbt12/12), formatCurrency(pjData.faturamento || pjData.rbt12/12)],
-            ["Alíquota Efetiva Aprox.", `${pjData.resultado.simplesAliquota.toFixed(2)}%`, `${pjData.resultado.lucroAliquota.toFixed(2)}%`],
-            ["Total Imposto Mensal", formatCurrency(pjData.resultado.simplesTotal), formatCurrency(pjData.resultado.lucroTotal)],
+            [
+              "Faturamento Mensal",
+              formatCurrency(pjData.faturamento || pjData.rbt12 / 12),
+              formatCurrency(pjData.faturamento || pjData.rbt12 / 12),
+            ],
+            [
+              "Alíquota Efetiva Aprox.",
+              `${pjData.resultado.simplesAliquota.toFixed(2)}%`,
+              `${pjData.resultado.lucroAliquota.toFixed(2)}%`,
+            ],
+            [
+              "Total Imposto Mensal",
+              formatCurrency(pjData.resultado.simplesTotal),
+              formatCurrency(pjData.resultado.lucroTotal),
+            ],
           ],
-          theme: 'striped',
-          headStyles: { fillColor: [13, 96, 132] }
+          theme: "striped",
+          headStyles: { fillColor: [13, 96, 132] },
         })
         currentY = (doc as any).lastAutoTable.finalY + 15
       }
@@ -197,13 +230,33 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
           head: [["Descrição", "Valor"]],
           body: [
             ["Salário Base Bruto", formatCurrency(funcionarioData.salario)],
-            ["Regime", funcionarioData.regime === "simples" ? "Simples Nacional" : funcionarioData.regime === "mei" ? "MEI" : "Lucro Presumido"],
-            ["Total de Benefícios", formatCurrency(funcionarioData.resultado.beneficiosTotais)],
-            ["Encargos (Férias, 13º, FGTS, INSS)", formatCurrency(funcionarioData.resultado.total - funcionarioData.salario - funcionarioData.resultado.beneficiosTotais)],
-            ["Custo Total Mensal", formatCurrency(funcionarioData.resultado.total)],
+            [
+              "Regime",
+              funcionarioData.regime === "simples"
+                ? "Simples Nacional"
+                : funcionarioData.regime === "mei"
+                  ? "MEI"
+                  : "Lucro Presumido",
+            ],
+            [
+              "Total de Benefícios",
+              formatCurrency(funcionarioData.resultado.beneficiosTotais),
+            ],
+            [
+              "Encargos (Férias, 13º, FGTS, INSS)",
+              formatCurrency(
+                funcionarioData.resultado.total -
+                  funcionarioData.salario -
+                  funcionarioData.resultado.beneficiosTotais,
+              ),
+            ],
+            [
+              "Custo Total Mensal",
+              formatCurrency(funcionarioData.resultado.total),
+            ],
           ],
-          theme: 'striped',
-          headStyles: { fillColor: [13, 96, 132] }
+          theme: "striped",
+          headStyles: { fillColor: [13, 96, 132] },
         })
         currentY = (doc as any).lastAutoTable.finalY + 15
       }
@@ -211,17 +264,18 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
       // Footer disclaimer
       doc.setFontSize(9)
       doc.setTextColor(150, 150, 150)
-      
-      const disclaimerText = "Aviso: Os dados apresentados neste relatório não são oficiais e possuem caráter exclusivamente simulatório e educativo. Eles não substituem uma consultoria contábil profissional. Entre em contato com um consultor da Bi2B para uma análise detalhada e personalizada do seu negócio."
+
+      const disclaimerText =
+        "Aviso: Os dados apresentados neste relatório não são oficiais e possuem caráter exclusivamente simulatório. Eles não substituem uma consultoria contábil profissional. Entre em contato com um consultor da Bi2B para uma análise detalhada e personalizada do seu negócio."
       const lines = doc.splitTextToSize(disclaimerText, 180)
-      
+
       // If we are too far down the page, add a new one for disclaimer
-      if (currentY + (lines.length * 5) > 280) {
+      if (currentY + lines.length * 5 > 280) {
         doc.addPage()
         currentY = 20
       } else {
         // Put disclaimer at the bottom of the current page if there is space, or just after the tables.
-        currentY = Math.max(currentY + 10, 270 - (lines.length * 5))
+        currentY = Math.max(currentY + 10, 270 - lines.length * 5)
       }
 
       doc.text(lines, 105, currentY, { align: "center" })
@@ -252,20 +306,27 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
                 <FileText size={24} />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Gerar Relatório</h2>
-                <p className="text-sm text-slate-400">Exporte suas simulações em PDF</p>
+                <h2 className="text-xl font-bold text-white">
+                  Gerar Relatório
+                </h2>
+                <p className="text-sm text-slate-400">
+                  Exporte suas simulações em PDF
+                </p>
               </div>
             </div>
 
             {!hasAnyCalculator ? (
               <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-200 text-sm mb-6">
-                Você ainda não realizou nenhuma simulação. Preencha e calcule alguma ferramenta primeiro para gerar um relatório.
+                Você ainda não realizou nenhuma simulação. Preencha e calcule
+                alguma ferramenta primeiro para gerar um relatório.
               </div>
             ) : (
               <div className="space-y-5">
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Nome Completo</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">
+                      Nome Completo
+                    </label>
                     <input
                       type="text"
                       value={name}
@@ -275,7 +336,9 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Telefone</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">
+                      Telefone
+                    </label>
                     <input
                       type="tel"
                       value={phone}
@@ -285,7 +348,9 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">E-mail</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">
+                      E-mail
+                    </label>
                     <input
                       type="email"
                       value={email}
@@ -297,7 +362,9 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
                 </div>
 
                 <div className="pt-2 border-t border-white/10">
-                  <h3 className="text-sm font-medium text-slate-300 mb-3">O que incluir no relatório?</h3>
+                  <h3 className="text-sm font-medium text-slate-300 mb-3">
+                    O que incluir no relatório?
+                  </h3>
                   <div className="space-y-2">
                     {irpfData && (
                       <label className="flex items-center gap-3 cursor-pointer">
@@ -307,7 +374,9 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
                           onChange={(e) => setIncludeIrpf(e.target.checked)}
                           className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#7ee7ff] focus:ring-[#7ee7ff]"
                         />
-                        <span className="text-sm text-slate-200">Simulação de IRPF</span>
+                        <span className="text-sm text-slate-200">
+                          Simulação de IRPF
+                        </span>
                       </label>
                     )}
                     {pjData && (
@@ -318,7 +387,9 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
                           onChange={(e) => setIncludePj(e.target.checked)}
                           className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#7ee7ff] focus:ring-[#7ee7ff]"
                         />
-                        <span className="text-sm text-slate-200">Comparativo (Simples Nacional x Lucro Presumido)</span>
+                        <span className="text-sm text-slate-200">
+                          Comparativo (Simples Nacional x Lucro Presumido)
+                        </span>
                       </label>
                     )}
                     {funcionarioData && (
@@ -326,10 +397,14 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
                         <input
                           type="checkbox"
                           checked={includeFuncionario}
-                          onChange={(e) => setIncludeFuncionario(e.target.checked)}
+                          onChange={(e) =>
+                            setIncludeFuncionario(e.target.checked)
+                          }
                           className="w-4 h-4 rounded border-white/20 bg-white/5 text-[#7ee7ff] focus:ring-[#7ee7ff]"
                         />
-                        <span className="text-sm text-slate-200">Custo de Funcionário</span>
+                        <span className="text-sm text-slate-200">
+                          Custo de Funcionário
+                        </span>
                       </label>
                     )}
                   </div>
@@ -344,7 +419,9 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
                       className="mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-[#7ee7ff] focus:ring-[#7ee7ff]"
                     />
                     <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">
-                      Concordo em fornecer meus dados para a Bi2B Consultoria. Entendo que posso receber contatos e materiais informativos, de acordo com a LGPD.
+                      Concordo em fornecer meus dados para a Bi2B Consultoria.
+                      Entendo que posso receber contatos e materiais
+                      informativos, de acordo com a LGPD.
                     </span>
                   </label>
                 </div>
@@ -374,8 +451,12 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
             <div className="h-16 w-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center mb-4 mx-auto animate-bounce">
               <Check size={32} />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">Relatório Gerado!</h2>
-            <p className="text-slate-400 mb-8">O download do seu PDF começou automaticamente.</p>
+            <h2 className="text-2xl font-bold text-white mb-2">
+              Relatório Gerado!
+            </h2>
+            <p className="text-slate-400 mb-8">
+              O download do seu PDF começou automaticamente.
+            </p>
             <button
               onClick={onClose}
               className="bg-white/10 hover:bg-white/20 text-white py-2 px-6 rounded-lg font-medium transition-all"
