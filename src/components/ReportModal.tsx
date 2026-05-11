@@ -142,8 +142,9 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
             ["Alíquota Nominal", `${irpfData.resultado.aliquota}%`],
             ["Parcela a Deduzir", formatCurrency(irpfData.resultado.parcela)],
             ...(irpfData.resultado.redutor ? [["Desconto Linear (Redutor)", `- ${formatCurrency(irpfData.resultado.redutor)}`]] : []),
-            ["Imposto Devido", formatCurrency(irpfData.resultado.imposto)],
             ["Alíquota Efetiva Real", `${irpfData.resultado.aliquotaEfetiva.toFixed(2)}%`],
+            ["Imposto Devido", formatCurrency(irpfData.resultado.imposto)],
+            
           ],
           theme: 'striped',
           headStyles: { fillColor: [13, 96, 132] }
@@ -274,7 +275,7 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-300 mb-1">Telefone / WhatsApp</label>
+                    <label className="block text-sm font-medium text-slate-300 mb-1">Telefone</label>
                     <input
                       type="tel"
                       value={phone}

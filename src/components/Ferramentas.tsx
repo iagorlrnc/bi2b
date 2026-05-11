@@ -8,7 +8,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ArrowLeft,
-  ArrowRight,
   Info,
   FileText,
 } from "lucide-react"
