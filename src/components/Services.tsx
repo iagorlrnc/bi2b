@@ -10,7 +10,7 @@ import {
 import { useEffect, useRef, useState } from "react"
 import { FaWhatsapp } from "react-icons/fa"
 
-import { getCampanhaUrl } from "../App"
+import { getCampanhaUrl } from "../utils/campanha"
 
 interface ServiceCardProps {
   icon: React.ReactNode

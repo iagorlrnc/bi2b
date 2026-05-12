@@ -1,7 +1,7 @@
 import { ArrowRight, Home } from "lucide-react"
 import { Link } from "react-router-dom"
 import bpontoImg from "../assets/img/bponto.png"
-import { getCampanhaUrl } from "../App"
+import { getCampanhaUrl } from "../utils/campanha"
 
 export default function NotFound() {
   return (

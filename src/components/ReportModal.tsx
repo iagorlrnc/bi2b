@@ -318,7 +318,7 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
             {!hasAnyCalculator ? (
               <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-200 text-sm mb-6">
                 Você ainda não realizou nenhuma simulação. Preencha e calcule
-                alguma ferramenta primeiro para gerar um relatório.
+                alguma simulação primeiro para gerar um relatório.
               </div>
             ) : (
               <div className="space-y-5">
@@ -461,7 +461,7 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
               onClick={onClose}
               className="bg-white/10 hover:bg-white/20 text-white py-2 px-6 rounded-lg font-medium transition-all"
             >
-              Voltar para as ferramentas
+              Voltar
             </button>
           </div>
         )}

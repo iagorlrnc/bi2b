@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react"
-import { Link } from "react-router-dom"
 import logoMain from "../assets/img/logo.png"
 import logoPonto from "../assets/img/bponto.png"
 
@@ -73,10 +72,11 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || menuOpen
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled || menuOpen
           ? "bg-slate-950/45 backdrop-blur-lg border-b border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.22)]"
           : "pointer-events-none -translate-y-full opacity-0 bg-transparent md:bg-transparent"
-        }`}
+      }`}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between box-border gap-3">
         {/* Esquerda: Logo (tamanhos normais) */}
@@ -123,12 +123,6 @@ export default function Header() {
             ))}
           </nav>
 
-          <Link
-            to="/ferramentas"
-            className="hidden min-[881px]:flex items-center justify-center h-[48px] px-6 rounded-full border border-white/20 bg-white/5 hover:bg-white/10 transition-colors text-white text-sm font-medium whitespace-nowrap"
-          >
-            Ferramentas
-          </Link>
           <a
             href="https://share.google/ZDrIBH8t9kXoMq5nJ"
             target="_blank"
@@ -219,13 +213,6 @@ export default function Header() {
                 {item.label}
               </button>
             ))}
-            <Link
-              to="/ferramentas"
-              onClick={() => setMenuOpen(false)}
-              className="mt-4 flex items-center justify-center rounded-full border border-white/20 bg-white/5 hover:bg-white/10 px-8 py-3 text-white w-full transition-colors font-medium"
-            >
-              Ferramentas
-            </Link>
             <a
               href="https://share.google/ZDrIBH8t9kXoMq5nJ"
               target="_blank"

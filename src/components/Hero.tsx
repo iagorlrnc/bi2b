@@ -1,7 +1,6 @@
-import { Link } from "react-router-dom"
 import { DatabaseZap, ShieldCheck, Sparkles } from "lucide-react"
 import logoMain from "../assets/img/logo.png"
-import { getCampanhaUrl } from "../App"
+import { getCampanhaUrl } from "../utils/campanha"
 
 export default function Hero() {
   const scrollToServices = () => {
@@ -21,8 +20,6 @@ export default function Hero() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,7,18,0.55),rgba(3,7,18,0.8)),url('/src/assets/img/heroimg.jpg')] bg-cover bg-center bg-no-repeat opacity-90" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,15,0.35)_0%,rgba(4,8,15,0.55)_45%,rgba(3,5,8,0.96)_100%)]" />
       </div>
-
-
 
       <div className="container mx-auto px-6 w-full mt-10 md:mt-0">
         <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
@@ -58,21 +55,15 @@ export default function Hero() {
               >
                 Portal do Cliente
               </a>
-              <Link
-                to="/ferramentas"
-                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 order-3 sm:order-2"
-              >
-                Ferramentas
-              </Link>
               <button
                 onClick={scrollToServices}
-                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] order-2 sm:order-3"
+                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 order-4 sm:order-4 sm:col-span-2"
               >
                 Conheça nossas soluções
               </button>
               <a
                 href={getCampanhaUrl()}
-                className="tech-button-primary w-full justify-center border border-white/15 bg-white/6 px-8 py-4 text-white hover:bg-white/10 order-4 sm:order-4"
+                className="tech-button-primary w-full justify-center bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-8 py-4 shadow-[0_12px_40px_rgba(13,96,132,0.32)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.42)] order-2 sm:order-3"
               >
                 Abrir minha empresa
               </a>

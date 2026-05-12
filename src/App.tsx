@@ -18,8 +18,7 @@ import Faturamento from "./components/Faturamento"
 import Performance from "./components/Performance"
 import Estrategia from "./components/Estrategia"
 import NotFound from "./components/NotFound"
-import Chatbot from "./components/Chatbot"
-import Ferramentas from "./components/Ferramentas"
+import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton"
 import { ReportProvider } from "./contexts/ReportContext"
 
 function Home() {
@@ -62,25 +61,11 @@ function AppRoutes() {
         <Route path="/faturamento" element={<Faturamento />} />
         <Route path="/performance" element={<Performance />} />
         <Route path="/estrategia" element={<Estrategia />} />
-        <Route path="/ferramentas" element={<Ferramentas />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      {[
-        "/",
-        "/obrigado",
-        "/faturamento",
-        "/performance",
-        "/estrategia",
-        "/chatbot",
-      ].includes(location.pathname) && <Chatbot />}
+      <WhatsAppFloatingButton />
     </div>
   )
-}
-
-export const getCampanhaUrl = () => {
-  const host = window.location.hostname.replace(/^www\./, "")
-  const port = window.location.port ? `:${window.location.port}` : ""
-  return `${window.location.protocol}//abrirminhaempresa.${host}${port}`
 }
 
 function App() {
@@ -95,7 +80,7 @@ function App() {
             <Routes>
               <Route path="*" element={<Campanha />} />
             </Routes>
-            <Chatbot />
+            <WhatsAppFloatingButton />
           </div>
         </Router>
       </ReportProvider>

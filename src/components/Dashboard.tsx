@@ -1,12 +1,5 @@
 import { useState } from "react"
-import {
-  BarChart3,
-  DollarSign,
-  Target,
-  Sparkles,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react"
+import { DollarSign, Sparkles, ChevronLeft, ChevronRight } from "lucide-react"
 
 export default function Resultados() {
   const powerBiSrc =
@@ -20,24 +13,6 @@ export default function Resultados() {
       heading: "Painel de Faturamento",
       subtitle: "Visão consolidade de negócio.",
       frameTitle: "Painel Power BI - Faturamento",
-      src: powerBiSrc,
-    },
-    {
-      id: "performance",
-      title: "Performance",
-      icon: BarChart3,
-      heading: "Painel de Performance",
-      subtitle: "Acompanhamento de eficiência e metas operacionais.",
-      frameTitle: "Painel Power BI - Performance",
-      src: powerBiSrc,
-    },
-    {
-      id: "estrategia",
-      title: "Estratégia",
-      icon: Target,
-      heading: "Painel de Estratégia",
-      subtitle: "Leitura executiva para direcionamento tático e crescimento.",
-      frameTitle: "Painel Power BI - Estratégia",
       src: powerBiSrc,
     },
   ] as const
@@ -91,7 +66,8 @@ export default function Resultados() {
             </button>
 
             <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
-              {activeMenu.title}<br/>({currentIndex + 1} de {menus.length})
+              {activeMenu.title}
+              <br />({currentIndex + 1} de {menus.length})
             </span>
 
             <button
