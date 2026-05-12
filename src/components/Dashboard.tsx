@@ -1,67 +1,18 @@
-import { useState } from "react"
-import {
-  BarChart3,
-  DollarSign,
-  Target,
-  Sparkles,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react"
+import { DollarSign, Sparkles } from "lucide-react"
 
 export default function Resultados() {
   const powerBiSrc =
     "https://app.powerbi.com/view?r=eyJrIjoiZTYxNzQ5MjktYWZkMS00M2ZhLTg3YzAtMWE1ZWM0ZmJiMzE0IiwidCI6IjAwZTBjNDIzLTk2MzYtNGM0Mi1hMTMwLTlhNWI1YjQwYzg3YiJ9"
 
-  const menus = [
-    {
-      id: "faturamento",
-      title: "Faturamento",
-      icon: DollarSign,
-      heading: "Painel de Faturamento",
-      subtitle: "Visão consolidade de negócio.",
-      frameTitle: "Painel Power BI - Faturamento",
-      src: powerBiSrc,
-    },
-    {
-      id: "performance",
-      title: "Performance",
-      icon: BarChart3,
-      heading: "Painel de Performance",
-      subtitle: "Acompanhamento de eficiência e metas operacionais.",
-      frameTitle: "Painel Power BI - Performance",
-      src: powerBiSrc,
-    },
-    {
-      id: "estrategia",
-      title: "Estratégia",
-      icon: Target,
-      heading: "Painel de Estratégia",
-      subtitle: "Leitura executiva para direcionamento tático e crescimento.",
-      frameTitle: "Painel Power BI - Estratégia",
-      src: powerBiSrc,
-    },
-  ] as const
-
-  const [activeMenuId, setActiveMenuId] =
-    useState<(typeof menus)[number]["id"]>("faturamento")
-
-  const activeMenu = menus.find((menu) => menu.id === activeMenuId) ?? menus[0]
-
-  const handlePrevMenu = () => {
-    const currentIndex = menus.findIndex((m) => m.id === activeMenuId)
-    if (currentIndex > 0) {
-      setActiveMenuId(menus[currentIndex - 1].id)
-    }
+  const activeMenu = {
+    id: "faturamento",
+    title: "Faturamento",
+    icon: DollarSign,
+    heading: "Painel de Faturamento",
+    subtitle: "Visão consolidade de negócio.",
+    frameTitle: "Painel Power BI - Faturamento",
+    src: powerBiSrc,
   }
-
-  const handleNextMenu = () => {
-    const currentIndex = menus.findIndex((m) => m.id === activeMenuId)
-    if (currentIndex < menus.length - 1) {
-      setActiveMenuId(menus[currentIndex + 1].id)
-    }
-  }
-
-  const currentIndex = menus.findIndex((m) => m.id === activeMenuId)
 
   return (
     <section id="dashboard" className="section-shell pt-6 pb-32">
@@ -80,29 +31,6 @@ export default function Resultados() {
         </div>
 
         <div className="space-y-4">
-          {/* Top Bar */}
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-gradient-to-r from-slate-950/40 to-slate-900/20 p-4 backdrop-blur-lg">
-            <button
-              onClick={handlePrevMenu}
-              disabled={currentIndex === 0}
-              className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronLeft size={20} />
-            </button>
-
-            <span className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400 text-center">
-              {activeMenu.title}<br/>({currentIndex + 1} de {menus.length})
-            </span>
-
-            <button
-              onClick={handleNextMenu}
-              disabled={currentIndex === menus.length - 1}
-              className="rounded-lg border border-white/20 bg-white/10 p-2 text-slate-300 transition-all duration-200 hover:bg-white/15 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
-
           {/* Main Container */}
           <div className="space-y-3">
             <div className="rounded-2xl border border-white/10 bg-white/5 p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.08)] backdrop-blur-lg">
@@ -144,33 +72,17 @@ export default function Resultados() {
               Menu
             </p>
 
-            <nav className="space-y-3">
-              {menus.map((menu) => {
-                const Icon = menu.icon
-                const isActive = activeMenuId === menu.id
-                return (
-                  <button
-                    key={menu.title}
-                    type="button"
-                    onClick={() => setActiveMenuId(menu.id)}
-                    className={`group flex w-full items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm font-medium transition-all duration-200 ${
-                      isActive
-                        ? "border-white/25 bg-white/12 text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.16),0_0_24px_rgba(255,255,255,0.18),inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-md"
-                        : "border-white/5 bg-white/5 text-slate-400 backdrop-blur-sm hover:border-white/20 hover:bg-white/10 hover:text-slate-100 hover:shadow-[0_0_18px_rgba(255,255,255,0.12)]"
-                    }`}
-                  >
-                    <Icon
-                      size={16}
-                      className={`${
-                        isActive
-                          ? "text-slate-300"
-                          : "text-slate-500 group-hover:text-slate-300"
-                      } transition-colors duration-200`}
-                    />
-                    <span>{menu.title}</span>
-                  </button>
-                )
-              })}
+            <nav>
+              <button
+                type="button"
+                className="group flex w-full items-center gap-3 rounded-lg border border-white/25 bg-white/12 px-4 py-3 text-left text-sm font-medium text-slate-100 shadow-[0_0_0_1px_rgba(255,255,255,0.16),0_0_24px_rgba(255,255,255,0.18),inset_0_1px_2px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-md transition-all duration-200"
+              >
+                <DollarSign
+                  size={16}
+                  className="text-slate-300 transition-colors duration-200"
+                />
+                <span>{activeMenu.title}</span>
+              </button>
             </nav>
           </aside>
 

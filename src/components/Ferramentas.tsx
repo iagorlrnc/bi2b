@@ -1470,14 +1470,6 @@ export default function Ferramentas() {
 
   const menus = [
     {
-      id: "tributario-pj",
-      title: "Alíquota Efetiva",
-      icon: Building2,
-      heading: "Calculadora Alíquota Efetiva",
-      subtitle: "Calcule a alíquota efetiva do Simples Nacional.",
-      content: <CalculadoraPJ />,
-    },
-    {
       id: "imposto-renda",
       title: "Imposto de Renda",
       icon: Calculator,
@@ -1493,10 +1485,18 @@ export default function Ferramentas() {
       subtitle: "Descubra o custo real de um funcionário para a empresa.",
       content: <CalculadoraFuncionario />,
     },
+    // {
+    //   id: "tributario-pj",
+    //   title: "Alíquota Efetiva",
+    //   icon: Building2,
+    //   heading: "Calculadora Alíquota Efetiva",
+    //   subtitle: "Calcule a alíquota efetiva do Simples Nacional.",
+    //   content: <CalculadoraPJ />,
+    // },
   ] as const
 
   const [activeMenuId, setActiveMenuId] =
-    useState<(typeof menus)[number]["id"]>("tributario-pj")
+    useState<(typeof menus)[number]["id"]>("imposto-renda")
 
   const activeMenu = menus.find((menu) => menu.id === activeMenuId) ?? menus[0]
 

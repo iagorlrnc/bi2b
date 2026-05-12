@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom"
 import { DatabaseZap, ShieldCheck, Sparkles } from "lucide-react"
 import logoMain from "../assets/img/logo.png"
-import { getCampanhaUrl } from "../App"
+import { getCampanhaUrl } from "../utils/campanha"
 
 export default function Hero() {
   const scrollToServices = () => {
@@ -21,8 +21,6 @@ export default function Hero() {
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(3,7,18,0.55),rgba(3,7,18,0.8)),url('/src/assets/img/heroimg.jpg')] bg-cover bg-center bg-no-repeat opacity-90" />
         <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(4,8,15,0.35)_0%,rgba(4,8,15,0.55)_45%,rgba(3,5,8,0.96)_100%)]" />
       </div>
-
-
 
       <div className="container mx-auto px-6 w-full mt-10 md:mt-0">
         <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr]">
