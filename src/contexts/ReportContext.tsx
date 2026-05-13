@@ -50,6 +50,10 @@ export type FuncionarioData = {
     inssPatronal: number
     beneficiosTotais: number
     total: number
+    percentualFaturamento: number
+    margemOperacionalAposContratacao: number
+    coberturaCaixaMeses: number
+    naZonaDeRisco: boolean
   }
 }
 
@@ -59,7 +63,9 @@ type ReportContextType = {
   pjData: PjData | null
   setPjData: React.Dispatch<React.SetStateAction<PjData | null>>
   funcionarioData: FuncionarioData | null
-  setFuncionarioData: React.Dispatch<React.SetStateAction<FuncionarioData | null>>
+  setFuncionarioData: React.Dispatch<
+    React.SetStateAction<FuncionarioData | null>
+  >
 }
 
 const ReportContext = createContext<ReportContextType | undefined>(undefined)
@@ -67,7 +73,8 @@ const ReportContext = createContext<ReportContextType | undefined>(undefined)
 export const ReportProvider = ({ children }: { children: ReactNode }) => {
   const [irpfData, setIrpfData] = useState<IrpfData | null>(null)
   const [pjData, setPjData] = useState<PjData | null>(null)
-  const [funcionarioData, setFuncionarioData] = useState<FuncionarioData | null>(null)
+  const [funcionarioData, setFuncionarioData] =
+    useState<FuncionarioData | null>(null)
 
   return (
     <ReportContext.Provider

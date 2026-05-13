@@ -970,6 +970,10 @@ function CalculadoraFuncionario() {
     inssPatronal: number
     beneficiosTotais: number
     total: number
+    percentualFaturamento: number
+    margemOperacionalAposContratacao: number
+    coberturaCaixaMeses: number
+    naZonaDeRisco: boolean
   } | null>(null)
 
   const [erro, setErro] = useState("")
@@ -1039,6 +1043,15 @@ function CalculadoraFuncionario() {
       inssPatronal +
       beneficiosTotais
 
+    const faturamento = Number(faturamentoEmpresa) || 0
+    const caixa = Number(caixaEmpresa) || 0
+    const percentualFaturamento =
+      faturamento > 0 ? (total / faturamento) * 100 : 0
+    const margemOperacionalAposContratacao = faturamento - total
+    const coberturaCaixaMeses = total > 0 ? caixa / total : 0
+    const naZonaDeRisco =
+      percentualFaturamento > 25 || coberturaCaixaMeses < 3 || caixa < total
+
     setResultado({
       bruto: s,
       ferias: feriasMensal,
@@ -1047,6 +1060,10 @@ function CalculadoraFuncionario() {
       inssPatronal,
       beneficiosTotais,
       total,
+      percentualFaturamento,
+      margemOperacionalAposContratacao,
+      coberturaCaixaMeses,
+      naZonaDeRisco,
     })
 
     setFuncionarioData({
@@ -1066,6 +1083,10 @@ function CalculadoraFuncionario() {
         inssPatronal,
         beneficiosTotais,
         total,
+        percentualFaturamento,
+        margemOperacionalAposContratacao,
+        coberturaCaixaMeses,
+        naZonaDeRisco,
       },
     })
   }
@@ -1288,6 +1309,66 @@ function CalculadoraFuncionario() {
               <span className="text-3xl font-bold text-emerald-400">
                 + {formatCurrency(resultado.total - resultado.bruto)}
               </span>
+            </div>
+
+            {/* Análise de Viabilidade */}
+            <div
+              className={`md:col-span-2 border rounded-lg p-5 ${resultado.naZonaDeRisco ? "bg-red-900/20 border-red-500/20" : "bg-green-900/20 border-green-500/20"}`}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <Info
+                  size={14}
+                  className={`shrink-0 ${resultado.naZonaDeRisco ? "text-red-400" : "text-green-400"}`}
+                />
+                <span
+                  className={`text-sm font-semibold ${resultado.naZonaDeRisco ? "text-red-200" : "text-green-200"}`}
+                >
+                  Análise de Viabilidade da Contratação
+                </span>
+              </div>
+
+              <div className="space-y-3 text-sm text-slate-300">
+                <div className="flex items-start justify-between gap-4">
+                  <span>Percentual do Faturamento:</span>
+                  <span
+                    className={`font-semibold ${resultado.percentualFaturamento > 20 ? "text-red-400" : "text-green-400"}`}
+                  >
+                    {resultado.percentualFaturamento.toFixed(2)}%
+                  </span>
+                </div>
+
+                <div className="flex items-start justify-between gap-4 border-t border-white/10 pt-2">
+                  <span>Margem Operacional após Contratação:</span>
+                  <span
+                    className={`font-semibold ${resultado.margemOperacionalAposContratacao >= 0 ? "text-green-400" : "text-red-400"}`}
+                  >
+                    {formatCurrency(resultado.margemOperacionalAposContratacao)}
+                  </span>
+                </div>
+
+                <div className="flex items-start justify-between gap-4 border-t border-white/10 pt-2">
+                  <span>Fôlego de Caixa (meses):</span>
+                  <span
+                    className={`font-semibold ${resultado.coberturaCaixaMeses >= 3 ? "text-green-400" : "text-red-400"}`}
+                  >
+                    {resultado.coberturaCaixaMeses.toFixed(1)} meses
+                  </span>
+                </div>
+
+                <div className="border-t border-white/10 pt-3 mt-3">
+                  <div
+                    className={`p-3 rounded-lg ${resultado.naZonaDeRisco ? "bg-red-950/50 border border-red-500/30" : "bg-green-950/50 border border-green-500/30"}`}
+                  >
+                    <p
+                      className={`font-semibold ${resultado.naZonaDeRisco ? "text-red-300" : "text-green-300"}`}
+                    >
+                      {resultado.naZonaDeRisco
+                        ? "⚠️ ZONA DE RISCO: Contratação pode comprometer a saúde financeira da empresa."
+                        : "✓ SEGURO: A empresa tem condições adequadas para contratar este funcionário."}
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 

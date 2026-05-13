@@ -259,6 +259,68 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
           headStyles: { fillColor: [13, 96, 132] },
         })
         currentY = (doc as any).lastAutoTable.finalY + 15
+
+        // Análise de Viabilidade da Contratação
+        doc.setFontSize(14)
+        doc.setTextColor(0, 0, 0)
+        doc.text(
+          "Análise de Viabilidade da Contratação do Funcionário",
+          14,
+          currentY,
+        )
+        currentY += 6
+
+        const riskColor = funcionarioData.resultado.naZonaDeRisco
+          ? [200, 50, 50]
+          : [50, 150, 50]
+        const riskStatus = funcionarioData.resultado.naZonaDeRisco
+          ? "ZONA DE RISCO"
+          : "SEGURO"
+
+        autoTable(doc, {
+          startY: currentY,
+          head: [["Indicador", "Valor"]],
+          body: [
+            [
+              "Percentual do Faturamento",
+              `${funcionarioData.resultado.percentualFaturamento.toFixed(2)}%`,
+            ],
+            [
+              "Margem Operacional após Contratação",
+              formatCurrency(
+                funcionarioData.resultado.margemOperacionalAposContratacao,
+              ),
+            ],
+            [
+              "Fôlego de Caixa (meses)",
+              `${funcionarioData.resultado.coberturaCaixaMeses.toFixed(1)} meses`,
+            ],
+            [riskStatus, ""],
+          ],
+          theme: "striped",
+          headStyles: { fillColor: [13, 96, 132] },
+          bodyStyles: {
+            textColor: [0, 0, 0],
+          },
+          didParseCell: (data: any) => {
+            if (
+              data.row.index === 3 &&
+              data.column.index === 0 &&
+              funcionarioData.resultado.naZonaDeRisco
+            ) {
+              data.cell.styles.fillColor = [255, 240, 240]
+              data.cell.styles.textColor = riskColor
+            } else if (
+              data.row.index === 3 &&
+              data.column.index === 0 &&
+              !funcionarioData.resultado.naZonaDeRisco
+            ) {
+              data.cell.styles.fillColor = [240, 255, 240]
+              data.cell.styles.textColor = riskColor
+            }
+          },
+        })
+        currentY = (doc as any).lastAutoTable.finalY + 15
       }
 
       // Footer disclaimer
