@@ -21,7 +21,7 @@ export default function Campanha() {
   const navigate = useNavigate()
   const location = useLocation()
   const [isFormSubmitted, setIsFormSubmitted] = useState(false)
-  const [showModal, setShowModal] = useState(false)
+  const [modalStep, setModalStep] = useState<"thanks" | "notice" | null>(null)
   const [consent, setConsent] = useState(false)
   const [showConsentError, setShowConsentError] = useState(false)
 
@@ -33,8 +33,10 @@ export default function Campanha() {
   const handleConsentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const isChecked = e.target.checked
     setConsent(isChecked)
-    
-    const container = document.getElementById("formulario-pag-abertura-de-empresa-060ce9f639cf1704454e")
+
+    const container = document.getElementById(
+      "formulario-pag-abertura-de-empresa-060ce9f639cf1704454e",
+    )
     if (container) {
       const btn = container.querySelector(
         'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
@@ -80,7 +82,7 @@ export default function Campanha() {
       ) {
         // Usa o gatilho do alerta oculto para ativar a nossa linda interface!
         setIsFormSubmitted(true)
-        setShowModal(true)
+        setModalStep("thanks")
         return // Engole o alerta sem mostrar a caixa feia no navegador
       }
       originalAlert(message)
@@ -96,14 +98,14 @@ export default function Campanha() {
           event.data[0].event_type === "conversion"
         ) {
           setIsFormSubmitted(true)
-          setShowModal(true)
+          setModalStep("thanks")
         } else if (
           typeof event.data === "object" &&
           !Array.isArray(event.data) &&
           event.data.eventType === "conversion"
         ) {
           setIsFormSubmitted(true)
-          setShowModal(true)
+          setModalStep("thanks")
         }
       } catch (e) {
         // Anti-crash override
@@ -129,12 +131,14 @@ export default function Campanha() {
             const formObj = container.querySelector("form")
             if (formObj && !formObj.dataset.btnListener) {
               formObj.dataset.btnListener = "true"
-              
+
               const submitBtn = formObj.querySelector(
                 'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
               ) as HTMLButtonElement | HTMLInputElement | null
               if (submitBtn) {
-                const checkbox = document.getElementById("consent-checkbox") as HTMLInputElement | null
+                const checkbox = document.getElementById(
+                  "consent-checkbox",
+                ) as HTMLInputElement | null
                 const isChecked = checkbox ? checkbox.checked : false
                 if (!isChecked) {
                   submitBtn.disabled = true
@@ -161,7 +165,7 @@ export default function Campanha() {
 
             if (html.includes("rd-form-success")) {
               setIsFormSubmitted(true)
-              setShowModal(true)
+              setModalStep("thanks")
             } else if (
               (html.includes("sucesso") ||
                 html.includes("obrigado") ||
@@ -169,7 +173,7 @@ export default function Campanha() {
               !html.includes("<form")
             ) {
               setIsFormSubmitted(true)
-              setShowModal(true)
+              setModalStep("thanks")
             }
           })
           observer.observe(container, {
@@ -500,32 +504,38 @@ export default function Campanha() {
                 style={{ paddingLeft: "0px", paddingRight: "0px" }}
                 onClickCapture={(e) => {
                   if (!consent) {
-                    const target = e.target as HTMLElement;
-                    if (target.closest('button[type="submit"], input[type="submit"], .bricks-form__submit')) {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      triggerConsentError();
+                    const target = e.target as HTMLElement
+                    if (
+                      target.closest(
+                        'button[type="submit"], input[type="submit"], .bricks-form__submit',
+                      )
+                    ) {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      triggerConsentError()
                     }
                   }
                 }}
                 onSubmitCapture={(e) => {
                   if (!consent) {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    triggerConsentError();
+                    e.stopPropagation()
+                    e.preventDefault()
+                    triggerConsentError()
                   }
                 }}
                 onKeyDownCapture={(e) => {
-                  if (!consent && e.key === 'Enter') {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    triggerConsentError();
+                  if (!consent && e.key === "Enter") {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    triggerConsentError()
                   }
                 }}
               ></div>
 
               {!isFormSubmitted && (
-                <div className={`mt-4 flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${showConsentError ? "border-red-500 bg-red-500/10 animate-shake" : "border-white/5 bg-[#0d6084]/10"}`}>
+                <div
+                  className={`mt-4 flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${showConsentError ? "border-red-500 bg-red-500/10 animate-shake" : "border-white/5 bg-[#0d6084]/10"}`}
+                >
                   <input
                     type="checkbox"
                     id="consent-checkbox"
@@ -533,8 +543,13 @@ export default function Campanha() {
                     onChange={handleConsentChange}
                     className="flex-shrink-0 w-5 h-5 rounded border-gray-300 text-[#0d6084] focus:ring-[#7ee7ff] cursor-pointer"
                   />
-                  <label htmlFor="consent-checkbox" className="text-xs text-slate-300 cursor-pointer leading-tight">
-                    Concordo em receber comunicações e aceito que meus dados sejam utilizados para fins de marketing e personalização de ofertas.
+                  <label
+                    htmlFor="consent-checkbox"
+                    className="text-xs text-slate-300 cursor-pointer leading-tight"
+                  >
+                    Concordo em receber comunicações e aceito que meus dados
+                    sejam utilizados para fins de marketing e personalização de
+                    ofertas.
                   </label>
                 </div>
               )}
@@ -568,29 +583,58 @@ export default function Campanha() {
       </section>
 
       {/* MODAL DE SUCESSO CUSTOMIZADO */}
-      {showModal && (
+      {modalStep && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 duration-300">
           <div className="tech-panel p-8 max-w-md w-full border-white/10">
-            <div className="w-16 h-16 bg-[#0d6084]/15 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#7ee7ff]/30">
-              <Check size={32} className="text-[#7ee7ff]" />
-            </div>
-            <h3 className="text-3xl font-extrabold text-white mb-3 text-center">
-              Muito Obrigado!
-            </h3>
-            <p className="text-slate-300 mb-8 text-lg leading-relaxed text-center">
-              Recebemos seus dados com sucesso.
-              <br />O e-book foi enviado para o endereço de
-              <br />
-              e-mail preenchido no formulário!
-            </p>
-            <button
-              onClick={() => {
-                setShowModal(false)
-              }}
-              className="tech-button-primary w-full bg-gradient-to-r from-[#0d6084] to-[#0a4a62] shadow-[0_14px_40px_rgba(13,96,132,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.34)]"
-            >
-              OK
-            </button>
+            {modalStep === "thanks" ? (
+              <>
+                <div className="w-16 h-16 bg-[#0d6084]/15 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#7ee7ff]/30">
+                  <Check size={32} className="text-[#7ee7ff]" />
+                </div>
+                <h3 className="text-3xl font-extrabold text-white mb-3 text-center">
+                  Muito Obrigado!
+                </h3>
+                <p className="text-slate-300 mb-8 text-lg leading-relaxed text-center">
+                  Recebemos seus dados com sucesso.
+                  <br />O e-book foi enviado para o endereço de
+                  <br />
+                  e-mail preenchido no formulário!
+                </p>
+                <button
+                  onClick={() => {
+                    setModalStep("notice")
+                  }}
+                  className="tech-button-primary w-full bg-gradient-to-r from-[#0d6084] to-[#0a4a62] shadow-[0_14px_40px_rgba(13,96,132,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.34)]"
+                >
+                  OK
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="w-16 h-16 bg-amber-500/15 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-300/30">
+                  <AlertCircle size={32} className="text-amber-300" />
+                </div>
+                <h3 className="text-3xl font-extrabold text-white mb-3 text-center">
+                  Confira seu e-mail
+                </h3>
+                <p className="text-slate-300 mb-8 text-lg leading-relaxed text-center">
+                  Se não encontrar a mensagem, verifique também as pastas
+                  {/* <span className="text-white font-semibold"> Principal</span>, */}
+                  <span className="text-white font-semibold"> Promoções</span> e
+                  <span className="text-white font-semibold"> Spam</span>.
+                  <br />
+                  Se ainda assim não localizar, fale com a gente pelo WhatsApp.
+                </p>
+                <button
+                  onClick={() => {
+                    setModalStep(null)
+                  }}
+                  className="tech-button-primary w-full bg-gradient-to-r from-[#0d6084] to-[#0a4a62] shadow-[0_14px_40px_rgba(13,96,132,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.34)]"
+                >
+                  Fechar
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
