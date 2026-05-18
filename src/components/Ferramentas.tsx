@@ -146,9 +146,6 @@ function CalculadoraIRPF() {
             placeholder="R$ 0,00"
             className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
           />
-          <p className="text-xs text-emerald-400 mt-2">
-            * Rendimentos até R$ 5.000,00 são isentos.
-          </p>
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2">
