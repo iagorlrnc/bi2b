@@ -146,6 +146,9 @@ function CalculadoraIRPF() {
             placeholder="R$ 0,00"
             className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-white placeholder-slate-500 focus:border-[#7ee7ff] focus:outline-none focus:ring-1 focus:ring-[#7ee7ff]"
           />
+          <p className="text-xs text-emerald-400 mt-2">
+            * Rendimentos até R$ 5.000,00 são isentos.
+          </p>
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2">
@@ -191,6 +194,15 @@ function CalculadoraIRPF() {
               Resumo do Imposto
             </h3>
           </div>
+
+          {resultado.base <= 5000 && (
+            <div className="mb-6 p-4 bg-emerald-900/20 border border-emerald-500/20 rounded-lg flex items-center gap-3">
+              <Info className="text-emerald-400 shrink-0" size={20} />
+              <p className="text-sm text-emerald-200">
+                <strong className="text-emerald-400">Você está isento!</strong> Rendimentos com base de cálculo de até R$ 5.000,00 são isentos de Imposto de Renda.
+              </p>
+            </div>
+          )}
 
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div className="bg-[#0a4a62]/30 border border-[#7ee7ff]/20 rounded-lg p-5">
@@ -1049,8 +1061,10 @@ function CalculadoraFuncionario() {
       faturamento > 0 ? (total / faturamento) * 100 : 0
     const margemOperacionalAposContratacao = faturamento - total
     const coberturaCaixaMeses = total > 0 ? caixa / total : 0
-    const naZonaDeRisco =
-      percentualFaturamento > 25 || coberturaCaixaMeses < 3 || caixa < total
+    
+    const faturamentoViavel = faturamento > 0 && percentualFaturamento <= 25;
+    const caixaViavel = caixa > 0 && coberturaCaixaMeses >= 3 && caixa >= total;
+    const naZonaDeRisco = !(faturamentoViavel || caixaViavel);
 
     setResultado({
       bruto: s,
