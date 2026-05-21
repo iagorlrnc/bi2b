@@ -38,10 +38,14 @@ export default function Hero() {
                 className="mb-2 h-11 w-auto sm:h-12 md:h-14 lg:h-16"
               />
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#7ee7ff] via-white pb-[10px] to-[#0d6084]">
-                Consultoria empresarial e gestão contábil — Inteligência para
-                sua gestão
+                Inteligência para sua gestão
               </span>
             </h1>
+            <h3>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#7ee7ff] via-white pb-[10px] to-[#0d6084]">
+                Consultoria empresarial e gestão contábil
+              </span>
+            </h3>
 
             <p className="section-copy mt-6 max-w-2xl text-lg md:text-xl">
               Soluções completas em consultoria, dados e gestão contábil para
