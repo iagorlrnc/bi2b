@@ -41,11 +41,11 @@ export default function Hero() {
                 Inteligência para sua gestão
               </span>
             </h1>
-            <h3>
+            <h2>
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#7ee7ff] via-white pb-[10px] to-[#0d6084]">
                 Consultoria empresarial e gestão contábil
               </span>
-            </h3>
+            </h2>
 
             <p className="section-copy mt-6 max-w-2xl text-lg md:text-xl">
               Soluções completas em consultoria, dados e gestão contábil para
