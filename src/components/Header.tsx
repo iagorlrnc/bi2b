@@ -73,10 +73,11 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || menuOpen
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled || menuOpen
           ? "bg-slate-950/45 backdrop-blur-lg border-b border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.22)]"
           : "pointer-events-none -translate-y-full opacity-0 bg-transparent md:bg-transparent"
-        }`}
+      }`}
     >
       <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between box-border gap-3">
         {/* Esquerda: Logo (tamanhos normais) */}
@@ -89,6 +90,7 @@ export default function Header() {
           <img
             src={logoMain}
             alt="Logo Bi2B"
+            loading="lazy"
             className="h-6 w-auto max-w-full"
           />
         </button>
@@ -103,6 +105,7 @@ export default function Header() {
           <img
             src={logoPonto}
             alt="Logo Bi2B"
+            loading="lazy"
             className="h-8 w-auto max-w-full"
           />
         </button>

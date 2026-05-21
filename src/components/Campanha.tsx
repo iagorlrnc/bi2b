@@ -258,6 +258,7 @@ export default function Campanha() {
                 <img
                   src={negocioImg}
                   alt="Empreendedora planejando e trabalhando no laptop"
+                  loading="lazy"
                   className="rounded-[28px] border border-white/10 shadow-2xl object-cover w-full h-[320px] sm:h-[400px]"
                 />
                 <div className="absolute -bottom-6 left-4 right-4 sm:right-auto sm:-left-6 tech-panel p-4 sm:p-5 sm:max-w-xs border-[#7ee7ff]/30 z-10 transition-transform hover:-translate-y-1">
@@ -284,6 +285,7 @@ export default function Campanha() {
               <img
                 src={fechadoImg}
                 alt="Equipe de especialistas analisando dados em reunião"
+                loading="lazy"
                 className="rounded-[28px] border border-white/10 shadow-xl w-full object-cover h-[320px] sm:h-[400px]"
               />
               <div className="absolute top-6 -right-6 tech-panel p-4 border-[#7ee7ff]/30 hidden lg:block z-10">

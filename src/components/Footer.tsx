@@ -21,6 +21,7 @@ export default function Footer() {
                   <img
                     src={logoMain}
                     alt="Logo Bi2B"
+                    loading="lazy"
                     className="h-6 md:h-[2rem] lg:h-7 w-auto max-w-full shrink-0 mx-auto md:mx-auto lg:mx-0"
                   />
                   <div className="hidden md:flex lg:hidden mt-3 items-center md:pt-1.5 justify-center gap-2 text-slate-300">

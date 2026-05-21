@@ -14,6 +14,7 @@ export default function NotFound() {
             <img
               src={bpontoImg}
               alt="Bi2B"
+              loading="lazy"
               className="h-12 w-auto sm:h-14 md:h-16"
             />
           </div>

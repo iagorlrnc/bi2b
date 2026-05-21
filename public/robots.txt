@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Primary sitemap
+Sitemap: https://bi2bconsultoria.com.br/sitemap.xml
+
+# If the campaign subdomain is used, include its sitemap (subdomain currently has no routes)
+Sitemap: https://abrirminhaempresa.bi2bconsultoria.com.br/sitemap.xml

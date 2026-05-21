@@ -34,10 +34,12 @@ export default function Hero() {
               <img
                 src={logoMain}
                 alt="Bi2B"
+                loading="lazy"
                 className="mb-2 h-11 w-auto sm:h-12 md:h-14 lg:h-16"
               />
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-[#7ee7ff] via-white pb-[10px] to-[#0d6084]">
-                Inteligência para sua gestão
+                Consultoria empresarial e gestão contábil — Inteligência para
+                sua gestão
               </span>
             </h1>
 
