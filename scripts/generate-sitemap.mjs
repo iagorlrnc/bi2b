@@ -1,7 +1,7 @@
 import fs from "fs"
 import path from "path"
 
-const domain = "https://bi2bconsultoria.com.br"
+const domain = "https://www.bi2bconsultoria.com.br"
 // Pages on the main domain
 const pages = [
   "/",
@@ -17,7 +17,7 @@ const pages = [
 // separate sitemap on the subdomain. We include the subdomain root to help
 // search engines discover it when hosted at abrirminhaempresa.bi2bconsultoria.com.br
 const includeSubdomain = true
-const subdomainHost = "https://abrirminhaempresa.bi2bconsultoria.com.br"
+const subdomainHost = "https://www.abrirminhaempresa.bi2bconsultoria.com.br"
 
 const mainUrls = pages.map(
   (p) =>
