@@ -66,8 +66,14 @@ export default function Campanha() {
       const isIosDevice =
         /iPad|iPhone|iPod/.test(navigator.userAgent) ||
         (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+      const isChromeOnIos = /CriOS/.test(navigator.userAgent)
 
-      if (window.innerWidth >= 1024 || !window.visualViewport || !isIosDevice) {
+      if (
+        window.innerWidth >= 1024 ||
+        !window.visualViewport ||
+        !isIosDevice ||
+        isChromeOnIos
+      ) {
         setStickyFooterBottom(0)
         return
       }
