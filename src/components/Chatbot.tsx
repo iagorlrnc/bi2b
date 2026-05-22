@@ -14,9 +14,9 @@ Você deve responder as dúvidas dos usuários EXCLUSIVAMENTE com base no contex
 1. **Escuta Ativa e Empatia Real**:
    - Cada resposta deve começar com uma breve validação empática e calorosa da situação ou dúvida do usuário (de 1 a 2 linhas). Mostre que compreende a dor dele.
    - Exemplos:
-     * *Dúvida sobre impostos*: "Entendo perfeitamente a sua preocupação. A carga tributária realmente assusta quem está empreendendo, mas com o planejamento certo conseguimos otimizar bastante."
-     * *Dúvida sobre abertura*: "Que excelente iniciativa! Começar um negócio próprio é um passo incrível, e planejar tudo desde o início evita muitas dores de cabeça futuras."
-     * *Insatisfação com contabilidade*: "Compreendo a sua frustração. Ter um suporte contábil que não responde rápido ou não orienta de perto é muito prejudicial para o crescimento da empresa."
+  * *Dúvida sobre impostos*: "Entendo a sua preocupação. A carga tributária pode pesar bastante, mas há caminhos legais para organizar isso melhor."
+  * *Dúvida sobre abertura*: "Entendi o cenário. Planejar a abertura com atenção ajuda a evitar retrabalho e decisões ruins lá na frente."
+  * *Insatisfação com contabilidade*: "Compreendo a situação. Quando o suporte contábil falha, a operação da empresa sente o impacto rapidamente."
 
 2. **Técnica da Pergunta Única de Condução**:
    - NUNCA termine uma resposta com uma frase fechada ou de forma passiva (como "Estou à disposição" ou "Tem mais alguma dúvida?").
@@ -203,6 +203,8 @@ Após responder todas as perguntas e sanar as dúvidas do usuário, envie as inf
 - Caso pergunte sobre valores específicos, diga que varia de acordo com a complexidade da demanda.
 - Nunca diga ou insinue que o cliente vai pagar mais impostos ou ter prejuízo com as soluções propostas.
 - Converse como se fosse uma pessoa de verdade prestando uma consultoria inicial amigável.
+- Não elogie o cliente nem use adjetivos como "lindo", "excelente", "incrível", "maravilhoso" ou similares.
+- Não use a palavra "pessoalmente" nas respostas.
 - Não utilize frases prontas e robotizadas como "Estou feliz em ajudar", "Espero ter ajudado" ou "Estou aqui para ajudar".
 - Evite usar emojis.
 - Evite usar tags puras do HTML nas respostas. Formate as respostas usando Markdown limpo compatível com a interface do chat.
@@ -273,6 +275,63 @@ const smoothScrollTo = (
   requestAnimationFrame(animation)
 }
 
+const cleanAssistantText = (text: string) => {
+  let cleanedText = text || ""
+
+  const adIdentifier = "Support Pollinations.AI"
+  if (cleanedText.includes(adIdentifier)) {
+    cleanedText = cleanedText.split(adIdentifier)[0]
+  }
+
+  cleanedText = cleanedText.replace(/```[\s\S]*?```/g, " ")
+  cleanedText = cleanedText.replace(/`([^`]+)`/g, "$1")
+  cleanedText = cleanedText.replace(/\bpessoalmente\b/gi, "")
+  cleanedText = cleanedText.replace(/<[^>]+>/g, " ")
+
+  return cleanedText.replace(/[\s\-*]+$/, "").trim()
+}
+
+const looksLikeHtmlError = (text: string) =>
+  /<!doctype html|<html[\s>]|cloudflare|bad gateway|text-origin\.pollinations\.ai/i.test(
+    text,
+  )
+
+const getFirstName = (fullName: string) => {
+  const firstName = fullName.trim().split(/\s+/)[0] || ""
+  return firstName.split("[").join("").split("]").join("")
+}
+
+const requestAssistantReply = async (systemPrompt: string) => {
+  const response = await fetch("/api/ia", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messages: [{ role: "system", content: systemPrompt }],
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error("Falha na resposta da API")
+  }
+
+  const data = await response.json()
+
+  if (data.error) {
+    throw new Error(data.error)
+  }
+
+  if (looksLikeHtmlError(data.text || "")) {
+    throw new Error("Resposta HTML inválida do serviço de IA")
+  }
+
+  const assistantText = cleanAssistantText(data.text || "")
+  if (!assistantText) {
+    throw new Error("Resposta vazia do serviço de IA")
+  }
+
+  return assistantText
+}
+
 export default function Chatbot() {
   const navigate = useNavigate()
   const location = useLocation()
@@ -307,15 +366,42 @@ export default function Chatbot() {
 
   const [messages, setMessages] = useState<
     { role: "user" | "assistant" | "system"; content: string }[]
-  >([
-    {
-      role: "assistant",
-      content:
-        "Olá! Para começarmos o atendimento, por favor, digite seu **nome completo**:",
-    },
-  ])
+  >([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+
+  // Busca uma saudação calorosa e humana inicial quando o chat abre pela primeira vez
+  useEffect(() => {
+    if (isOpen && messages.length === 0 && !isLoading) {
+      const getInitialGreeting = async () => {
+        setIsLoading(true)
+        try {
+          const text = await requestAssistantReply(
+            "Você é o consultor virtual da Bi2B - Soluções Contábeis, Tributárias e de Consultoria. Dê as boas-vindas ao visitante de forma profissional e humana. Apresente-se de forma direta e faça apenas uma pergunta natural para começar o atendimento pedindo o nome completo. Não use tom robótico, não mencione formulário, não elogie o cliente e não faça mais de uma pergunta.",
+          )
+
+          setMessages([
+            {
+              role: "assistant",
+              content: text,
+            },
+          ])
+        } catch (error) {
+          console.error("Erro ao obter saudação inicial:", error)
+          setMessages([
+            {
+              role: "assistant",
+              content:
+                "Olá! Vou seguir com seu atendimento. Como você gostaria de ser chamado?",
+            },
+          ])
+        } finally {
+          setIsLoading(false)
+        }
+      }
+      getInitialGreeting()
+    }
+  }, [isOpen, messages.length, isLoading])
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -368,7 +454,10 @@ export default function Chatbot() {
   // Função para envio ao RD Station
   const sendToRDStation = async (
     data: typeof leadData,
-    chatHistory: { role: "user" | "assistant" | "system"; content: string }[] = messages,
+    chatHistory: {
+      role: "user" | "assistant" | "system"
+      content: string
+    }[] = messages,
   ) => {
     try {
       const token = import.meta.env.VITE_RD_STATION_PUBLIC_TOKEN
@@ -712,50 +801,118 @@ export default function Chatbot() {
 
     // --- LÓGICA DO FUNIL DE LEADS ---
     if (leadStep === 0) {
-      setMessages((prev) => [...prev, { role: "user", content: userMessage }])
+      const firstName = getFirstName(userMessage)
+      const updatedMessages: typeof messages = [
+        ...messages,
+        { role: "user", content: userMessage },
+      ]
+      setMessages(updatedMessages)
       setLeadData((prev) => ({ ...prev, name: userMessage }))
-      setLeadStep(1)
-      setTimeout(() => {
+      setIsLoading(true)
+      try {
+        const text = await requestAssistantReply(
+          `Você é o consultor virtual da Bi2B. O usuário acabou de informar o nome completo dele. Chame-o apenas pelo primeiro nome: ${firstName}. Responda de forma profissional e humana, sem elogiar o cliente. Em seguida, solicite apenas o telefone ou WhatsApp de contato de maneira muito natural e amigável. Não tire dúvidas ainda. Não use tom de formulário, não use placeholders como [Nome completo], não use a palavra pessoalmente e faça exatamente uma pergunta.`,
+        )
+
         setMessages((prev) => [
           ...prev,
           {
-            role: "assistant",
-            content: `Prazer em conhecer, **${userMessage.split(" ")[0]}**! Qual é o seu **telefone para contato**? `,
+            role: "assistant" as const,
+            content: text,
           },
         ])
-      }, 500)
+        setLeadStep(1)
+      } catch (error) {
+        console.error("Erro ao pedir telefone:", error)
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant" as const,
+            content: firstName
+              ? `Entendi, ${firstName}. Vou seguir com seu atendimento. Qual é o seu telefone ou WhatsApp para contato?`
+              : "Entendi. Vou seguir com seu atendimento. Qual é o seu telefone ou WhatsApp para contato?",
+          },
+        ])
+        setLeadStep(1)
+      } finally {
+        setIsLoading(false)
+      }
       return
     }
 
     if (leadStep === 1) {
-      setMessages((prev) => [...prev, { role: "user", content: userMessage }])
+      const updatedMessages: typeof messages = [
+        ...messages,
+        { role: "user", content: userMessage },
+      ]
+      setMessages(updatedMessages)
       setLeadData((prev) => ({ ...prev, phone: userMessage }))
-      setLeadStep(2)
-      setTimeout(() => {
+      setIsLoading(true)
+      try {
+        const text = await requestAssistantReply(
+          "Você é o consultor virtual da Bi2B. O usuário acabou de informar o telefone de contato. Responda de forma profissional e humana. Em seguida, peça apenas o CNPJ da empresa dele ou o CPF caso ainda não possua empresa, de maneira natural e acolhedora. Não tire dúvidas ainda, não elogie o cliente e faça exatamente uma pergunta.",
+        )
+
         setMessages((prev) => [
           ...prev,
           {
-            role: "assistant",
-            content: `Obrigado! Agora, por favor, informe seu **CNPJ** (ou CPF, caso não possua empresa):`,
+            role: "assistant" as const,
+            content: text,
           },
         ])
-      }, 500)
+        setLeadStep(2)
+      } catch (error) {
+        console.error("Erro ao pedir CNPJ/CPF:", error)
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant" as const,
+            content:
+              "Perfeito. Agora preciso de um dado rápido para seguir de forma correta: você já tem CNPJ ou prefere me informar o CPF por enquanto?",
+          },
+        ])
+        setLeadStep(2)
+      } finally {
+        setIsLoading(false)
+      }
       return
     }
 
     if (leadStep === 2) {
-      setMessages((prev) => [...prev, { role: "user", content: userMessage }])
+      const updatedMessages: typeof messages = [
+        ...messages,
+        { role: "user", content: userMessage },
+      ]
+      setMessages(updatedMessages)
       setLeadData((prev) => ({ ...prev, document: userMessage }))
-      setLeadStep(3)
-      setTimeout(() => {
+      setIsLoading(true)
+      try {
+        const text = await requestAssistantReply(
+          "Você é o consultor virtual da Bi2B. O usuário informou o CNPJ ou CPF. Responda de forma profissional e humana. Explique brevemente, com linguagem simples, que a Bi2B respeita a privacidade dele e peça o consentimento LGPD de forma natural e acolhedora, em uma única pergunta. Não elogie o cliente nem use a palavra pessoalmente.",
+        )
+
         setMessages((prev) => [
           ...prev,
           {
-            role: "assistant",
-            content: `Por último, a Bi2B Consultoria está comprometida em proteger e respeitar sua privacidade. Você concorda em receber nossas comunicações e que seus dados sejam utilizados para fins de marketing e otimização de preferências do cliente?`,
+            role: "assistant" as const,
+            content: text,
           },
         ])
-      }, 500)
+        setLeadStep(3)
+      } catch (error) {
+        console.error("Erro ao pedir consentimento:", error)
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant" as const,
+            content:
+              "Antes de seguirmos, preciso do seu consentimento para continuar o atendimento e tratar seus dados com segurança. Você autoriza?",
+          },
+        ])
+        setLeadStep(3)
+      } finally {
+        setIsLoading(false)
+      }
       return
     }
 
@@ -778,6 +935,9 @@ export default function Chatbot() {
 
     setIsLoading(true)
 
+    const fallbackAssistantText =
+      "No momento não consegui consultar a IA, mas posso continuar com seu atendimento. Qual é a sua dúvida principal?"
+
     try {
       const response = await fetch("/api/ia", {
         method: "POST",
@@ -792,35 +952,24 @@ export default function Chatbot() {
         }),
       })
 
-      if (!response.ok) {
-        throw new Error("Falha na resposta da API")
+      let assistantText = fallbackAssistantText
+
+      if (response.ok) {
+        const data = await response.json()
+        const rawText = data.text || ""
+
+        if (!data.error && !looksLikeHtmlError(rawText)) {
+          const cleanedText = cleanAssistantText(rawText)
+
+          if (cleanedText) {
+            assistantText = cleanedText
+          }
+        }
       }
-
-      const data = await response.json()
-      let assistantText = data.text || ""
-
-      if (data.error) {
-        throw new Error(data.error)
-      }
-
-      const looksLikeHtmlError =
-        /<!doctype html|<html[\s>]|cloudflare|bad gateway/i.test(assistantText)
-      if (!assistantText.trim() || looksLikeHtmlError) {
-        throw new Error("Resposta inválida do serviço de IA")
-      }
-
-      // Remove a propaganda de fim de resposta da API gratuita
-      const adIdentifier = "Support Pollinations.AI"
-      if (assistantText.includes(adIdentifier)) {
-        assistantText = assistantText.split(adIdentifier)[0]
-      }
-
-      // Limpa rastros da propaganda ou formatações mortas no final (traços, asteriscos soltos e quebras de linha extras)
-      assistantText = assistantText.replace(/[\s\-*]+$/, "")
 
       const assistantMessages: typeof messages = [
         ...newMessages,
-        { role: "assistant", content: assistantText.trim() },
+        { role: "assistant" as const, content: assistantText.trim() },
       ]
       setMessages(assistantMessages)
 
@@ -831,9 +980,8 @@ export default function Chatbot() {
       const errorMessages: typeof messages = [
         ...newMessages,
         {
-          role: "assistant",
-          content:
-            "Desculpe, ocorreu um erro na comunicação. Por favor, entre em contato via WhatsApp: https://wa.me/556392812239",
+          role: "assistant" as const,
+          content: fallbackAssistantText,
         },
       ]
       setMessages(errorMessages)
@@ -954,18 +1102,55 @@ export default function Chatbot() {
                 onClick={() => {
                   const finalLeadData = { ...leadData, consent: true }
                   setLeadData(finalLeadData)
-                  const initialMessages: typeof messages = [
+                  const updatedMessages: typeof messages = [
                     ...messages,
                     { role: "user", content: "Sim, eu concordo." },
-                    {
-                      role: "assistant",
-                      content:
-                        "Ótimo! Consentimento registrado. Sou o assistente de Inteligência Artificial da Bi2B. Como posso ajudar o seu negócio hoje?",
-                    },
                   ]
-                  setMessages(initialMessages)
+                  setMessages(updatedMessages)
                   setLeadStep(4)
-                  sendToRDStation(finalLeadData, initialMessages)
+                  setIsLoading(true)
+
+                  const getPostConsentGreeting = async () => {
+                    try {
+                      const text = await requestAssistantReply(
+                        "Você é o consultor virtual da Bi2B. O usuário acabou de dar o consentimento LGPD. Informe que o consentimento foi registrado, dê boas-vindas ao atendimento completo de forma profissional e humana, e pergunte como pode ajudar o negócio dele hoje. Não utilize emojis, não use a palavra pessoalmente e faça exatamente uma pergunta.",
+                      )
+
+                      const finalMessages: {
+                        role: "user" | "assistant" | "system"
+                        content: string
+                      }[] = [
+                        ...updatedMessages,
+                        {
+                          role: "assistant" as const,
+                          content: text,
+                        },
+                      ]
+                      setMessages(finalMessages)
+                      sendToRDStation(finalLeadData, finalMessages)
+                    } catch (error) {
+                      console.error(
+                        "Erro ao gerar saudação pós-consentimento:",
+                        error,
+                      )
+                      const fallbackMessages: {
+                        role: "user" | "assistant" | "system"
+                        content: string
+                      }[] = [
+                        ...updatedMessages,
+                        {
+                          role: "assistant" as const,
+                          content:
+                            "Vou seguir com seu atendimento por aqui. Como posso te ajudar agora?",
+                        },
+                      ]
+                      setMessages(fallbackMessages)
+                      sendToRDStation(finalLeadData, fallbackMessages)
+                    } finally {
+                      setIsLoading(false)
+                    }
+                  }
+                  getPostConsentGreeting()
                 }}
                 className="w-full bg-[#0d6084] hover:bg-[#0a4a62] text-white py-3 rounded-xl font-medium transition-colors"
               >
