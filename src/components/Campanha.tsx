@@ -17,8 +17,19 @@ import {
 } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
+import { FaWhatsapp } from "react-icons/fa"
 import ebookMockupImg from "../assets/img/ebook_mockup.png"
 import logoImg from "../assets/img/logo.png"
+
+// Tipagem mínima para o construtor do RDStationForms carregado dinamicamente
+type RDStationFormsConstructor = new (
+  formId: string,
+  arg: string,
+) => { createForm(): void }
+
+const getRDStationForms = (): RDStationFormsConstructor | undefined =>
+  (window as Window & { RDStationForms?: RDStationFormsConstructor })
+    .RDStationForms
 
 const RETURN_SCROLL_KEY = "bi2b:faturamento:return-scroll"
 
@@ -136,7 +147,7 @@ export default function Campanha() {
           setIsFormSubmitted(true)
           setModalStep("thanks")
         }
-      } catch (e) {
+      } catch {
         // Anti-crash override
       }
     }
@@ -144,7 +155,8 @@ export default function Campanha() {
 
     const renderForm = () => {
       const container = document.getElementById(formId)
-      if (!(window as any).RDStationForms || !container) return
+      const RDForms = getRDStationForms()
+      if (!RDForms || !container) return
 
       if (container.hasChildNodes() || container.dataset.rdLoaded === "true") {
         return
@@ -152,7 +164,7 @@ export default function Campanha() {
 
       container.dataset.rdLoaded = "true"
       try {
-        new (window as any).RDStationForms(formId, "null").createForm()
+        new RDForms(formId, "null").createForm()
 
         setTimeout(() => {
           const observer = new MutationObserver(() => {
@@ -179,12 +191,12 @@ export default function Campanha() {
               formObj.addEventListener("submit", () => {
                 const btn = formObj.querySelector(
                   'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
-                ) as any
+                ) as HTMLButtonElement | HTMLInputElement | null
                 if (btn) {
                   if (btn.tagName === "INPUT") {
-                    btn.value = "Aguarde..."
+                    ;(btn as HTMLInputElement).value = "Aguarde..."
                   } else {
-                    btn.innerHTML = "Aguarde..."
+                    ;(btn as HTMLButtonElement).innerHTML = "Aguarde..."
                   }
                   btn.style.opacity = "0.7"
                   btn.style.pointerEvents = "none"
@@ -227,7 +239,7 @@ export default function Campanha() {
       script.async = true
       script.addEventListener("load", renderForm)
       document.body.appendChild(script)
-    } else if ((window as any).RDStationForms) {
+    } else if (getRDStationForms()) {
       setTimeout(renderForm, 100)
     } else {
       script.addEventListener("load", renderForm)
@@ -398,6 +410,20 @@ export default function Campanha() {
           .animate-fade-in-up {
             animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
           }
+
+          @media (min-width: 1024px) and (max-width: 1276px) {
+            .whatsapp-text-hide {
+              display: none !important;
+            }
+            .whatsapp-btn-shrink {
+              padding: 0 !important;
+              width: 3.5rem !important;
+              height: 3.5rem !important;
+              min-width: 3.5rem !important;
+              border-radius: 9999px !important;
+              justify-content: center !important;
+            }
+          }
         `}
       </style>
 
@@ -409,7 +435,7 @@ export default function Campanha() {
           </div>
           <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full text-emerald-400 text-[10px] md:text-xs font-bold uppercase tracking-wide">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-            Conexão Segura e Criptografada
+            Conexão Segura
           </div>
         </div>
       </header>
@@ -419,12 +445,12 @@ export default function Campanha() {
         <div className="container mx-auto px-6 relative z-10">
           <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
             {/* COPY PERSUASIVA (ESQUERDA) */}
-            <div className="lg:col-span-7 space-y-6 md:space-y-8">
+            <div className="lg:col-span-7 space-y-6 md:space-y-8 min-h-[640px] lg:min-h-[820px]">
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-950/20 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-cyan-300 backdrop-blur-md">
                 <Sparkles size={14} className="animate-pulse" />
                 E-book Premium Gratuito
               </div>
-              
+
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
                 Abra sua empresa sem burocracia e{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-cyan-200 to-white drop-shadow-sm">
@@ -434,30 +460,90 @@ export default function Campanha() {
               </h1>
 
               <p className="text-base sm:text-lg md:text-xl text-slate-300 font-medium leading-relaxed max-w-xl">
-                Descubra no nosso novo guia prático o passo a passo definitivo para formalizar seu negócio de forma ágil, segura e com o menor enquadramento tributário possível.
+                Descubra no nosso novo guia prático o passo a passo definitivo
+                para formalizar seu negócio de forma ágil, segura e com o menor
+                enquadramento tributário possível.
               </p>
 
               {/* Selos Rápidos */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-6 border-t border-white/5 max-w-lg">
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="text-cyan-400 flex-shrink-0" size={18} />
-                  <span className="text-xs text-slate-300 font-semibold">100% Segura</span>
+                  <ShieldCheck
+                    className="text-cyan-400 flex-shrink-0"
+                    size={18}
+                  />
+                  <span className="text-xs text-slate-300 font-semibold">
+                    100% Segura
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Zap className="text-cyan-400 flex-shrink-0" size={18} />
-                  <span className="text-xs text-slate-300 font-semibold">Acesso Imediato</span>
+                  <span className="text-xs text-slate-300 font-semibold">
+                    Acesso Imediato
+                  </span>
                 </div>
                 <div className="flex items-center gap-2 col-span-2 sm:col-span-1">
                   <Check className="text-cyan-400 flex-shrink-0" size={18} />
-                  <span className="text-xs text-slate-300 font-semibold">Sem Taxas Ocultas</span>
+                  <span className="text-xs text-slate-300 font-semibold">
+                    Sem Taxas Ocultas
+                  </span>
                 </div>
               </div>
+
+              {/* Modern contact card: headline, benefits, CTA and visible number */}
+              <div className="!mt-16 md:!mt-24 relative group">
+                {/* Background glow effects that appear on hover */}
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500/20 via-cyan-500/10 to-transparent rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+                <div className="relative w-full rounded-2xl bg-slate-900/40 backdrop-blur-xl border border-white/[0.08] hover:border-emerald-500/20 p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col lg:flex-row items-start lg:items-center gap-6 sm:gap-8 transition-all duration-300">
+                  <div className="flex-1 space-y-3">
+                    {/* Living Status and Title side-by-side in the same line without breaking */}
+                    <div className="flex flex-row flex-nowrap items-center gap-3">
+                      <span className="shrink-0 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-400 border border-emerald-500/20">
+                        <span className="relative flex h-1.5 w-1.5">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                        </span>
+                        Online Agora
+                      </span>
+                      <h3 className="text-base sm:text-xl md:text-2xl font-extrabold text-white tracking-tight whitespace-nowrap shrink-0">
+                        Fale com um especialista
+                      </h3>
+                    </div>
+
+                    <p className="text-sm text-slate-300 leading-relaxed max-w-xl">
+                      Tire suas dúvidas sobre abertura de empresa, economia de impostos
+                      em poucos minutos, de forma 100% gratuita.
+                    </p>
+                  </div>
+
+                  {/* Right CTA area */}
+                  <div className="flex flex-col items-center justify-center gap-3 w-full lg:w-auto flex-shrink-0 border-t lg:border-t-0 lg:border-l border-white/[0.08] pt-6 lg:pt-0 lg:pl-8 text-center">
+                    <a
+                      href="https://wa.me/556392812239?text=Ol%C3%A1%2C%20gostaria%20de%20falar%20com%20um%20especialista%20sobre%20abrir%20minha%20empresa"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group/btn whatsapp-btn-shrink mx-auto inline-flex items-center justify-center gap-2.5 bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 hover:from-emerald-400 hover:via-emerald-500 hover:to-teal-500 text-white font-extrabold px-8 py-3.5 rounded-full shadow-[0_10px_30px_rgba(16,185,129,0.3)] hover:shadow-[0_15px_35px_rgba(16,185,129,0.5)] hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 text-center text-sm"
+                    >
+                      <FaWhatsapp
+                        size={20}
+                        className="transition-transform duration-300 group-hover/btn:rotate-12 group-hover/btn:scale-110 shrink-0"
+                      />
+                      <span className="whatsapp-text-hide">Iniciar Conversa</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* (removed small WhatsApp card — replaced by larger separate card below) */}
             </div>
 
             {/* FORMULÁRIO + MOCKUP DO EBOOK (DIREITA - CAPTURA PRIMÁRIA) */}
             <div className="lg:col-span-5 pt-8 lg:pt-0">
-              <div id="hero-form-container" className="relative tech-panel p-6 sm:p-8 border-cyan-400/20 shadow-[0_0_50px_rgba(6,182,212,0.15)] transition-all hover:border-cyan-400/30">
-                
+              <div
+                id="hero-form-container"
+                className="relative tech-panel p-6 sm:p-8 border-cyan-400/20 shadow-[0_0_50px_rgba(6,182,212,0.15)] transition-all hover:border-cyan-400/30"
+              >
                 {/* Mockup do Ebook em Destaque flutuante */}
                 <div className="relative flex justify-center -mt-12 sm:-mt-16 mb-6">
                   <div className="relative group">
@@ -475,17 +561,24 @@ export default function Campanha() {
                 </div>
 
                 {/* Gatilho Mental de Urgência (Timer) */}
-                <div className="bg-cyan-950/30 border border-cyan-500/20 rounded-xl p-3 mb-6 text-center">
-                  <p className="text-[11px] sm:text-xs font-semibold text-cyan-300 flex items-center justify-center gap-1.5">
+                <div className="bg-red-950/30 border border-red-500/20 rounded-xl p-3 mb-6 text-center">
+                  <p className="text-[11px] sm:text-xs font-semibold text-red-300 flex items-center justify-center gap-1.5">
                     <Clock size={13} className="animate-pulse" />
-                    Acesso gratuito garantido hoje por mais: <span className="font-mono font-bold text-white bg-cyan-900/60 px-2 py-0.5 rounded border border-cyan-400/20">{formatTime(timeLeft)}</span>
+                    Acesso gratuito garantido hoje por mais:{" "}
+                    <span className="font-mono font-bold text-white bg-red-900 px-2 py-0.5 rounded border border-cyan-400/20">
+                      {formatTime(timeLeft)}
+                    </span>
                   </p>
                 </div>
 
                 {/* Chamada para Ação */}
                 <div className="text-center mb-6">
-                  <h3 className="text-lg sm:text-xl font-bold text-white uppercase tracking-wide">Receba o E-book Grátis</h3>
-                  <p className="text-xs text-slate-400 mt-1">Preencha abaixo para receber o E-Book imediatamente</p>
+                  <h3 className="text-lg sm:text-xl font-bold text-white uppercase tracking-wide">
+                    Receba o E-book Grátis
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Preencha abaixo para receber o E-Book imediatamente
+                  </p>
                 </div>
 
                 {/* Container do Formulário Integrado */}
@@ -539,7 +632,9 @@ export default function Campanha() {
                       htmlFor="consent-checkbox"
                       className="text-[10px] text-slate-300 cursor-pointer leading-snug font-medium"
                     >
-                      Concordo em receber comunicações e aceito que meus dados sejam utilizados para fins de marketing e personalização de ofertas.
+                      Concordo em receber comunicações e aceito que meus dados
+                      sejam utilizados para fins de marketing e personalização
+                      de ofertas.
                     </label>
                   </div>
                 )}
@@ -549,7 +644,7 @@ export default function Campanha() {
                   {!isFormSubmitted ? (
                     <p className="text-[11px] text-slate-400 flex items-center justify-center gap-1.5 font-medium">
                       <Lock size={12} className="text-cyan-400" />
-                      Seus dados protegidos contra spam.
+                      Seus dados protegidos.
                     </p>
                   ) : (
                     <p className="text-emerald-400 text-xs font-bold flex items-center justify-center gap-1.5">
@@ -576,7 +671,9 @@ export default function Campanha() {
               O que você vai aprender ao baixar este guia gratuito:
             </h2>
             <p className="text-slate-300 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
-              Desenvolvemos um material simples, sem termos contábeis difíceis de compreender, com foco direto na sua economia e segurança jurídica.
+              Desenvolvemos um material simples, sem termos contábeis difíceis
+              de compreender, com foco direto na sua economia e segurança
+              jurídica.
             </p>
           </div>
 
@@ -585,25 +682,28 @@ export default function Campanha() {
               {
                 icon: TrendingUp,
                 title: "Economia Tributária",
-                desc: "Compare de forma clara o Simples Nacional, Lucro Presumido e a tributação por Pessoa Física e escolha o menor imposto legal."
+                desc: "Compare de forma clara o Simples Nacional, Lucro Presumido e a tributação por Pessoa Física e escolha o menor imposto legal.",
               },
               {
                 icon: Building2,
                 title: "Processo Sem Erros",
-                desc: "Evite os erros capitais que atrasam a emissão do seu CNPJ ou geram problemas imediatos junto aos órgãos governamentais."
+                desc: "Evite os erros capitais que atrasam a emissão do seu CNPJ ou geram problemas imediatos junto aos órgãos governamentais.",
               },
               {
                 icon: FileText,
                 title: "Regulamentação Fácil",
-                desc: "Descubra como estruturar sua atividade corretamente usando as KNAEs ideais para o seu modelo de negócio ou serviço."
+                desc: "Descubra como estruturar sua atividade corretamente usando as KNAEs ideais para o seu modelo de negócio ou serviço.",
               },
               {
                 icon: BadgeCheck,
                 title: "Checklist de Sucesso",
-                desc: "Um plano de ação prático com tudo o que você deve configurar logo nos primeiros dias após ter a sua empresa aberta."
-              }
+                desc: "Um plano de ação prático com tudo o que você deve configurar logo nos primeiros dias após ter a sua empresa aberta.",
+              },
             ].map((item, idx) => (
-              <div key={idx} className="tech-card group border-white/5 bg-slate-900/20 hover:border-cyan-400/25 transition-all">
+              <div
+                key={idx}
+                className="tech-card group border-white/5 bg-slate-900/20 hover:border-cyan-400/25 transition-all"
+              >
                 <div className="w-12 h-12 bg-cyan-950/40 text-cyan-400 rounded-2xl flex items-center justify-center mb-6 border border-cyan-500/10 group-hover:scale-110 transition-transform duration-300">
                   <item.icon size={22} />
                 </div>
@@ -631,7 +731,8 @@ export default function Campanha() {
               Para quem este material é indispensável?
             </h2>
             <p className="text-slate-300 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
-              Se você se enquadra em algum destes perfis, continuar atuando na informalidade ou sem suporte pode estar custando caro.
+              Se você se enquadra em algum destes perfis, continuar atuando na
+              informalidade ou sem suporte pode estar custando caro.
             </p>
           </div>
 
@@ -639,35 +740,42 @@ export default function Campanha() {
             {[
               {
                 title: "Prestadores de Serviços (PJs)",
-                desc: "Profissionais de TI, desenvolvedores, designers, redatores ou consultores que fecharam contratos corporativos e precisam emitir notas fiscais sem pagar o imposto massivo de Pessoa Física (que chega a até 27.5%)."
+                desc: "Profissionais de TI, desenvolvedores, designers, redatores ou consultores que fecharam contratos corporativos e precisam emitir notas fiscais sem pagar o imposto massivo de Pessoa Física (que chega a até 27.5%).",
               },
               {
                 title: "Empresas de Tecnologia & Startups",
-                desc: "Empreendedores digitais que planejam iniciar operações, criar novas marcas ou aplicativos, e buscam o menor regime de imposto adequado para iniciar com segurança financeira."
+                desc: "Empreendedores digitais que planejam iniciar operações, criar novas marcas ou aplicativos, e buscam o menor regime de imposto adequado para iniciar com segurança financeira.",
               },
               {
                 title: "Profissionais Liberais e Autônomos",
-                desc: "Médicos, advogados, arquitetos, psicólogos e demais autônomos que desejam regularizar suas receitas, planejar a previdência e expandir sua marca com CNPJ."
+                desc: "Médicos, advogados, arquitetos, psicólogos e demais autônomos que desejam regularizar suas receitas, planejar a previdência e expandir sua marca com CNPJ.",
               },
               {
                 title: "Infoprodutores, Creators e Afiliados",
-                desc: "Criadores de cursos, infoprodutos ou afiliados digitais que precisam emitir centenas de notas automatizadas e necessitam de uma contabilidade especializada para e-commerce."
-              }
+                desc: "Criadores de cursos, infoprodutos ou afiliados digitais que precisam emitir centenas de notas automatizadas e necessitam de uma contabilidade especializada para e-commerce.",
+              },
             ].map((item, idx) => (
-              <div key={idx} className="tech-panel p-6 border-white/5 bg-slate-900/10 flex items-start gap-4">
+              <div
+                key={idx}
+                className="tech-panel p-6 border-white/5 bg-slate-900/10 flex items-start gap-4"
+              >
                 <div className="w-7 h-7 rounded-full bg-cyan-950 flex-shrink-0 flex items-center justify-center border border-cyan-500/10 mt-1">
                   <Check size={14} className="text-cyan-400" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2">
+                    {item.title}
+                  </h3>
+                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
-  
+
       {/* SEÇÃO: CTA SECUNDÁRIO FOCADO (FINAL) */}
       <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#090d14] to-[#05070b]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_center,_rgba(34,211,238,0.08),_transparent_65%)]" />
@@ -679,11 +787,15 @@ export default function Campanha() {
             Pronto para economizar de forma imediata e legal?
           </h2>
           <p className="text-slate-300 text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed">
-            Faça o download do guia definitivo agora mesmo. É rápido, 100% gratuito e trará a transformação tributária que a sua futura empresa merece.
+            Faça o download do guia definitivo agora mesmo. É rápido, 100%
+            gratuito e trará a transformação tributária que a sua futura empresa
+            merece.
           </p>
           <button
             onClick={() => {
-              document.getElementById("hero-form-container")?.scrollIntoView({ behavior: "smooth" })
+              document
+                .getElementById("hero-form-container")
+                ?.scrollIntoView({ behavior: "smooth" })
             }}
             className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-cyan-400 to-[#0d6084] hover:from-cyan-300 hover:to-[#0a4a62] text-white font-extrabold px-6 sm:px-10 py-4 rounded-full shadow-[0_20px_50px_rgba(6,182,212,0.3)] hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 text-xs sm:text-sm md:text-base text-center"
           >
@@ -704,8 +816,11 @@ export default function Campanha() {
               <img src={logoImg} alt="Bi2B Logo" className="h-6 w-auto" />
             </div>
             <p className="text-center md:text-right">
-              &copy; {new Date().getFullYear()} Bi2B Contabilidade Inteligente. Todos os direitos reservados.<br />
-              Desenvolvido com foco máximo em proteção de dados de leads de acordo com a LGPD.
+              &copy; {new Date().getFullYear()} Bi2B Contabilidade Inteligente.
+              Todos os direitos reservados.
+              <br />
+              Desenvolvido com foco máximo em proteção de dados de leads de
+              acordo com a LGPD.
             </p>
           </div>
           <div className="mt-6 flex justify-center">
@@ -726,16 +841,26 @@ export default function Campanha() {
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#05070b]/90 border-t border-cyan-400/20 backdrop-blur-lg p-4 flex items-center justify-between lg:hidden animate-fade-in-up shadow-2xl shadow-cyan-400/10">
           <div className="flex items-center gap-3">
             <div className="w-8 h-10 bg-cyan-950/40 rounded-md overflow-hidden flex-shrink-0 border border-cyan-500/10">
-              <img src={ebookMockupImg} alt="Ebook" className="w-full h-full object-cover scale-110" />
+              <img
+                src={ebookMockupImg}
+                alt="Ebook"
+                className="w-full h-full object-cover scale-110"
+              />
             </div>
             <div>
-              <p className="text-[11px] font-bold text-white leading-tight">Guia Abertura & Impostos</p>
-              <p className="text-[10px] text-cyan-300 font-bold">100% Gratuito</p>
+              <p className="text-[11px] font-bold text-white leading-tight">
+                Guia Abertura & Impostos
+              </p>
+              <p className="text-[10px] text-cyan-300 font-bold">
+                100% Gratuito
+              </p>
             </div>
           </div>
           <button
             onClick={() => {
-              document.getElementById("hero-form-container")?.scrollIntoView({ behavior: "smooth" })
+              document
+                .getElementById("hero-form-container")
+                ?.scrollIntoView({ behavior: "smooth" })
             }}
             className="bg-gradient-to-r from-cyan-400 to-[#0d6084] text-white text-[11px] sm:text-xs font-extrabold px-6 sm:px-8 py-2.5 rounded-full shadow-lg shadow-cyan-500/10 active:scale-95 transition-all flex-shrink-0 whitespace-nowrap"
           >
@@ -758,8 +883,8 @@ export default function Campanha() {
                 </h3>
                 <p className="text-slate-300 mb-8 text-base leading-relaxed text-center">
                   Seus dados foram processados com sucesso.
-                  <br />
-                  O link para download do e-book foi enviado para o endereço de e-mail preenchido no formulário!
+                  <br />O link para download do e-book foi enviado para o
+                  endereço de e-mail preenchido no formulário!
                 </p>
                 <button
                   onClick={() => {
@@ -779,12 +904,15 @@ export default function Campanha() {
                   Confira seu e-mail
                 </h3>
                 <p className="text-slate-300 mb-8 text-base leading-relaxed text-center">
-                  Se não encontrar a mensagem em alguns instantes, certifique-se de verificar as pastas
+                  Se não encontrar a mensagem em alguns instantes, certifique-se
+                  de verificar as pastas
                   <span className="text-white font-semibold"> Principal</span>,
                   <span className="text-white font-semibold"> Promoções</span> e
                   <span className="text-white font-semibold"> Spam</span>.
-                  <br /><br />
-                  Se ainda assim não o encontrar, sinta-se à vontade para falar conosco.
+                  <br />
+                  <br />
+                  Se ainda assim não o encontrar, sinta-se à vontade para falar
+                  conosco.
                 </p>
                 <button
                   onClick={() => {
@@ -802,4 +930,3 @@ export default function Campanha() {
     </div>
   )
 }
-

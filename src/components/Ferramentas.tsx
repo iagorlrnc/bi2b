@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom"
 import {
   Calculator,
   Briefcase,
-  Building2,
   Sparkles,
   ChevronLeft,
   ChevronRight,
@@ -423,7 +422,7 @@ function calcularAliquotaEfetivaSimples(
   }
 }
 
-function CalculadoraPJ() {
+export function CalculadoraPJ() {
   const { setPjData } = useReportContext()
   const [faturamento, setFaturamento] = useState<number | "">("")
   const [rbt12, setRbt12] = useState<number | "">("")
