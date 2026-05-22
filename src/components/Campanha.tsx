@@ -875,7 +875,7 @@ export default function Campanha() {
         <div
           className="fixed left-0 right-0 z-50 bg-[#05070b]/90 border-t border-cyan-400/20 backdrop-blur-lg p-4 flex items-center justify-between lg:hidden animate-fade-in-up shadow-2xl shadow-cyan-400/10"
           style={{
-            bottom: `calc(env(safe-area-inset-bottom) + ${stickyFooterBottom}px)`,
+            bottom: `${stickyFooterBottom}px`,
           }}
         >
           <div className="flex items-center gap-3">
