@@ -2,9 +2,13 @@ import { FaWhatsapp } from "react-icons/fa"
 
 const WHATSAPP_URL = "https://wa.me/556392812239"
 
-export default function WhatsAppFloatingButton() {
+interface WhatsAppFloatingButtonProps {
+  higherOnMobile?: boolean
+}
+
+export default function WhatsAppFloatingButton({ higherOnMobile = false }: WhatsAppFloatingButtonProps) {
   return (
-    <div className="fixed bottom-6 right-6 z-[9999] flex items-center gap-3">
+    <div className={`fixed ${higherOnMobile ? "bottom-24 lg:bottom-6" : "bottom-6"} right-6 z-[9999] flex items-center gap-3`}>
       <a
         href={WHATSAPP_URL}
         target="_blank"

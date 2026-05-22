@@ -8,12 +8,17 @@ import {
   FileText,
   BadgeCheck,
   Sparkles,
+  Lock,
+  Download,
+  Clock,
+  Users,
+  BookOpen,
+  Zap,
 } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
-
-import negocioImg from "../assets/img/negocio.jpg"
-import fechadoImg from "../assets/img/fechado.jpg"
+import ebookMockupImg from "../assets/img/ebook_mockup.png"
+import logoImg from "../assets/img/logo.png"
 
 const RETURN_SCROLL_KEY = "bi2b:faturamento:return-scroll"
 
@@ -24,6 +29,30 @@ export default function Campanha() {
   const [modalStep, setModalStep] = useState<"thanks" | "notice" | null>(null)
   const [consent, setConsent] = useState(false)
   const [showConsentError, setShowConsentError] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(899) // 14 minutes and 59 seconds
+  const [showStickyCta, setShowStickyCta] = useState(false)
+
+  // Timer effect to create urgency
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => (prev <= 1 ? 899 : prev - 1))
+    }, 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  // Scroll listener for sticky CTA (mobile only)
+  useEffect(() => {
+    const handleScroll = () => {
+      const heroForm = document.getElementById("hero-form-container")
+      if (heroForm) {
+        const rect = heroForm.getBoundingClientRect()
+        // Exibe o sticky CTA apenas quando o formulário estiver fora de vista no mobile
+        setShowStickyCta(rect.bottom < 0)
+      }
+    }
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   const triggerConsentError = () => {
     setShowConsentError(true)
@@ -215,182 +244,372 @@ export default function Campanha() {
     }
   }, [])
 
-  return (
-    <div className="min-h-screen relative">
-      {/* SECTION 1: INÍCIO */}
-      <section id="inicio" className="section-shell pt-12">
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-14 items-center">
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <div className="section-label w-fit">
-                  <Sparkles size={14} />
-                  Abertura de Empresa
-                </div>
-                <h1 className="section-title">
-                  Abra sua Empresa do Jeito Certo e Pague{" "}
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#7ee7ff] via-white to-[#0d6084]">
-                    Menos Impostos
-                  </span>
-                </h1>
-              </div>
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+  }
 
-              <p className="section-copy max-w-2xl">
-                Abrir uma empresa pode ser a melhor decisão para quem deseja
-                crescer profissionalmente — mas também pode se tornar um
-                problema quando é feito sem planejamento. O erro mais comum é
-                ignorar o planejamento tributário, levando a pagamentos
-                desnecessários de impostos.
+  return (
+    <div className="min-h-screen bg-[#05070b] relative text-white selection:bg-cyan-500/30 selection:text-white">
+      {/* Elementos de gradiente de fundo */}
+      <div className="absolute top-0 inset-x-0 h-[700px] bg-[radial-gradient(circle_at_top_center,_rgba(6,182,212,0.15),_rgba(13,96,132,0.05)_40%,_transparent_75%)] pointer-events-none" />
+      <div className="absolute top-1/4 left-[-100px] w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-2/3 right-[-100px] w-96 h-96 bg-rose-500/5 rounded-full blur-3xl pointer-events-none" />
+
+      {/* Estilos para customização e override do formulário RD Station */}
+      <style>
+        {`
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e form,
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e section,
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .bricks-form {
+            background-color: transparent !important;
+            background: transparent !important;
+            padding: 0 !important;
+            margin: 0 !important;
+          }
+          
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button.bricks-form__submit,
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e input[type="submit"],
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button[type="submit"] {
+            background: linear-gradient(90deg, #22d3ee 0%, #0d6084 100%) !important;
+            border: none !important;
+            color: #ffffff !important;
+            font-weight: 800 !important;
+            font-family: 'Space Grotesk', sans-serif !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
+            border-radius: 9999px !important;
+            padding: 16px 32px !important;
+            font-size: 14px !important;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3) !important;
+            cursor: pointer !important;
+            width: 100% !important;
+            margin-top: 10px !important;
+          }
+
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button.bricks-form__submit:hover,
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e input[type="submit"]:hover,
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button[type="submit"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 15px 30px rgba(6, 182, 212, 0.45) !important;
+            filter: brightness(1.1) !important;
+          }
+
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button.bricks-form__submit:disabled {
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+            transform: none !important;
+            box-shadow: none !important;
+            filter: brightness(0.6) grayscale(0.5) !important;
+          }
+
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .bricks-form__field {
+            margin-bottom: 16px !important;
+          }
+
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .bricks-form__label {
+            color: #e2e8f0 !important;
+            font-size: 13px !important;
+            font-weight: 600 !important;
+            margin-bottom: 6px !important;
+            display: block !important;
+            text-align: left !important;
+          }
+
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e input:not([type="checkbox"]):not([type="radio"]),
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e select {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #0f172a !important;
+            padding: 12px 16px !important;
+            font-size: 14px !important;
+            width: 100% !important;
+            transition: all 0.3s ease !important;
+            border-radius: 12px !important;
+          }
+
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e input:not([type="checkbox"]):not([type="radio"]):focus,
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e select:focus {
+            border-color: #22d3ee !important;
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2) !important;
+          }
+
+          /* Container da Bandeira do Telefone */
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__flag-container {
+            position: absolute !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            display: flex !important;
+            align-items: center !important;
+            height: 100% !important;
+            border-radius: 12px 0 0 12px !important;
+          }
+
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__selected-flag {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 14px !important;
+            height: 100% !important;
+            background-color: transparent !important;
+            border-radius: 12px 0 0 12px !important;
+          }
+
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__flag {
+            margin: 0 !important;
+          }
+          
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__arrow {
+            margin-left: 6px !important;
+          }
+
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked button.bricks-form__submit,
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked button[type="submit"],
+          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked input[type="submit"] {
+            opacity: 0.5 !important;
+            filter: brightness(0.6) grayscale(0.5) !important;
+            cursor: not-allowed !important;
+          }
+
+          @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+          }
+          .animate-shake {
+            animation: shake 0.4s ease-in-out;
+          }
+
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(20px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+          .animate-fade-in-up {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+        `}
+      </style>
+
+      {/* HEADER DE ALTA CONVERSÃO (Sem Links Distrativos) */}
+      <header className="w-full py-5 border-b border-white/5 bg-[#05070b]/60 backdrop-blur-md sticky top-0 z-40">
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <img src={logoImg} alt="Bi2B Logo" className="h-8 md:h-9 w-auto" />
+          </div>
+          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-full text-emerald-400 text-[10px] md:text-xs font-bold uppercase tracking-wide">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+            Conexão Segura e Criptografada
+          </div>
+        </div>
+      </header>
+
+      {/* SEÇÃO HERO: IMPACTO TOTAL + FORMULÁRIO ABOVE THE FOLD */}
+      <section className="section-shell pt-8 md:pt-16 pb-20 relative overflow-hidden">
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="grid lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            {/* COPY PERSUASIVA (ESQUERDA) */}
+            <div className="lg:col-span-7 space-y-6 md:space-y-8">
+              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-950/20 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-cyan-300 backdrop-blur-md">
+                <Sparkles size={14} className="animate-pulse" />
+                E-book Premium Gratuito
+              </div>
+              
+              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
+                Abra sua empresa sem burocracia e{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-cyan-200 to-white drop-shadow-sm">
+                  Economize até 60%
+                </span>{" "}
+                em Impostos
+              </h1>
+
+              <p className="text-base sm:text-lg md:text-xl text-slate-300 font-medium leading-relaxed max-w-xl">
+                Descubra no nosso novo guia prático o passo a passo definitivo para formalizar seu negócio de forma ágil, segura e com o menor enquadramento tributário possível.
               </p>
 
-              <div className="tech-panel border-l-4 border-[#7ee7ff] p-3 max-w-2xl">
-                <p className="text-slate-300 italic">
-                  "Antes de abrir sua empresa, é fundamental avaliar cada
-                  detalhe com cuidado. O Simples Nacional nem sempre é a melhor
-                  opção. Cada caso precisa ser analisado individualmente para
-                  garantir economia desde o início."
-                </p>
-              </div>
-            </div>
-
-            <div className="flex justify-center lg:justify-end">
-              <div className="relative w-full max-w-md">
-                <img
-                  src={negocioImg}
-                  alt="Empreendedora planejando e trabalhando no laptop"
-                  className="rounded-[28px] border border-white/10 shadow-2xl object-cover w-full h-[320px] sm:h-[400px]"
-                />
-                <div className="absolute -bottom-6 left-4 right-4 sm:right-auto sm:-left-6 tech-panel p-4 sm:p-5 sm:max-w-xs border-[#7ee7ff]/30 z-10 transition-transform hover:-translate-y-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <AlertCircle className="text-[#7ee7ff]" size={24} />
-                    <p className="font-semibold text-white">Evite riscos</p>
-                  </div>
-                  <p className="text-sm text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                    Não pague impostos indevidamente por falta de análise
-                    prévia.
-                  </p>
+              {/* Selos Rápidos */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-6 border-t border-white/5 max-w-lg">
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="text-cyan-400 flex-shrink-0" size={18} />
+                  <span className="text-xs text-slate-300 font-semibold">100% Segura</span>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 2: SINAIS */}
-      <section id="sinais" className="section-shell pt-6">
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-14 items-center">
-            <div className="order-2 lg:order-1 relative">
-              <img
-                src={fechadoImg}
-                alt="Equipe de especialistas analisando dados em reunião"
-                className="rounded-[28px] border border-white/10 shadow-xl w-full object-cover h-[320px] sm:h-[400px]"
-              />
-              <div className="absolute top-6 -right-6 tech-panel p-4 border-[#7ee7ff]/30 hidden lg:block z-10">
-                <div className="flex items-center gap-3">
-                  <div className="bg-[#0d6084]/15 p-2 rounded-full">
-                    <TrendingUp className="text-[#7ee7ff]" size={20} />
-                  </div>
-                  <p className="font-semibold text-white">
-                    Maximize seus lucros
-                  </p>
+                <div className="flex items-center gap-2">
+                  <Zap className="text-cyan-400 flex-shrink-0" size={18} />
+                  <span className="text-xs text-slate-300 font-semibold">Acesso Imediato</span>
+                </div>
+                <div className="flex items-center gap-2 col-span-2 sm:col-span-1">
+                  <Check className="text-cyan-400 flex-shrink-0" size={18} />
+                  <span className="text-xs text-slate-300 font-semibold">Sem Taxas Ocultas</span>
                 </div>
               </div>
             </div>
 
-            <div className="space-y-8 order-1 lg:order-2">
-              <div>
-                <div className="section-label w-fit mb-5">
-                  <Sparkles size={14} />
-                  Para Autônomos
-                </div>
-                <h2 className="section-title mb-6">
-                  Sinais de que Você Precisa Abrir Uma Empresa Agora
-                </h2>
-                <p className="section-copy max-w-2xl">
-                  Se você atua como Pessoa Física, preste atenção nestes sinais
-                  indicativos de que a hora de formalizar chegou:
-                </p>
-              </div>
-
-              <div className="space-y-5 tech-panel p-6 border-white/10">
-                {[
-                  "Você está pagando impostos demais como pessoa física (IRPF e INSS)",
-                  "Precisa emitir nota fiscal para fechar contratos com empresas",
-                  "Quer crescer profissionalmente e ter novas oportunidades no mercado",
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-3">
-                    <Check
-                      size={22}
-                      className="text-[#7ee7ff] flex-shrink-0 mt-0.5"
+            {/* FORMULÁRIO + MOCKUP DO EBOOK (DIREITA - CAPTURA PRIMÁRIA) */}
+            <div className="lg:col-span-5 pt-8 lg:pt-0">
+              <div id="hero-form-container" className="relative tech-panel p-6 sm:p-8 border-cyan-400/20 shadow-[0_0_50px_rgba(6,182,212,0.15)] transition-all hover:border-cyan-400/30">
+                
+                {/* Mockup do Ebook em Destaque flutuante */}
+                <div className="relative flex justify-center -mt-12 sm:-mt-16 mb-6">
+                  <div className="relative group">
+                    <div className="absolute inset-0 bg-cyan-400/20 rounded-2xl blur-xl group-hover:bg-cyan-400/30 transition-all duration-500" />
+                    <img
+                      src={ebookMockupImg}
+                      alt="E-book Guia Completo para Abrir Sua Empresa"
+                      className="relative w-28 sm:w-32 h-auto object-cover rounded-xl shadow-2xl border border-white/10 transform rotate-1 group-hover:rotate-0 transition-transform duration-500"
                     />
-                    <p className="text-slate-100 font-medium">{item}</p>
+                    <span className="absolute -bottom-2 -right-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white font-extrabold text-[10px] sm:text-xs px-3 py-1.5 rounded-full shadow-lg border border-amber-400/20 flex items-center gap-1 animate-pulse">
+                      <Download size={12} />
+                      100% GRÁTIS
+                    </span>
                   </div>
-                ))}
-              </div>
+                </div>
 
-              <div className="tech-panel border-l-4 border-[#7ee7ff] p-4 max-w-2xl">
-                <p className="text-slate-300 font-medium">
-                  Formalizar seu negócio pode reduzir sua carga tributária, dar
-                  mais credibilidade e abrir portas para novos contratos
-                  empresariais.
-                </p>
+                {/* Gatilho Mental de Urgência (Timer) */}
+                <div className="bg-cyan-950/30 border border-cyan-500/20 rounded-xl p-3 mb-6 text-center">
+                  <p className="text-[11px] sm:text-xs font-semibold text-cyan-300 flex items-center justify-center gap-1.5">
+                    <Clock size={13} className="animate-pulse" />
+                    Acesso gratuito garantido hoje por mais: <span className="font-mono font-bold text-white bg-cyan-900/60 px-2 py-0.5 rounded border border-cyan-400/20">{formatTime(timeLeft)}</span>
+                  </p>
+                </div>
+
+                {/* Chamada para Ação */}
+                <div className="text-center mb-6">
+                  <h3 className="text-lg sm:text-xl font-bold text-white uppercase tracking-wide">Receba o E-book Grátis</h3>
+                  <p className="text-xs text-slate-400 mt-1">Preencha abaixo para receber o E-Book imediatamente</p>
+                </div>
+
+                {/* Container do Formulário Integrado */}
+                <div
+                  role="main"
+                  id="formulario-pag-abertura-de-empresa-060ce9f639cf1704454e"
+                  className={`py-0 w-full transition-all duration-300 ${isFormSubmitted ? "opacity-60 pointer-events-none grayscale-[20%]" : ""} ${!consent ? "consent-not-checked" : ""}`}
+                  onClickCapture={(e) => {
+                    if (!consent) {
+                      const target = e.target as HTMLElement
+                      if (
+                        target.closest(
+                          'button[type="submit"], input[type="submit"], .bricks-form__submit',
+                        )
+                      ) {
+                        e.stopPropagation()
+                        e.preventDefault()
+                        triggerConsentError()
+                      }
+                    }
+                  }}
+                  onSubmitCapture={(e) => {
+                    if (!consent) {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      triggerConsentError()
+                    }
+                  }}
+                  onKeyDownCapture={(e) => {
+                    if (!consent && e.key === "Enter") {
+                      e.stopPropagation()
+                      e.preventDefault()
+                      triggerConsentError()
+                    }
+                  }}
+                ></div>
+
+                {/* Consent Checkbox com tratamento de erros visual */}
+                {!isFormSubmitted && (
+                  <div
+                    className={`mt-4 flex items-start gap-3 p-3 rounded-xl border transition-all duration-300 ${showConsentError ? "border-red-500 bg-red-500/10 animate-shake" : "border-white/5 bg-[#0d6084]/15"}`}
+                  >
+                    <input
+                      type="checkbox"
+                      id="consent-checkbox"
+                      checked={consent}
+                      onChange={handleConsentChange}
+                      className="flex-shrink-0 w-4 h-4 mt-0.5 rounded border-gray-600 text-cyan-500 focus:ring-cyan-400 bg-slate-900 cursor-pointer"
+                    />
+                    <label
+                      htmlFor="consent-checkbox"
+                      className="text-[10px] text-slate-300 cursor-pointer leading-snug font-medium"
+                    >
+                      Concordo em receber comunicações e aceito que meus dados sejam utilizados para fins de marketing e personalização de ofertas.
+                    </label>
+                  </div>
+                )}
+
+                {/* Indicador de Privacidade e Segurança */}
+                <div className="mt-5 border-t border-white/10 pt-4 text-center">
+                  {!isFormSubmitted ? (
+                    <p className="text-[11px] text-slate-400 flex items-center justify-center gap-1.5 font-medium">
+                      <Lock size={12} className="text-cyan-400" />
+                      Seus dados protegidos contra spam.
+                    </p>
+                  ) : (
+                    <p className="text-emerald-400 text-xs font-bold flex items-center justify-center gap-1.5">
+                      <Check size={14} />
+                      Tudo pronto! Verifique sua caixa de entrada.
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* SECTION 3: PROCESSO RÁPIDO */}
-      <section id="processo" className="section-shell pt-6">
+      {/* SEÇÃO: O QUE VOCÊ VAI APRENDER (BENEFÍCIOS E CARDS PREMIUM) */}
+      <section className="section-shell bg-[#080c14]/40 py-20 border-y border-white/5">
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-3xl mx-auto mb-16 text-center">
-            <div className="section-label w-fit mx-auto mb-5">
-              <Sparkles size={14} />
-              Nossa Jornada
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-950/20 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-cyan-300 mb-4">
+              <BookOpen size={14} />
+              Conteúdo de Valor Real
             </div>
-            <h2 className="section-title mb-6">
-              Abertura Rápida, Simples e Sem Burocracia
+            <h2 className="text-3xl md:text-4.5xl font-extrabold text-white mb-6">
+              O que você vai aprender ao baixar este guia gratuito:
             </h2>
-            <p className="section-copy max-w-2xl mx-auto">
-              Nós cuidamos de tudo para você com orientação especializada para
-              garantir que você pague menos imposto desde o primeiro mês.
+            <p className="text-slate-300 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
+              Desenvolvemos um material simples, sem termos contábeis difíceis de compreender, com foco direto na sua economia e segurança jurídica.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 justify-items-center md:justify-items-stretch">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
+                icon: TrendingUp,
+                title: "Economia Tributária",
+                desc: "Compare de forma clara o Simples Nacional, Lucro Presumido e a tributação por Pessoa Física e escolha o menor imposto legal."
+              },
+              {
                 icon: Building2,
-                title: "CNPJ",
-                desc: "Obtenção ágil do seu registro nacional sem dores de cabeça.",
+                title: "Processo Sem Erros",
+                desc: "Evite os erros capitais que atrasam a emissão do seu CNPJ ou geram problemas imediatos junto aos órgãos governamentais."
               },
               {
                 icon: FileText,
-                title: "Inscrição Municipal",
-                desc: "Regularização correta para o seu tipo de serviço ou produto.",
+                title: "Regulamentação Fácil",
+                desc: "Descubra como estruturar sua atividade corretamente usando as KNAEs ideais para o seu modelo de negócio ou serviço."
               },
               {
                 icon: BadgeCheck,
-                title: "Alvará",
-                desc: "Garantimos a liberação do seu negócio para operar dentro da lei.",
-              },
-              {
-                icon: TrendingUp,
-                title: "Enquadramento",
-                desc: "Análise individual para escolher o regime mais vantajoso.",
-              },
-            ].map((item, i) => (
-              <div key={i} className="tech-card w-full">
-                <div className="mb-4 flex items-center gap-4 lg:block lg:mb-0">
-                  <div className="w-14 h-14 bg-[#0d6084]/15 text-[#7ee7ff] rounded-2xl flex items-center justify-center mb-0 border border-[#7ee7ff]/15 shrink-0 lg:mb-6">
-                    <item.icon size={24} />
-                  </div>
-                  <h3 className="text-lg font-bold text-white mb-0 uppercase tracking-wide lg:mb-3">
-                    {item.title}
-                  </h3>
+                title: "Checklist de Sucesso",
+                desc: "Um plano de ação prático com tudo o que você deve configurar logo nos primeiros dias após ter a sua empresa aberta."
+              }
+            ].map((item, idx) => (
+              <div key={idx} className="tech-card group border-white/5 bg-slate-900/20 hover:border-cyan-400/25 transition-all">
+                <div className="w-12 h-12 bg-cyan-950/40 text-cyan-400 rounded-2xl flex items-center justify-center mb-6 border border-cyan-500/10 group-hover:scale-110 transition-transform duration-300">
+                  <item.icon size={22} />
                 </div>
-                <div className="w-12 h-0.5 bg-[#FF0000] mb-4"></div>
+                <h3 className="text-lg font-bold text-white mb-3 group-hover:text-cyan-300 transition-colors">
+                  {item.title}
+                </h3>
                 <p className="text-slate-400 text-sm leading-relaxed">
                   {item.desc}
                 </p>
@@ -400,236 +619,178 @@ export default function Campanha() {
         </div>
       </section>
 
-      {/* SECTION 4: SEGURANÇA / CTA */}
-      <section className="section-shell relative isolate pt-6">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,_rgba(13,96,132,0.15),_transparent_50%)]" />
+      {/* SEÇÃO: IDENTIFICAÇÃO (PARA QUEM É ESTE EBOOK) */}
+      <section className="section-shell py-20 relative">
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="section-label w-fit mx-auto mb-5">
-              <ShieldCheck size={14} />
-              Segurança Total
+          <div className="max-w-3xl mx-auto mb-16 text-center">
+            <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-950/20 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-cyan-300 mb-4">
+              <Users size={14} />
+              Identificação Direta
             </div>
-            <h2 className="section-title mb-6">
-              Comece seu Negócio com Segurança
+            <h2 className="text-3xl md:text-4.5xl font-extrabold text-white mb-6">
+              Para quem este material é indispensável?
             </h2>
-            <p className="section-copy max-w-2xl mx-auto mb-12">
-              Abrir uma empresa não precisa ser complicado. Nossa equipe realiza
-              todo o processo de forma rápida, com acompanhamento tributário e
-              suporte contábil, garantindo que você comece sua jornada
-              empreendedora com tranquilidade.
+            <p className="text-slate-300 text-base md:text-lg leading-relaxed max-w-xl mx-auto">
+              Se você se enquadra em algum destes perfis, continuar atuando na informalidade ou sem suporte pode estar custando caro.
             </p>
+          </div>
 
-            <div className="tech-panel px-4 py-4 sm:p-5 md:p-8">
-              <div
-                className={`text-center mb-8 rounded-2xl p-4 sm:p-6 transition-all duration-300 ${isFormSubmitted ? "opacity-60" : ""}`}
-              >
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
-                  Receba seu E-book Gratuitamente
-                </h3>
-                <p className="text-slate-300 text-base">
-                  Preencha o formulário abaixo para receber o material
-                  exclusivo.
-                </p>
-              </div>
-
-              <style>
-                {`
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e form,
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e section,
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .bricks-form {
-                    background-color: transparent !important;
-                    background: transparent !important;
-                  }
-                  
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e input:not([type="checkbox"]):not([type="radio"]),
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e select,
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e textarea {
-                    border-radius: 12px !important;
-                    color: #000000 !important;
-                  }
-
-                  /* Container da Bandeira do Telefone */
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__flag-container {
-                    position: absolute !important;
-                    top: 0 !important;
-                    bottom: 0 !important;
-                    display: flex !important;
-                    align-items: center !important;
-                    height: 100% !important;
-                    border-radius: 12px 0 0 12px !important;
-                  }
-
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__selected-flag {
-                    display: flex !important;
-                    align-items: center !important;
-                    justify-content: center !important;
-                    padding: 0 14px !important;
-                    height: 100% !important;
-                    background-color: transparent !important;
-                    border-radius: 12px 0 0 12px !important;
-                  }
-
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__flag {
-                    margin: 0 !important;
-                  }
-                  
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__arrow {
-                    margin-left: 6px !important;
-                  }
-
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked button.bricks-form__submit,
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked button[type="submit"],
-                  #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked input[type="submit"] {
-                    opacity: 0.5 !important;
-                    filter: brightness(0.6) grayscale(0.5) !important;
-                    cursor: not-allowed !important;
-                  }
-
-                  @keyframes shake {
-                    0%, 100% { transform: translateX(0); }
-                    20% { transform: translateX(-6px); }
-                    40% { transform: translateX(6px); }
-                    60% { transform: translateX(-4px); }
-                    80% { transform: translateX(4px); }
-                  }
-                  .animate-shake {
-                    animation: shake 0.4s ease-in-out;
-                  }
-                `}
-              </style>
-              <div
-                role="main"
-                id="formulario-pag-abertura-de-empresa-060ce9f639cf1704454e"
-                className={` py-0 w-full transition-all duration-300 ${isFormSubmitted ? "opacity-60 pointer-events-none grayscale-[20%]" : ""} ${!consent ? "consent-not-checked" : ""}`}
-                style={{ paddingLeft: "0px", paddingRight: "0px" }}
-                onClickCapture={(e) => {
-                  if (!consent) {
-                    const target = e.target as HTMLElement
-                    if (
-                      target.closest(
-                        'button[type="submit"], input[type="submit"], .bricks-form__submit',
-                      )
-                    ) {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      triggerConsentError()
-                    }
-                  }
-                }}
-                onSubmitCapture={(e) => {
-                  if (!consent) {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    triggerConsentError()
-                  }
-                }}
-                onKeyDownCapture={(e) => {
-                  if (!consent && e.key === "Enter") {
-                    e.stopPropagation()
-                    e.preventDefault()
-                    triggerConsentError()
-                  }
-                }}
-              ></div>
-
-              {!isFormSubmitted && (
-                <div
-                  className={`mt-4 flex items-center gap-3 p-3 rounded-xl border transition-all duration-300 ${showConsentError ? "border-red-500 bg-red-500/10 animate-shake" : "border-white/5 bg-[#0d6084]/10"}`}
-                >
-                  <input
-                    type="checkbox"
-                    id="consent-checkbox"
-                    checked={consent}
-                    onChange={handleConsentChange}
-                    className="flex-shrink-0 w-5 h-5 rounded border-gray-300 text-[#0d6084] focus:ring-[#7ee7ff] cursor-pointer"
-                  />
-                  <label
-                    htmlFor="consent-checkbox"
-                    className="text-xs text-slate-300 cursor-pointer leading-tight"
-                  >
-                    Concordo em receber comunicações e aceito que meus dados
-                    sejam utilizados para fins de marketing e personalização de
-                    ofertas.
-                  </label>
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {[
+              {
+                title: "Prestadores de Serviços (PJs)",
+                desc: "Profissionais de TI, desenvolvedores, designers, redatores ou consultores que fecharam contratos corporativos e precisam emitir notas fiscais sem pagar o imposto massivo de Pessoa Física (que chega a até 27.5%)."
+              },
+              {
+                title: "Empresas de Tecnologia & Startups",
+                desc: "Empreendedores digitais que planejam iniciar operações, criar novas marcas ou aplicativos, e buscam o menor regime de imposto adequado para iniciar com segurança financeira."
+              },
+              {
+                title: "Profissionais Liberais e Autônomos",
+                desc: "Médicos, advogados, arquitetos, psicólogos e demais autônomos que desejam regularizar suas receitas, planejar a previdência e expandir sua marca com CNPJ."
+              },
+              {
+                title: "Infoprodutores, Creators e Afiliados",
+                desc: "Criadores de cursos, infoprodutos ou afiliados digitais que precisam emitir centenas de notas automatizadas e necessitam de uma contabilidade especializada para e-commerce."
+              }
+            ].map((item, idx) => (
+              <div key={idx} className="tech-panel p-6 border-white/5 bg-slate-900/10 flex items-start gap-4">
+                <div className="w-7 h-7 rounded-full bg-cyan-950 flex-shrink-0 flex items-center justify-center border border-cyan-500/10 mt-1">
+                  <Check size={14} className="text-cyan-400" />
                 </div>
-              )}
-
-              <div className="mt-8 border-t border-white/20 pb-4 pt-6">
-                {!isFormSubmitted ? (
-                  <p className="text-[#7ee7ff] text-sm text-center font-bold flex items-center justify-center gap-1.5">
-                    <AlertCircle size={16} />
-                    Preencha o formulário para receber o E-book
-                  </p>
-                ) : (
-                  <p className="text-[#7ee7ff] text-sm text-center font-bold flex items-center justify-center gap-1.5">
-                    <Check size={16} />O e-book foi enviado para o seu e-mail!
-                  </p>
-                )}
+                <div>
+                  <h3 className="text-base sm:text-lg font-bold text-white mb-2">{item.title}</h3>
+                  <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
+                </div>
               </div>
-            </div>
-
-            <div className="mt-8 flex justify-start">
-              <button
-                onClick={handleBack}
-                aria-label="Voltar para a página anterior"
-                className="tech-button-primary bg-gradient-to-r from-[#0d6084] to-[#0a4a62] px-6 py-3 shadow-[0_14px_40px_rgba(13,96,132,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.34)]"
-              >
-                <ArrowLeft size={18} />
-                Início
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </section>
+  
+      {/* SEÇÃO: CTA SECUNDÁRIO FOCADO (FINAL) */}
+      <section className="py-24 relative overflow-hidden bg-gradient-to-b from-[#090d14] to-[#05070b]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_center,_rgba(34,211,238,0.08),_transparent_65%)]" />
+        <div className="container mx-auto px-6 relative z-10 text-center max-w-3xl">
+          <div className="w-14 h-14 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 text-cyan-400 shadow-lg shadow-cyan-400/5">
+            <Download size={26} />
+          </div>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">
+            Pronto para economizar de forma imediata e legal?
+          </h2>
+          <p className="text-slate-300 text-base md:text-lg mb-8 max-w-xl mx-auto leading-relaxed">
+            Faça o download do guia definitivo agora mesmo. É rápido, 100% gratuito e trará a transformação tributária que a sua futura empresa merece.
+          </p>
+          <button
+            onClick={() => {
+              document.getElementById("hero-form-container")?.scrollIntoView({ behavior: "smooth" })
+            }}
+            className="inline-flex items-center gap-2 sm:gap-3 bg-gradient-to-r from-cyan-400 to-[#0d6084] hover:from-cyan-300 hover:to-[#0a4a62] text-white font-extrabold px-6 sm:px-10 py-4 rounded-full shadow-[0_20px_50px_rgba(6,182,212,0.3)] hover:-translate-y-1 hover:scale-105 active:scale-95 transition-all duration-300 text-xs sm:text-sm md:text-base text-center"
+          >
+            <Download size={18} className="flex-shrink-0" />
+            Quero Receber o E-book Grátis
+          </button>
+          <p className="text-[10px] sm:text-xs text-slate-500 mt-4 font-semibold uppercase tracking-wide">
+            ✓ DOWNLOAD IMEDIATO | ✓ CONTEÚDO ATUALIZADO 2026
+          </p>
+        </div>
+      </section>
+
+      {/* RODAPÉ SIMPLIFICADO (SEM DISTRAÇÕES E FOCADO) */}
+      <footer className="py-10 border-t border-white/5 bg-[#030508] text-slate-500 text-xs">
+        <div className="container mx-auto px-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="flex items-center gap-3 opacity-60">
+              <img src={logoImg} alt="Bi2B Logo" className="h-6 w-auto" />
+            </div>
+            <p className="text-center md:text-right">
+              &copy; {new Date().getFullYear()} Bi2B Contabilidade Inteligente. Todos os direitos reservados.<br />
+              Desenvolvido com foco máximo em proteção de dados de leads de acordo com a LGPD.
+            </p>
+          </div>
+          <div className="mt-6 flex justify-center">
+            <button
+              onClick={handleBack}
+              aria-label="Voltar para a página anterior"
+              className="inline-flex items-center gap-2 hover:text-white transition-colors duration-200"
+            >
+              <ArrowLeft size={14} />
+              Voltar ao Início do Site
+            </button>
+          </div>
+        </div>
+      </footer>
+
+      {/* STICKY CTA NO MOBILE (FICA FIXO NO RODAPÉ DO CELULAR AO ROLAR) */}
+      {showStickyCta && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#05070b]/90 border-t border-cyan-400/20 backdrop-blur-lg p-4 flex items-center justify-between lg:hidden animate-fade-in-up shadow-2xl shadow-cyan-400/10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-10 bg-cyan-950/40 rounded-md overflow-hidden flex-shrink-0 border border-cyan-500/10">
+              <img src={ebookMockupImg} alt="Ebook" className="w-full h-full object-cover scale-110" />
+            </div>
+            <div>
+              <p className="text-[11px] font-bold text-white leading-tight">Guia Abertura & Impostos</p>
+              <p className="text-[10px] text-cyan-300 font-bold">100% Gratuito</p>
+            </div>
+          </div>
+          <button
+            onClick={() => {
+              document.getElementById("hero-form-container")?.scrollIntoView({ behavior: "smooth" })
+            }}
+            className="bg-gradient-to-r from-cyan-400 to-[#0d6084] text-white text-[11px] sm:text-xs font-extrabold px-6 sm:px-8 py-2.5 rounded-full shadow-lg shadow-cyan-500/10 active:scale-95 transition-all flex-shrink-0 whitespace-nowrap"
+          >
+            Receber E-book
+          </button>
+        </div>
+      )}
 
       {/* MODAL DE SUCESSO CUSTOMIZADO */}
       {modalStep && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 duration-300">
-          <div className="tech-panel p-8 max-w-md w-full border-white/10">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/75 backdrop-blur-sm px-4 duration-300">
+          <div className="tech-panel p-8 max-w-md w-full border-cyan-500/20 shadow-[0_0_50px_rgba(6,182,212,0.1)]">
             {modalStep === "thanks" ? (
               <>
-                <div className="w-16 h-16 bg-[#0d6084]/15 rounded-full flex items-center justify-center mx-auto mb-6 border border-[#7ee7ff]/30">
-                  <Check size={32} className="text-[#7ee7ff]" />
+                <div className="w-16 h-16 bg-cyan-950/40 rounded-full flex items-center justify-center mx-auto mb-6 border border-cyan-500/30">
+                  <Check size={32} className="text-cyan-400" />
                 </div>
                 <h3 className="text-3xl font-extrabold text-white mb-3 text-center">
                   Muito Obrigado!
                 </h3>
-                <p className="text-slate-300 mb-8 text-lg leading-relaxed text-center">
-                  Recebemos seus dados com sucesso.
-                  <br />O e-book foi enviado para o endereço de
+                <p className="text-slate-300 mb-8 text-base leading-relaxed text-center">
+                  Seus dados foram processados com sucesso.
                   <br />
-                  e-mail preenchido no formulário!
+                  O link para download do e-book foi enviado para o endereço de e-mail preenchido no formulário!
                 </p>
                 <button
                   onClick={() => {
                     setModalStep("notice")
                   }}
-                  className="tech-button-primary w-full bg-gradient-to-r from-[#0d6084] to-[#0a4a62] shadow-[0_14px_40px_rgba(13,96,132,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.34)]"
+                  className="w-full bg-gradient-to-r from-cyan-400 to-[#0d6084] text-white font-extrabold py-4 rounded-full shadow-lg shadow-cyan-500/15 hover:brightness-110 transition-all text-sm uppercase tracking-wider"
                 >
                   OK
                 </button>
               </>
             ) : (
               <>
-                <div className="w-16 h-16 bg-amber-500/15 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-300/30">
-                  <AlertCircle size={32} className="text-amber-300" />
+                <div className="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-500/20">
+                  <AlertCircle size={32} className="text-amber-400" />
                 </div>
                 <h3 className="text-3xl font-extrabold text-white mb-3 text-center">
                   Confira seu e-mail
                 </h3>
-                <p className="text-slate-300 mb-8 text-lg leading-relaxed text-center">
-                  Se não encontrar a mensagem, verifique também as pastas
-                  {/* <span className="text-white font-semibold"> Principal</span>, */}
+                <p className="text-slate-300 mb-8 text-base leading-relaxed text-center">
+                  Se não encontrar a mensagem em alguns instantes, certifique-se de verificar as pastas
+                  <span className="text-white font-semibold"> Principal</span>,
                   <span className="text-white font-semibold"> Promoções</span> e
                   <span className="text-white font-semibold"> Spam</span>.
-                  <br />
-                  Se ainda assim não localizar, fale com a gente pelo WhatsApp.
+                  <br /><br />
+                  Se ainda assim não o encontrar, sinta-se à vontade para falar conosco.
                 </p>
                 <button
                   onClick={() => {
                     setModalStep(null)
                   }}
-                  className="tech-button-primary w-full bg-gradient-to-r from-[#0d6084] to-[#0a4a62] shadow-[0_14px_40px_rgba(13,96,132,0.28)] hover:-translate-y-0.5 hover:shadow-[0_18px_50px_rgba(13,96,132,0.34)]"
+                  className="w-full bg-gradient-to-r from-cyan-400 to-[#0d6084] text-white font-extrabold py-4 rounded-full shadow-lg shadow-cyan-500/15 hover:brightness-110 transition-all text-sm uppercase tracking-wider"
                 >
                   Fechar
                 </button>
@@ -641,3 +802,4 @@ export default function Campanha() {
     </div>
   )
 }
+
