@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react"
+import { useState } from "react"
 import { Sparkles } from "lucide-react"
-import { FaWhatsapp, FaCheckCircle, FaTimesCircle } from "react-icons/fa"
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa"
 import emailjs from "@emailjs/browser"
 
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID
@@ -22,25 +22,6 @@ export default function Contact() {
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState<"success" | "error">("success")
   const [modalMessage, setModalMessage] = useState("")
-  const [isSectionVisible, setIsSectionVisible] = useState(false)
-  const sectionRef = useRef<HTMLElement>(null)
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsSectionVisible(entry.isIntersecting)
-      },
-      { threshold: 0.1 },
-    )
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current)
-    }
-    return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current)
-      }
-    }
-  }, [])
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -123,7 +104,7 @@ export default function Contact() {
 
   return (
     <>
-      <section ref={sectionRef} className="section-shell pt-6">
+      <section className="section-shell pt-6">
         <div className="container mx-auto px-6 relative z-10">
           <div className="max-w-5xl mx-auto text-center mb-12">
             <div className="section-label mx-auto mb-5 w-fit">
