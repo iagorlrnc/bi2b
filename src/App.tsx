@@ -82,7 +82,6 @@ function App() {
             <Routes>
               <Route path="*" element={<Campanha />} />
             </Routes>
-            <WhatsAppFloatingButton higherOnMobile={true} />
           </div>
         </Router>
       </ReportProvider>

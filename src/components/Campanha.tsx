@@ -36,6 +36,7 @@ export default function Campanha() {
   const [showConsentError, setShowConsentError] = useState(false)
   const [timeLeft, setTimeLeft] = useState(899) // 14 minutes and 59 seconds
   const [showStickyCta, setShowStickyCta] = useState(false)
+  const [stickyFooterBottom, setStickyFooterBottom] = useState(0)
 
   // Timer effect to create urgency
   useEffect(() => {
@@ -56,7 +57,57 @@ export default function Campanha() {
       }
     }
     window.addEventListener("scroll", handleScroll)
+    handleScroll()
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const updateStickyFooterPosition = () => {
+      if (window.innerWidth >= 1024 || !window.visualViewport) {
+        setStickyFooterBottom(0)
+        return
+      }
+
+      const viewport = window.visualViewport
+      const hiddenBrowserChrome = Math.max(
+        0,
+        window.innerHeight - viewport.height - viewport.offsetTop,
+      )
+
+      setStickyFooterBottom(hiddenBrowserChrome)
+    }
+
+    updateStickyFooterPosition()
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener(
+        "resize",
+        updateStickyFooterPosition,
+      )
+      window.visualViewport.addEventListener(
+        "scroll",
+        updateStickyFooterPosition,
+      )
+    }
+
+    window.addEventListener("orientationchange", updateStickyFooterPosition)
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener(
+          "resize",
+          updateStickyFooterPosition,
+        )
+        window.visualViewport.removeEventListener(
+          "scroll",
+          updateStickyFooterPosition,
+        )
+      }
+      window.removeEventListener(
+        "orientationchange",
+        updateStickyFooterPosition,
+      )
+    }
   }, [])
 
   const triggerConsentError = () => {
@@ -811,7 +862,12 @@ export default function Campanha() {
 
       {/* STICKY CTA NO MOBILE (FICA FIXO NO RODAPÉ DO CELULAR AO ROLAR) */}
       {showStickyCta && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#05070b]/90 border-t border-cyan-400/20 backdrop-blur-lg p-4 flex items-center justify-between lg:hidden animate-fade-in-up shadow-2xl shadow-cyan-400/10">
+        <div
+          className="fixed left-0 right-0 z-50 bg-[#05070b]/90 border-t border-cyan-400/20 backdrop-blur-lg p-4 flex items-center justify-between lg:hidden animate-fade-in-up shadow-2xl shadow-cyan-400/10"
+          style={{
+            bottom: `calc(env(safe-area-inset-bottom) + ${stickyFooterBottom}px)`,
+          }}
+        >
           <div className="flex items-center gap-3">
             <div className="w-8 h-10 bg-cyan-950/40 rounded-md overflow-hidden flex-shrink-0 border border-cyan-500/10">
               <img
