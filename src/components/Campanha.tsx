@@ -63,7 +63,11 @@ export default function Campanha() {
 
   useEffect(() => {
     const updateStickyFooterPosition = () => {
-      if (window.innerWidth >= 1024 || !window.visualViewport) {
+      const isIosDevice =
+        /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+
+      if (window.innerWidth >= 1024 || !window.visualViewport || !isIosDevice) {
         setStickyFooterBottom(0)
         return
       }
