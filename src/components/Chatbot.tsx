@@ -398,7 +398,7 @@ export default function Chatbot() {
           return null
         })
         .filter(Boolean)
-        .join("\r\n\r\n----------------------------------------\r\n\r\n")
+        .join("\r\n\r\n")
 
       const payload = {
         token_rdstation: token,
