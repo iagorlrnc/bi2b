@@ -467,7 +467,7 @@ export default function Campanha() {
 
               {/* Selos Rápidos */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-6 border-t border-white/5 max-w-lg">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
                   <ShieldCheck
                     className="text-cyan-400 flex-shrink-0"
                     size={18}
@@ -476,13 +476,13 @@ export default function Campanha() {
                     100% Segura
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center sm:justify-start gap-2">
                   <Zap className="text-cyan-400 flex-shrink-0" size={18} />
                   <span className="text-xs text-slate-300 font-semibold">
                     Acesso Imediato
                   </span>
                 </div>
-                <div className="flex items-center gap-2 col-span-2 sm:col-span-1">
+                <div className="flex items-center justify-center sm:justify-start gap-2 col-span-2 sm:col-span-1">
                   <Check className="text-cyan-400 flex-shrink-0" size={18} />
                   <span className="text-xs text-slate-300 font-semibold">
                     Sem Taxas Ocultas
@@ -849,7 +849,7 @@ export default function Campanha() {
             </div>
             <div>
               <p className="text-[11px] font-bold text-white leading-tight">
-                Guia Abertura & Impostos
+                Guia Abrir Minha Empresa
               </p>
               <p className="text-[10px] text-cyan-300 font-bold">
                 100% Gratuito
