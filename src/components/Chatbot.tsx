@@ -319,6 +319,21 @@ export default function Chatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  // Foca automaticamente o campo de input/textarea apropriado quando o passo muda ou o chat é aberto
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        if (leadStep === 1 || leadStep === 2) {
+          inputRef.current?.focus()
+        } else if (leadStep === 0 || leadStep === 4) {
+          textareaRef.current?.focus()
+        }
+      }, 100)
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen, leadStep])
 
   const closeChat = useCallback(() => {
     // Se o usuário já passou do consentimento, pede confirmação antes de fechar
@@ -986,6 +1001,7 @@ export default function Chatbot() {
               <div className="relative flex items-end">
                 {leadStep === 1 || leadStep === 2 ? (
                   <input
+                    ref={inputRef}
                     type="tel"
                     inputMode="numeric"
                     value={input}
