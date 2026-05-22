@@ -4,7 +4,6 @@ import {
   TrendingUp,
   Building2,
   ShieldCheck,
-  ArrowLeft,
   FileText,
   BadgeCheck,
   Sparkles,
@@ -15,7 +14,6 @@ import {
   BookOpen,
   Zap,
 } from "lucide-react"
-import { useLocation, useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { FaWhatsapp } from "react-icons/fa"
 import ebookMockupImg from "../assets/img/ebook_mockup.png"
@@ -31,11 +29,7 @@ const getRDStationForms = (): RDStationFormsConstructor | undefined =>
   (window as Window & { RDStationForms?: RDStationFormsConstructor })
     .RDStationForms
 
-const RETURN_SCROLL_KEY = "bi2b:faturamento:return-scroll"
-
 export default function Campanha() {
-  const navigate = useNavigate()
-  const location = useLocation()
   const [isFormSubmitted, setIsFormSubmitted] = useState(false)
   const [modalStep, setModalStep] = useState<"thanks" | "notice" | null>(null)
   const [consent, setConsent] = useState(false)
@@ -93,16 +87,6 @@ export default function Campanha() {
         }
       }
     }
-  }
-
-  const handleBack = () => {
-    if (location.state?.fromInternalLink) {
-      navigate(-1)
-      return
-    }
-
-    sessionStorage.removeItem(RETURN_SCROLL_KEY)
-    navigate("/", { state: { scrollToTop: true } })
   }
 
   useEffect(() => {
@@ -448,7 +432,7 @@ export default function Campanha() {
             <div className="lg:col-span-7 space-y-6 md:space-y-8 min-h-[640px] lg:min-h-[820px]">
               <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-950/20 px-4 py-2 text-xs font-bold uppercase tracking-[0.15em] text-cyan-300 backdrop-blur-md">
                 <Sparkles size={14} className="animate-pulse" />
-                E-book Premium Gratuito
+                E-book Gratuito
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold text-white leading-tight">
@@ -512,8 +496,8 @@ export default function Campanha() {
                     </div>
 
                     <p className="text-sm text-slate-300 leading-relaxed max-w-xl">
-                      Tire suas dúvidas sobre abertura de empresa, economia de impostos
-                      em poucos minutos, de forma 100% gratuita.
+                      Tire suas dúvidas sobre abertura de empresa, economia de
+                      impostos em poucos minutos, de forma 100% gratuita.
                     </p>
                   </div>
 
@@ -529,7 +513,9 @@ export default function Campanha() {
                         size={20}
                         className="transition-transform duration-300 group-hover/btn:rotate-12 group-hover/btn:scale-110 shrink-0"
                       />
-                      <span className="whatsapp-text-hide">Iniciar Conversa</span>
+                      <span className="whatsapp-text-hide">
+                        Iniciar Conversa
+                      </span>
                     </a>
                   </div>
                 </div>
@@ -665,7 +651,7 @@ export default function Campanha() {
           <div className="max-w-3xl mx-auto mb-16 text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-950/20 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-cyan-300 mb-4">
               <BookOpen size={14} />
-              Conteúdo de Valor Real
+              Conteúdo do E-book
             </div>
             <h2 className="text-3xl md:text-4.5xl font-extrabold text-white mb-6">
               O que você vai aprender ao baixar este guia gratuito:
@@ -692,7 +678,7 @@ export default function Campanha() {
               {
                 icon: FileText,
                 title: "Regulamentação Fácil",
-                desc: "Descubra como estruturar sua atividade corretamente usando as KNAEs ideais para o seu modelo de negócio ou serviço.",
+                desc: "Descubra como estruturar sua atividade corretamente usando as CNAEs ideais para o seu modelo de negócio ou serviço.",
               },
               {
                 icon: BadgeCheck,
@@ -725,7 +711,7 @@ export default function Campanha() {
           <div className="max-w-3xl mx-auto mb-16 text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-950/20 px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-cyan-300 mb-4">
               <Users size={14} />
-              Identificação Direta
+              Público Alvo
             </div>
             <h2 className="text-3xl md:text-4.5xl font-extrabold text-white mb-6">
               Para quem este material é indispensável?
@@ -816,22 +802,9 @@ export default function Campanha() {
               <img src={logoImg} alt="Bi2B Logo" className="h-6 w-auto" />
             </div>
             <p className="text-center md:text-right">
-              &copy; {new Date().getFullYear()} Bi2B Contabilidade Inteligente.
-              Todos os direitos reservados.
-              <br />
-              Desenvolvido com foco máximo em proteção de dados de leads de
-              acordo com a LGPD.
+              &copy; {new Date().getFullYear()} Bi2B Consultoria. Todos os
+              direitos reservados.
             </p>
-          </div>
-          <div className="mt-6 flex justify-center">
-            <button
-              onClick={handleBack}
-              aria-label="Voltar para a página anterior"
-              className="inline-flex items-center gap-2 hover:text-white transition-colors duration-200"
-            >
-              <ArrowLeft size={14} />
-              Voltar ao Início do Site
-            </button>
           </div>
         </div>
       </footer>
