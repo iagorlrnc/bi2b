@@ -6,12 +6,16 @@ export default async function handler(req, res) {
   try {
     const { messages } = req.body
 
+    const headers = {
+      "Content-Type": "application/json",
+    }
+    if (process.env.POLLINATIONS_API_KEY) {
+      headers["Authorization"] = `Bearer ${process.env.POLLINATIONS_API_KEY}`
+    }
+
     const response = await fetch("https://text.pollinations.ai/", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.POLLINATIONS_API_KEY}`,
-      },
+      headers,
       body: JSON.stringify({
         messages,
         model: "openai",
@@ -55,4 +59,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Erro no backend da Vercel" })
   }
 }
-c
