@@ -38,6 +38,18 @@ export default function Campanha() {
   const [showStickyCta, setShowStickyCta] = useState(false)
   const [stickyFooterBottom, setStickyFooterBottom] = useState(0)
 
+  // Effect to reposition chatbot button above mobile sticky CTA when it is visible
+  useEffect(() => {
+    if (showStickyCta) {
+      document.body.classList.add("chatbot-above-sticky-cta")
+    } else {
+      document.body.classList.remove("chatbot-above-sticky-cta")
+    }
+    return () => {
+      document.body.classList.remove("chatbot-above-sticky-cta")
+    }
+  }, [showStickyCta])
+
   // Timer effect to create urgency
   useEffect(() => {
     const timer = setInterval(() => {
@@ -317,6 +329,13 @@ export default function Campanha() {
       {/* Estilos para customização e override do formulário RD Station */}
       <style>
         {`
+          @media (max-width: 1023px) {
+            body.chatbot-above-sticky-cta .fixed.bottom-6.right-6 {
+              bottom: 96px !important;
+              transition: bottom 0.3s ease !important;
+            }
+          }
+
           #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e form,
           #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e section,
           #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .bricks-form {

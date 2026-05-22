@@ -18,7 +18,7 @@ import Faturamento from "./components/Faturamento"
 import Performance from "./components/Performance"
 import Estrategia from "./components/Estrategia"
 import NotFound from "./components/NotFound"
-import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton"
+import Chatbot from "./components/Chatbot"
 import Ferramentas from "./components/Ferramentas"
 import { ReportProvider } from "./contexts/ReportContext"
 
@@ -65,7 +65,7 @@ function AppRoutes() {
         <Route path="/ferramentas" element={<Ferramentas />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
-      <WhatsAppFloatingButton />
+      {["/", "/obrigado", "/faturamento", "/performance", "/estrategia", "/ferramentas", "/chatbot"].includes(location.pathname) && <Chatbot />}
     </div>
   )
 }
@@ -82,6 +82,7 @@ function App() {
             <Routes>
               <Route path="*" element={<Campanha />} />
             </Routes>
+            <Chatbot />
           </div>
         </Router>
       </ReportProvider>

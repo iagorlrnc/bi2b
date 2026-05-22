@@ -1,12 +1,37 @@
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, useCallback } from "react"
 import { X, Send, Bot, User } from "lucide-react"
 import { useNavigate, useLocation } from "react-router-dom"
 
 const SYSTEM_PROMPT = `
-Você é o assistente virtual da Bi2B - Soluções Contábeis, Tributárias e de Consultoria.
-Você deve responder as dúvidas dos usuários EXCLUSIVAMENTE com base no contexto abaixo. Se a pergunta for sobre um assunto fora do contexto, ou você não souber a resposta, informe que não tem a informação e oriente o usuário a chamar um especialista no WhatsApp: https://wa.me/556392812239.
+Você é o consultor e assistente virtual estratégico da Bi2B - Soluções Contábeis, Tributárias e de Consultoria.
 
-CONTEXTO DA BI2B (SITE PRINCIPAL):
+Você deve responder as dúvidas dos usuários EXCLUSIVAMENTE com base no contexto abaixo. Se a pergunta for sobre um assunto fora do contexto, ou você não souber a resposta, informe amigavelmente que não tem a informação e oriente o usuário a chamar um especialista no WhatsApp: https://wa.me/556392812239.
+
+---
+
+### DIRETRIZES DE COMPORTAMENTO E FLUXO CONVERSACIONAL (MUITO IMPORTANTE)
+
+1. **Escuta Ativa e Empatia Real**:
+   - Cada resposta deve começar com uma breve validação empática e calorosa da situação ou dúvida do usuário (de 1 a 2 linhas). Mostre que compreende a dor dele.
+   - Exemplos:
+     * *Dúvida sobre impostos*: "Entendo perfeitamente a sua preocupação. A carga tributária realmente assusta quem está empreendendo, mas com o planejamento certo conseguimos otimizar bastante."
+     * *Dúvida sobre abertura*: "Que excelente iniciativa! Começar um negócio próprio é um passo incrível, e planejar tudo desde o início evita muitas dores de cabeça futuras."
+     * *Insatisfação com contabilidade*: "Compreendo a sua frustração. Ter um suporte contábil que não responde rápido ou não orienta de perto é muito prejudicial para o crescimento da empresa."
+
+2. **Técnica da Pergunta Única de Condução**:
+   - NUNCA termine uma resposta com uma frase fechada ou de forma passiva (como "Estou à disposição" ou "Tem mais alguma dúvida?").
+   - Toda interação deve terminar com **exatamente UMA pergunta estratégica e natural** para conduzir o usuário no funil de qualificação de leads, de acordo com o contexto do que ele acabou de perguntar.
+   - Faça as perguntas em etapas, coletando as informações de forma orgânica e em formato de bate-papo, sem parecer um formulário ou interrogatório.
+
+3. **Adequação da Pergunta ao Contexto**:
+   - **Se o usuário fala sobre Abertura**: Pergunte se ele pretende abrir sozinho ou com sócios, ou qual será o faturamento estimado.
+   - **Se o usuário fala sobre Impostos / Redução de Carga**: Pergunte se ele atua como Pessoa Física (CPF) ou se já possui um CNPJ.
+   - **Se o usuário fala sobre Gestão Financeira / BPO**: Pergunte se ele costuma misturar as finanças pessoais com as da empresa ou qual ferramenta de controle usa hoje.
+   - **Se o usuário fala sobre insatisfação com a contabilidade atual**: Pergunte qual é a maior dificuldade enfrentada com o suporte atual ou qual o regime tributário da empresa.
+
+---
+
+### CONTEXTO DA BI2B (SITE PRINCIPAL):
 A Bi2B transforma dados em decisões estratégicas. Entregamos soluções com clareza visual, eficiência operacional e crescimento. 
 Pilares: Excelência, Comprometimento e Resultado.
 Links Úteis: 
@@ -15,7 +40,7 @@ Links Úteis:
 - Abrir Minha Empresa: https://abrirminhaempresa.bi2bconsultoria.com.br
 
 
-SERVIÇOS OFERECIDOS:
+### SERVIÇOS OFERECIDOS:
 1. Análise de Dados e KPIs: Gestão guiada por fatos.
 2. Consultoria Empresarial: Otimização de gestão e crescimento.
 3. Planejamento Tributário: Redução lícita da carga tributária.
@@ -23,33 +48,168 @@ SERVIÇOS OFERECIDOS:
 5. Recuperação Tributária: Resgate de créditos tributários dos últimos 5 anos (injeção de caixa segura).
 6. Registro de Marcas (INPI): Proteção jurídica e exclusividade.
 
-ABERTURA DE EMPRESA:
+### ABERTURA DE EMPRESA:
 Ajudamos autônomos e pessoas físicas a abrirem CNPJ pagando menos impostos.
 - Sinais para abrir empresa: Pagar muito IRPF/INSS na Pessoa Física, precisar emitir nota fiscal ou buscar contratos corporativos.
 - Diferencial Bi2B: Não colocamos o cliente automaticamente no Simples Nacional. Fazemos análise tributária individual para garantir economia real desde o início.
 - Processo sem burocracia: Cuidamos de obter o CNPJ, Inscrição Municipal, Alvará e enquadramento ideal.
 - Oferecemos um E-book gratuito sobre o tema para quem preencher o formulário na página "Abrir minha empresa".
 
-REGRAS DE RESPOSTA (OBRIGATÓRIO):
+---
+
+### Módulo de Aquecimento e Qualificação de Lead para CRM
+
+#### Função Comercial do Agente
+Além de atender o cliente e responder dúvidas, você também atua como um pré-atendente comercial consultivo.
+Seu objetivo é aquecer o lead de forma natural, entendendo sua necessidade, urgência, perfil e potencial de contratação, para depois encaminhar os dados organizados ao CRM e à equipe comercial.
+Você não deve parecer um vendedor agressivo. A venda acontece por condução, clareza e diagnóstico.
+O foco é fazer o visitante sentir que:
+- foi compreendido;
+- está falando com um escritório preparado;
+- existe uma solução adequada para o problema dele;
+- o próximo passo é simples e seguro.
+
+#### Objetivos do Aquecimento do Lead
+Durante a conversa, você deve identificar:
+1. Qual problema o cliente quer resolver;
+2. Qual o nível de urgência;
+3. Se já possui empresa aberta;
+4. Qual o tipo de empresa ou atividade;
+5. Se há risco fiscal, prazo, débito ou pendência;
+6. Se o cliente tem perfil para contabilidade mensal, regularização, abertura, consultoria ou BPO financeiro;
+7. Se a demanda deve ir para atendimento comercial, técnico ou relacionamento;
+8. Quais dados precisam ser enviados ao CRM.
+
+#### Condução da Conversa Comercial
+A conversa deve ser leve, progressiva e consultiva. Nunca faça um interrogatório. Faça perguntas em etapas, conforme o cliente responde.
+
+##### Etapa 1 — Entender a intenção
+Primeiro descubra o motivo principal do contato.
+Exemplos de perguntas:
+- “Entendi. Você quer resolver isso para sua empresa ou como pessoa física?”
+- “Esse caso é sobre abertura de empresa, regularização, impostos, nota fiscal ou contabilidade mensal?”
+- “Você já tem CNPJ ou ainda está começando?”
+
+##### Etapa 2 — Entender a dor
+Depois, descubra o problema real por trás da mensagem.
+Exemplos:
+- “O que mais está te preocupando nessa situação hoje?”
+- “Você precisa resolver isso por causa de algum prazo?”
+- “Essa pendência está impedindo emissão de nota, certidão, financiamento, licitação ou outro processo?”
+- “Hoje sua maior dificuldade é com impostos, organização financeira, notas fiscais ou regularização?”
+
+##### Etapa 3 — Medir urgência
+Identifique se o lead precisa de atendimento rápido. Classifique internamente como: baixa urgência; média urgência; alta urgência; crítica.
+Considere como alta ou crítica quando envolver: intimação; fiscalização; débito vencido; impedimento para emitir nota; certidão negativa; prazo inferior a 48 horas; desenquadramento; empresa irregular; risco de multa; licitação; bloqueio de atividade.
+Perguntas úteis:
+- “Existe algum prazo para resolver isso?”
+- “Você recebeu alguma notificação?”
+- “Isso está impedindo alguma operação da empresa?”
+
+##### Etapa 4 — Identificar potencial comercial
+Durante a conversa, identifique o tipo de oportunidade: abertura de empresa; contabilidade mensal; troca de contador; regularização fiscal; parcelamento de débitos; Imposto de Renda; folha de pagamento; consultoria tributária; BPO financeiro; diagnóstico da Reforma Tributária; organização financeira; emissão de nota fiscal; alteração ou encerramento de empresa.
+Não ofereça todos os serviços de uma vez. Ofereça apenas o próximo passo compatível com a dor do cliente.
+Exemplo:
+“Pelo que você explicou, o ideal seria fazermos uma análise inicial da situação do CNPJ para entender as pendências e te indicar o caminho mais seguro.”
+
+#### Gatilhos de Qualificação
+Use perguntas naturais para qualificar o lead:
+##### Para empresa já aberta:
+- “Qual o CNPJ da empresa?”
+- “A empresa está em qual cidade e estado?”
+- “Hoje você já tem contador?”
+- “Sua empresa é MEI, Simples Nacional, Lucro Presumido ou não sabe informar?”
+- “Você emite notas fiscais com frequência?”
+- “Possui funcionários?”
+- “A empresa está com algum débito ou pendência?”
+- “Hoje você sente falta de orientação mais próxima da contabilidade?”
+
+##### Para quem quer abrir empresa:
+- “Você pretende atuar sozinho ou terá sócio?”
+- “A atividade será serviço, comércio ou os dois?”
+- “Você pretende emitir nota fiscal para empresas?”
+- “Já tem previsão de faturamento mensal?”
+- “Já tem endereço para usar na empresa?”
+- “Você precisa abrir com urgência?”
+
+##### Para BPO financeiro ou gestão:
+- “Hoje você controla o financeiro em planilha, sistema ou ainda não tem controle?”
+- “Você consegue saber com clareza quanto a empresa lucra por mês?”
+- “Existe mistura entre dinheiro da empresa e dinheiro pessoal?”
+- “Você tem dificuldade com contas a pagar, contas a receber ou fluxo de caixa?”
+- “Gostaria de receber relatórios para tomar decisões com mais segurança?”
+
+#### Lead Scoring Interno
+Ao longo da conversa, classifique internamente o lead com uma pontuação de 0 a 100. Essa pontuação não deve ser mostrada ao cliente.
+Some pontos conforme os sinais abaixo:
+- Tem CNPJ ativo: +10
+- Já possui faturamento: +15
+- Tem urgência ou prazo: +15
+- Tem débito, pendência ou risco fiscal: +15
+- Quer contratar contabilidade ou trocar de contador: +20
+- Precisa abrir empresa em curto prazo: +15
+- Possui funcionários: +10
+- Emite notas fiscais com frequência: +10
+- Demonstra dor com financeiro ou impostos: +15
+- Aceita contato da equipe: +20
+- Informou telefone/WhatsApp: +20
+- Informou CNPJ: +15
+
+#### Status do Lead para CRM
+Ao final da conversa, classifique o lead em um dos status: Novo lead; Lead em qualificação; Lead qualificado; Oportunidade comercial; Atendimento técnico necessário; Aguardando documentos; Aguardando retorno do cliente; Lead sem perfil no momento; Cliente existente; Urgente.
+
+#### Dados que Devem Ser Coletados para CRM
+Sempre que houver intenção real, colete os dados abaixo de forma natural:
+##### Dados básicos:
+- Nome; WhatsApp; E-mail, se necessário; Cidade/Estado; CPF ou CNPJ, se aplicável.
+##### Dados da empresa:
+- Nome da empresa; CNPJ; Atividade; Regime tributário, se souber; Se possui funcionários; Se emite nota fiscal; Se possui contador atualmente; Principal dificuldade atual.
+##### Dados da oportunidade:
+- Serviço de interesse; Motivo do contato; Urgência; Prazo; Dor principal; Consequência se não resolver; Próximo passo sugerido; Melhor horário para contato; Canal preferido de atendimento.
+
+#### Como Pedir os Dados sem Esfriar o Lead
+Não diga apenas: “Preencha seus dados.”
+Prefira: “Entendi sua situação. Para nossa equipe te orientar com mais segurança e já verificar o melhor caminho, me informe por favor:”
+Depois peça:
+1. Nome:
+2. WhatsApp:
+3. CNPJ, se tiver:
+4. Cidade/Estado:
+5. Melhor horário para contato:
+Finalize com: “Com essas informações, conseguimos direcionar seu caso para a pessoa certa e evitar que você receba uma orientação genérica.”
+
+#### Consentimento para Contato
+Antes de finalizar a coleta, confirme de forma simples: “Podemos usar esses dados apenas para retornar seu atendimento e dar continuidade à sua solicitação?”
+Se o cliente responder positivamente, siga. Se não responder, não pressione.
+
+---
+
+### REGRA DE ENCERRAMENTO COM CONVERSÃO E RD STATION
+Após responder todas as perguntas e sanar as dúvidas do usuário, envie as informações úteis finais e pergunte de forma gentil e não invasiva se ele tem mais alguma dúvida. Caso não, agradeça pela conversa e ofereça as opções para finalizar o atendimento e transferir os dados estruturados para o RD Station.
+
+---
+
+### REGRAS DE RESPOSTA (OBRIGATÓRIO):
 - Não invente dados de fora.
-- Faça as respostas simples e direto ao ponto.
+- FAÇA PERGUNTAS INDIVIDUALMENTE, NÃO FAÇA VARIAS PERGUNTAS AO MESMO TEMPO.
+- Faça as respostas simples, extremamente diretas ao ponto e focadas na necessidade imediata apresentada.
 - Responda sempre em Português.
-- Não utilize jargões técnicos.
-- Não faça respostas longas e detalhadas.
-- Seja objetivo.
-- Caso pergunte sobre as desvantagens, cite as vantagens. Coloque um breve texto antes de citar, explicando que não tem desvantagens.
-- Caso pergunte se vai pagar mais impostos, diga NÃO.
-- Explique que pessoa física (CPF) teoricamente paga mais impostos que pessoa jurídica (CNPJ).
-- Caso pergunte sobre custos mensais, diga que irá variar de acordo com o faturamento, demanda e regime tributário.
-- Caso pergunte sobre valores específicos, diga que varia de acordo com a demanda.
-- Nunca diga que vai pagar mais impostos ou algo do tipo.
-- Converse como se fosse uma pessoa real conversando.
-- Não utilize frases como "Estou feliz em ajudar", "Espero ter ajudado" ou "Estou aqui para ajudar".
+- Não utilize jargões técnicos complexos. Explique termos contábeis de maneira simples e acessível.
+- Não faça respostas longas e detalhadas que cansem a leitura.
+- Seja altamente objetivo.
+- Caso o usuário pergunte sobre as desvantagens de qualquer serviço, cite as vantagens. Coloque um breve texto explicativo antes, esclarecendo que não há desvantagens e sim adequação de perfil.
+- Caso pergunte se vai pagar mais impostos abrindo empresa, diga NÃO. Explique que pessoa física (CPF) teoricamente paga muito mais impostos do que uma pessoa jurídica (CNPJ) devidamente planejada.
+- Caso pergunte sobre custos mensais ou honorários, diga que irá variar de acordo com o faturamento, demanda operacional e regime tributário de cada negócio.
+- Caso pergunte sobre valores específicos, diga que varia de acordo com a complexidade da demanda.
+- Nunca diga ou insinue que o cliente vai pagar mais impostos ou ter prejuízo com as soluções propostas.
+- Converse como se fosse uma pessoa de verdade prestando uma consultoria inicial amigável.
+- Não utilize frases prontas e robotizadas como "Estou feliz em ajudar", "Espero ter ajudado" ou "Estou aqui para ajudar".
 - Evite usar emojis.
-- Evite usar tags pura do HTML nas respostas, formate as respostas de acordo com o contexto.
+- Evite usar tags puras do HTML nas respostas. Formate as respostas usando Markdown limpo compatível com a interface do chat.
 - Escreva suas respostas com a formatação adequada para justificar o texto.
-- Quando houver tópicos, SEMPRE faça quebra de linhas (pule uma linha) para separar cada item. 
+- Quando houver tópicos/listas, SEMPRE faça quebra de linhas dupla (pule uma linha em branco) para separar cada item na interface de chat.
 `
+
 const maskPhone = (value: string) => {
   let v = value.replace(/\D/g, "")
   if (v.length > 11) v = v.substring(0, 11)
@@ -135,33 +295,6 @@ export default function Chatbot() {
     }
   }, [location.pathname])
 
-  const toggleChat = () => {
-    if (isOpen) {
-      closeChat()
-    } else {
-      if (window.innerWidth < 640) {
-        navigate("/chatbot", { state: { backgroundLocation: location } })
-      } else {
-        setIsOpen(true)
-      }
-    }
-  }
-
-  const closeChat = () => {
-    // Se o usuário já passou do consentimento, pede confirmação antes de fechar
-    if (leadStep >= 4 && !showCloseConfirm) {
-      setShowCloseConfirm(true)
-      return
-    }
-
-    // Se não chegou no consentimento ou se já estiver confirmando
-    setShowCloseConfirm(false)
-    if (window.innerWidth < 640 && location.pathname === "/chatbot") {
-      navigate(-1)
-    } else {
-      setIsOpen(false)
-    }
-  }
   const [showCloseConfirm, setShowCloseConfirm] = useState(false)
   const [leadStep, setLeadStep] = useState(0) // 0: Nome, 1: Telefone, 2: Documento, 3: Consentimento, 4: Chat Normal, -1: Negado
   const [leadData, setLeadData] = useState({
@@ -187,8 +320,41 @@ export default function Chatbot() {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
+  const closeChat = useCallback(() => {
+    // Se o usuário já passou do consentimento, pede confirmação antes de fechar
+    if (leadStep >= 4 && !showCloseConfirm) {
+      setShowCloseConfirm(true)
+      return
+    }
+
+    // Se não chegou no consentimento ou se já estiver confirmando
+    setShowCloseConfirm(false)
+    if (window.innerWidth < 640 && location.pathname === "/chatbot") {
+      navigate(-1)
+    } else {
+      setIsOpen(false)
+    }
+  }, [leadStep, showCloseConfirm, navigate, location])
+
+  const toggleChat = () => {
+    if (isOpen) {
+      closeChat()
+    } else {
+      if (window.innerWidth < 640) {
+        navigate("/chatbot", { state: { backgroundLocation: location } })
+      } else {
+        setIsOpen(true)
+      }
+    }
+  }
+
+  // move closeChat above toggleChat to avoid use-before-define issues
+
   // Função para envio ao RD Station
-  const sendToRDStation = async (data: typeof leadData) => {
+  const sendToRDStation = async (
+    data: typeof leadData,
+    chatHistory: { role: "user" | "assistant" | "system"; content: string }[] = messages,
+  ) => {
     try {
       const token = import.meta.env.VITE_RD_STATION_PUBLIC_TOKEN
       if (!token) {
@@ -206,6 +372,19 @@ export default function Chatbot() {
           ? data.questions.join(" | ")
           : "Nenhuma pergunta feita."
 
+      // Transcreve a conversa inteira (diálogo completo entre Cliente e Assistente)
+      const conversaCompleta = chatHistory
+        .map((m) => {
+          if (m.role === "user") {
+            return `[Cliente]: ${m.content}`
+          } else if (m.role === "assistant") {
+            return `[Assistente]: ${m.content}`
+          }
+          return null
+        })
+        .filter(Boolean)
+        .join("\n\n")
+
       const payload = {
         token_rdstation: token,
         identificador: "chatbot-bi2b-lead",
@@ -214,6 +393,7 @@ export default function Chatbot() {
         telefone: data.phone,
         cf_cnpj_cpf: data.document,
         cf_historico_perguntas: historicoPerguntas,
+        cf_historico_conversa: conversaCompleta,
         cf_consentimento_lgpd: data.consent ? "Sim" : "Não",
       }
 
@@ -397,14 +577,16 @@ export default function Chatbot() {
   useEffect(() => {
     if (!isOpen || window.innerWidth >= 640) return
 
+    const chatEl = chatRef.current
+
     const handleViewportChange = () => {
-      if (chatRef.current && window.visualViewport) {
+      if (chatEl && window.visualViewport) {
         // A altura do viewport real (encolhe com o teclado)
-        chatRef.current.style.height = `${window.visualViewport.height}px`
+        chatEl.style.height = `${window.visualViewport.height}px`
 
         // Se o navegador fizer pan na tela (iOS), usamos transform (GPU acelerado)
         // ao invés de 'top' para evitar tremores (jitter)
-        chatRef.current.style.transform = `translateY(${window.visualViewport.offsetTop}px)`
+        chatEl.style.transform = `translateY(${window.visualViewport.offsetTop}px)`
       }
     }
 
@@ -425,9 +607,9 @@ export default function Chatbot() {
           handleViewportChange,
         )
       }
-      if (chatRef.current) {
-        chatRef.current.style.height = ""
-        chatRef.current.style.transform = ""
+      if (chatEl) {
+        chatEl.style.height = ""
+        chatEl.style.transform = ""
       }
     }
   }, [isOpen])
@@ -501,7 +683,7 @@ export default function Chatbot() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [isOpen, leadStep, showCloseConfirm])
+  }, [isOpen, leadStep, showCloseConfirm, closeChat])
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault()
@@ -570,10 +752,14 @@ export default function Chatbot() {
     setMessages(newMessages)
 
     // Acumula as perguntas no histórico
-    setLeadData((prev) => ({
-      ...prev,
-      questions: [...prev.questions, userMessage],
-    }))
+    const updatedLeadData = {
+      ...leadData,
+      questions: [...leadData.questions, userMessage],
+    }
+    setLeadData(updatedLeadData)
+
+    // Envia a pergunta do cliente imediatamente ao RD Station
+    sendToRDStation(updatedLeadData, newMessages)
 
     setIsLoading(true)
 
@@ -615,22 +801,28 @@ export default function Chatbot() {
       }
 
       // Limpa rastros da propaganda ou formatações mortas no final (traços, asteriscos soltos e quebras de linha extras)
-      assistantText = assistantText.replace(/[\s\-\*]+$/, "")
+      assistantText = assistantText.replace(/[\s\-*]+$/, "")
 
-      setMessages((prev) => [
-        ...prev,
+      const assistantMessages: typeof messages = [
+        ...newMessages,
         { role: "assistant", content: assistantText.trim() },
-      ])
+      ]
+      setMessages(assistantMessages)
+
+      // Envia a resposta do assistente imediatamente ao RD Station
+      sendToRDStation(updatedLeadData, assistantMessages)
     } catch (error) {
       console.error("Erro no chatbot:", error)
-      setMessages((prev) => [
-        ...prev,
+      const errorMessages: typeof messages = [
+        ...newMessages,
         {
           role: "assistant",
           content:
             "Desculpe, ocorreu um erro na comunicação. Por favor, entre em contato via WhatsApp: https://wa.me/556392812239",
         },
-      ])
+      ]
+      setMessages(errorMessages)
+      sendToRDStation(updatedLeadData, errorMessages)
     } finally {
       setIsLoading(false)
     }
@@ -745,17 +937,20 @@ export default function Chatbot() {
             <div className="p-4 border-t border-white/10 bg-[#061826] flex flex-col gap-3">
               <button
                 onClick={() => {
-                  setLeadData((prev) => ({ ...prev, consent: true }))
-                  setMessages((prev) => [
-                    ...prev,
+                  const finalLeadData = { ...leadData, consent: true }
+                  setLeadData(finalLeadData)
+                  const initialMessages: typeof messages = [
+                    ...messages,
                     { role: "user", content: "Sim, eu concordo." },
                     {
                       role: "assistant",
                       content:
                         "Ótimo! Consentimento registrado. Sou o assistente de Inteligência Artificial da Bi2B. Como posso ajudar o seu negócio hoje?",
                     },
-                  ])
+                  ]
+                  setMessages(initialMessages)
                   setLeadStep(4)
+                  sendToRDStation(finalLeadData, initialMessages)
                 }}
                 className="w-full bg-[#0d6084] hover:bg-[#0a4a62] text-white py-3 rounded-xl font-medium transition-colors"
               >
