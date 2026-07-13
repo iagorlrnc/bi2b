@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import logoMain from "../assets/img/logo.png"
 import logoPonto from "../assets/img/bponto.png"
 
@@ -8,6 +8,8 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [isProgrammaticScroll, setIsProgrammaticScroll] = useState(false)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,6 +40,11 @@ export default function Header() {
   }, [menuOpen])
 
   const scrollToSection = (id: string) => {
+    if (location.pathname !== "/") {
+      setMenuOpen(false)
+      navigate("/", { state: { scrollToSection: id } })
+      return
+    }
     const element = document.getElementById(id)
     if (element) {
       setIsProgrammaticScroll(true)
@@ -73,7 +80,7 @@ export default function Header() {
   return (
     <header
       ref={headerRef}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || menuOpen
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled || menuOpen || location.pathname !== "/"
           ? "bg-slate-950/45 backdrop-blur-lg border-b border-white/10 shadow-[0_8px_24px_rgba(0,0,0,0.22)]"
           : "pointer-events-none -translate-y-full opacity-0 bg-transparent md:bg-transparent"
         }`}

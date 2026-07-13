@@ -21,6 +21,9 @@ import NotFound from "./components/NotFound"
 import WhatsAppFloatingButton from "./components/WhatsAppFloatingButton"
 import Ferramentas from "./components/Ferramentas"
 import { ReportProvider } from "./contexts/ReportContext"
+import PrivacyPolicy from "./components/PrivacyPolicy"
+import { CookieProvider } from "./contexts/CookieContext"
+import CookieBanner from "./components/CookieBanner"
 
 function Home() {
   const location = useLocation()
@@ -28,6 +31,14 @@ function Home() {
   useEffect(() => {
     if (location.state?.scrollToTop) {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" })
+    } else if (location.state?.scrollToSection) {
+      const id = location.state.scrollToSection
+      setTimeout(() => {
+        const element = document.getElementById(id)
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" })
+        }
+      }, 100)
     }
   }, [location.state])
 
@@ -63,9 +74,11 @@ function AppRoutes() {
         <Route path="/performance" element={<Performance />} />
         <Route path="/estrategia" element={<Estrategia />} />
         <Route path="/ferramentas" element={<Ferramentas />} />
+        <Route path="/politica-de-privacidade" element={<PrivacyPolicy />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       <WhatsAppFloatingButton />
+      <CookieBanner />
     </div>
   )
 }
@@ -77,22 +90,26 @@ function App() {
   if (isCampanhaSubdomain) {
     return (
       <ReportProvider>
-        <Router>
-          <div className="relative min-h-screen overflow-x-hidden bg-transparent text-white">
-            <Routes>
-              <Route path="*" element={<Campanha />} />
-            </Routes>
-          </div>
-        </Router>
+        <CookieProvider>
+          <Router>
+            <div className="relative min-h-screen overflow-x-hidden bg-transparent text-white">
+              <Routes>
+                <Route path="*" element={<Campanha />} />
+              </Routes>
+            </div>
+          </Router>
+        </CookieProvider>
       </ReportProvider>
     )
   }
 
   return (
     <ReportProvider>
-      <Router>
-        <AppRoutes />
-      </Router>
+      <CookieProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
+      </CookieProvider>
     </ReportProvider>
   )
 }
