@@ -64,43 +64,33 @@ export default function ReportModal({ isOpen, onClose }: ReportModalProps) {
       currency: "BRL",
     }).format(val)
 
-  const sendToRDStation = async () => {
-    try {
-      const token = import.meta.env.VITE_RD_STATION_PUBLIC_TOKEN
-      if (!token) {
-        console.warn("VITE_RD_STATION_PUBLIC_TOKEN não está definido no .env")
-        return
-      }
+  const sendToWhatsApp = () => {
+    const calculadoras = []
+    if (includeIrpf && irpfData) calculadoras.push("IRPF (Simulação de Imposto Simplificada)")
+    if (includePj && pjData) calculadoras.push("PJ (Comparativo Simples Nacional vs Lucro Presumido)")
+    if (includeFuncionario && funcionarioData) calculadoras.push("Custo de Funcionário")
 
-      const calculadoras = []
-      if (includeIrpf) calculadoras.push("IRPF")
-      if (includePj) calculadoras.push("PJ")
-      if (includeFuncionario) calculadoras.push("Custo de Funcionário")
+    const whatsappMsg = `Olá! Acabei de gerar uma simulação financeira no site da Bi2B.
 
-      const payload = {
-        token_rdstation: token,
-        identificador: "gerador-relatorio-bi2b",
-        email: email,
-        nome: name,
-        telefone: phone,
-        cf_consentimento_lgpd: "Sim",
-        cf_calculadoras_utilizadas: calculadoras.join(", "),
-      }
+*Meus Dados:*
+- *Nome:* ${name.trim()}
+- *E-mail:* ${email.trim()}
+- *Telefone:* ${phone}
 
-      await fetch("https://www.rdstation.com.br/api/1.2/conversions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-    } catch (error) {
-      console.error("Erro ao enviar dados para o RD Station", error)
-    }
+*Simulações no Relatório:*
+- ${calculadoras.join("\n- ")}
+
+Gostaria de agendar uma análise estratégica detalhada dessas simulações com um especialista!`
+
+    const encodedText = encodeURIComponent(whatsappMsg)
+    const whatsappUrl = `https://wa.me/556392812239?text=${encodedText}`
+    window.open(whatsappUrl, "_blank")
   }
 
   const generatePDF = async () => {
     setIsGenerating(true)
     try {
-      await sendToRDStation()
+      sendToWhatsApp()
 
       const doc = new jsPDF()
 

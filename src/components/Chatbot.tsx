@@ -187,48 +187,28 @@ export default function Chatbot() {
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  // Função para envio ao RD Station
-  const sendToRDStation = async (data: typeof leadData) => {
-    try {
-      const token = import.meta.env.VITE_RD_STATION_PUBLIC_TOKEN
-      if (!token) {
-        console.warn("VITE_RD_STATION_PUBLIC_TOKEN não está definido no .env")
-        return
-      }
+  // Função para enviar os dados e redirecionar ao WhatsApp
+  const sendToWhatsApp = (data: typeof leadData) => {
+    const historicoPerguntas =
+      data.questions.length > 0
+        ? data.questions.join("\n- ")
+        : "Nenhuma pergunta registrada no chatbot."
 
-      // RD Station OBRIGA um campo "email" para criar o lead.
-      // como não é solicitado email, é gerado um email fictício.
-      const telefoneNumeros = data.phone.replace(/\D/g, "")
-      const dummyEmail = `cliente.${telefoneNumeros}@chatbot.com`
+    const whatsappMsg = `Olá! Concluí minha interação com o assistente virtual no site da Bi2B.
 
-      const historicoPerguntas =
-        data.questions.length > 0
-          ? data.questions.join(" | ")
-          : "Nenhuma pergunta feita."
+*Meus Dados:*
+- *Nome:* ${data.name.trim()}
+- *Telefone:* ${data.phone}
+- *CPF/CNPJ:* ${data.document || "Não informado"}
 
-      const payload = {
-        token_rdstation: token,
-        identificador: "chatbot-bi2b-lead",
-        email: dummyEmail,
-        nome: data.name,
-        telefone: data.phone,
-        cf_cnpj_cpf: data.document,
-        cf_historico_perguntas: historicoPerguntas,
-        cf_consentimento_lgpd: data.consent ? "Sim" : "Não",
-      }
+*Perguntas feitas ao assistente:*
+- ${historicoPerguntas}
 
-      console.log("Enviando para RD Station...", payload)
+Gostaria de falar com um consultor especialista para dar prosseguimento ao meu atendimento!`
 
-      await fetch("https://www.rdstation.com.br/api/1.2/conversions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      })
-
-      console.log("Lead enviado com sucesso ao RD Station!")
-    } catch (error) {
-      console.error("Erro ao enviar dados para o RD Station", error)
-    }
+    const encodedText = encodeURIComponent(whatsappMsg)
+    const whatsappUrl = `https://wa.me/556392812239?text=${encodedText}`
+    window.open(whatsappUrl, "_blank")
   }
 
   const formatMessage = (content: string) => {
@@ -864,8 +844,8 @@ export default function Chatbot() {
                 <div className="flex flex-col gap-3">
                   <button
                     onClick={() => {
-                      // Envia os dados para o RD Station
-                      sendToRDStation(leadData)
+                       // Envia os dados e redireciona ao WhatsApp
+                       sendToWhatsApp(leadData)
 
                       // Reseta o estado para a próxima vez que abrir
                       setLeadStep(0)

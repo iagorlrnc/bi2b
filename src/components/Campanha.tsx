@@ -19,15 +19,14 @@ import { FaWhatsapp } from "react-icons/fa"
 import ebookMockupImg from "../assets/img/ebook_mockup.png"
 import logoImg from "../assets/img/logo.png"
 
-// Tipagem mínima para o construtor do RDStationForms carregado dinamicamente
-type RDStationFormsConstructor = new (
-  formId: string,
-  arg: string,
-) => { createForm(): void }
-
-const getRDStationForms = (): RDStationFormsConstructor | undefined =>
-  (window as Window & { RDStationForms?: RDStationFormsConstructor })
-    .RDStationForms
+// Removed RD Station Types
+const maskPhone = (value: string) => {
+  const digits = value.replace(/\D/g, "")
+  if (digits.length <= 2) return digits
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
+  if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`
+}
 
 export default function Campanha() {
   const [isFormSubmitted, setIsFormSubmitted] = useState(false)
@@ -37,6 +36,13 @@ export default function Campanha() {
   const [timeLeft, setTimeLeft] = useState(899) // 14 minutes and 59 seconds
   const [showStickyCta, setShowStickyCta] = useState(false)
   const [stickyFooterBottom, setStickyFooterBottom] = useState(0)
+
+  // Form State
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [businessSegment, setBusinessSegment] = useState("")
+  const [errorMsg, setErrorMsg] = useState("")
 
   // Timer effect to create urgency
   useEffect(() => {
@@ -126,179 +132,57 @@ export default function Campanha() {
   }
 
   const handleConsentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const isChecked = e.target.checked
-    setConsent(isChecked)
+    setConsent(e.target.checked)
+  }
 
-    const container = document.getElementById(
-      "formulario-pag-abertura-de-empresa-060ce9f639cf1704454e",
-    )
-    if (container) {
-      const btn = container.querySelector(
-        'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
-      ) as HTMLButtonElement | HTMLInputElement | null
-      if (btn) {
-        if (!isChecked) {
-          btn.disabled = true
-          btn.style.opacity = "0.5"
-          btn.style.cursor = "not-allowed"
-        } else {
-          btn.disabled = false
-          btn.style.opacity = "1"
-          btn.style.cursor = "pointer"
-        }
-      }
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPhone(maskPhone(e.target.value))
+  }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim()) {
+      setErrorMsg("Por favor, informe seu nome.")
+      return
     }
+    if (!email.trim() || !email.includes("@")) {
+      setErrorMsg("Por favor, insira um e-mail válido.")
+      return
+    }
+    if (phone.replace(/\D/g, "").length < 10) {
+      setErrorMsg("Por favor, insira um telefone válido com DDD.")
+      return
+    }
+    if (!businessSegment) {
+      setErrorMsg("Por favor, selecione o seu ramo de atuação.")
+      return
+    }
+    if (!consent) {
+      triggerConsentError()
+      return
+    }
+
+    setErrorMsg("")
+    setIsFormSubmitted(true)
+    setModalStep("thanks")
+
+    const whatsappMsg = `Olá! Acabei de me cadastrar para baixar o E-book contábil da Bi2B.
+
+*Dados Cadastrados:*
+- *Nome:* ${name.trim()}
+- *E-mail:* ${email.trim()}
+- *Telefone/WhatsApp:* ${phone}
+- *Ramo de Atuação:* ${businessSegment}`
+
+    const encodedText = encodeURIComponent(whatsappMsg)
+    const whatsappUrl = `https://wa.me/556392812239?text=${encodedText}`
+
+    // Trigger download / redirect
+    window.open(whatsappUrl, "_blank")
   }
 
   useEffect(() => {
     window.scrollTo(0, 0)
-
-    const scriptId = "rdstation-forms-script"
-    const formId = "formulario-pag-abertura-de-empresa-060ce9f639cf1704454e"
-
-    // Suprime o "window.alert" chato que a RD Station tenta ejetar na tela
-    const originalAlert = window.alert
-    window.alert = function (message) {
-      if (
-        typeof message === "string" &&
-        (message.toLowerCase().includes("obrigado") ||
-          message.toLowerCase().includes("sucesso") ||
-          message.toLowerCase().includes("enviad"))
-      ) {
-        // Usa o gatilho do alerta oculto para ativar a nossa linda interface!
-        setIsFormSubmitted(true)
-        setModalStep("thanks")
-        return // Engole o alerta sem mostrar a caixa feia no navegador
-      }
-      originalAlert(message)
-    }
-
-    // Listener NATIVO de sucesso recomendado pela RD Station (Ignora envios em branco)
-    const handleRdMessage = (event: MessageEvent) => {
-      if (!event.data) return
-      try {
-        if (
-          Array.isArray(event.data) &&
-          event.data[0] &&
-          event.data[0].event_type === "conversion"
-        ) {
-          setIsFormSubmitted(true)
-          setModalStep("thanks")
-        } else if (
-          typeof event.data === "object" &&
-          !Array.isArray(event.data) &&
-          event.data.eventType === "conversion"
-        ) {
-          setIsFormSubmitted(true)
-          setModalStep("thanks")
-        }
-      } catch {
-        // Anti-crash override
-      }
-    }
-    window.addEventListener("message", handleRdMessage)
-
-    const renderForm = () => {
-      const container = document.getElementById(formId)
-      const RDForms = getRDStationForms()
-      if (!RDForms || !container) return
-
-      if (container.hasChildNodes() || container.dataset.rdLoaded === "true") {
-        return
-      }
-
-      container.dataset.rdLoaded = "true"
-      try {
-        new RDForms(formId, "null").createForm()
-
-        setTimeout(() => {
-          const observer = new MutationObserver(() => {
-            const html = container.innerHTML.toLowerCase()
-            const formObj = container.querySelector("form")
-            if (formObj && !formObj.dataset.btnListener) {
-              formObj.dataset.btnListener = "true"
-
-              const submitBtn = formObj.querySelector(
-                'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
-              ) as HTMLButtonElement | HTMLInputElement | null
-              if (submitBtn) {
-                const checkbox = document.getElementById(
-                  "consent-checkbox",
-                ) as HTMLInputElement | null
-                const isChecked = checkbox ? checkbox.checked : false
-                if (!isChecked) {
-                  submitBtn.disabled = true
-                  submitBtn.style.opacity = "0.5"
-                  submitBtn.style.cursor = "not-allowed"
-                }
-              }
-
-              formObj.addEventListener("submit", () => {
-                const btn = formObj.querySelector(
-                  'button.bricks-form__submit, button[type="submit"], input[type="submit"]',
-                ) as HTMLButtonElement | HTMLInputElement | null
-                if (btn) {
-                  if (btn.tagName === "INPUT") {
-                    ;(btn as HTMLInputElement).value = "Aguarde..."
-                  } else {
-                    ;(btn as HTMLButtonElement).innerHTML = "Aguarde..."
-                  }
-                  btn.style.opacity = "0.7"
-                  btn.style.pointerEvents = "none"
-                }
-              })
-            }
-
-            if (html.includes("rd-form-success")) {
-              setIsFormSubmitted(true)
-              setModalStep("thanks")
-            } else if (
-              (html.includes("sucesso") ||
-                html.includes("obrigado") ||
-                html.includes("enviad")) &&
-              !html.includes("<form")
-            ) {
-              setIsFormSubmitted(true)
-              setModalStep("thanks")
-            }
-          })
-          observer.observe(container, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-          })
-        }, 500)
-      } catch (err) {
-        console.error("RD Station Forms erro:", err)
-      }
-    }
-
-    let script = document.getElementById(scriptId) as HTMLScriptElement
-
-    if (!script) {
-      script = document.createElement("script")
-      script.id = scriptId
-      script.src =
-        "https://d335luupugsy2.cloudfront.net/js/rdstation-forms/stable/rdstation-forms.min.js"
-      script.type = "text/javascript"
-      script.async = true
-      script.addEventListener("load", renderForm)
-      document.body.appendChild(script)
-    } else if (getRDStationForms()) {
-      setTimeout(renderForm, 100)
-    } else {
-      script.addEventListener("load", renderForm)
-    }
-
-    return () => {
-      window.alert = originalAlert // Restaura o alerta padrão ao sair da página
-      window.removeEventListener("message", handleRdMessage)
-      const container = document.getElementById(formId)
-      if (container) {
-        container.innerHTML = ""
-        delete container.dataset.rdLoaded
-      }
-    }
   }, [])
 
   const formatTime = (seconds: number) => {
@@ -314,134 +198,9 @@ export default function Campanha() {
       <div className="absolute top-1/4 left-[-100px] w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-2/3 right-[-100px] w-96 h-96 bg-rose-500/5 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Estilos para customização e override do formulário RD Station */}
+      {/* Removed RD Station overrides styles */}
       <style>
         {`
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e form,
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e section,
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .bricks-form {
-            background-color: transparent !important;
-            background: transparent !important;
-            padding: 0 !important;
-            margin: 0 !important;
-          }
-          
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button.bricks-form__submit,
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e input[type="submit"],
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button[type="submit"] {
-            background: linear-gradient(90deg, #22d3ee 0%, #0d6084 100%) !important;
-            border: none !important;
-            color: #ffffff !important;
-            font-weight: 800 !important;
-            font-family: 'Space Grotesk', sans-serif !important;
-            text-transform: uppercase !important;
-            letter-spacing: 0.05em !important;
-            border-radius: 9999px !important;
-            padding: 16px 32px !important;
-            font-size: 14px !important;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
-            box-shadow: 0 10px 25px rgba(6, 182, 212, 0.3) !important;
-            cursor: pointer !important;
-            width: 100% !important;
-            margin-top: 10px !important;
-          }
-
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button.bricks-form__submit:hover,
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e input[type="submit"]:hover,
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button[type="submit"]:hover {
-            transform: translateY(-2px) !important;
-            box-shadow: 0 15px 30px rgba(6, 182, 212, 0.45) !important;
-            filter: brightness(1.1) !important;
-          }
-
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e button.bricks-form__submit:disabled {
-            opacity: 0.5 !important;
-            cursor: not-allowed !important;
-            transform: none !important;
-            box-shadow: none !important;
-            filter: brightness(0.6) grayscale(0.5) !important;
-          }
-
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .bricks-form__field {
-            margin-bottom: 16px !important;
-          }
-
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .bricks-form__label {
-            color: #e2e8f0 !important;
-            font-size: 13px !important;
-            font-weight: 600 !important;
-            margin-bottom: 6px !important;
-            display: block !important;
-            text-align: left !important;
-          }
-
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e input:not([type="checkbox"]):not([type="radio"]),
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e select {
-            background-color: rgba(255, 255, 255, 0.95) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            color: #0f172a !important;
-            padding: 12px 16px !important;
-            font-size: 14px !important;
-            width: 100% !important;
-            transition: all 0.3s ease !important;
-            border-radius: 12px !important;
-          }
-
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e input:not([type="checkbox"]):not([type="radio"]):focus,
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e select:focus {
-            border-color: #22d3ee !important;
-            background-color: #ffffff !important;
-            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.2) !important;
-          }
-
-          /* Container da Bandeira do Telefone */
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__flag-container {
-            position: absolute !important;
-            top: 0 !important;
-            bottom: 0 !important;
-            display: flex !important;
-            align-items: center !important;
-            height: 100% !important;
-            border-radius: 12px 0 0 12px !important;
-          }
-
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__selected-flag {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            padding: 0 14px !important;
-            height: 100% !important;
-            background-color: transparent !important;
-            border-radius: 12px 0 0 12px !important;
-          }
-
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__flag {
-            margin: 0 !important;
-          }
-          
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e .iti__arrow {
-            margin-left: 6px !important;
-          }
-
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked button.bricks-form__submit,
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked button[type="submit"],
-          #formulario-pag-abertura-de-empresa-060ce9f639cf1704454e.consent-not-checked input[type="submit"] {
-            opacity: 0.5 !important;
-            filter: brightness(0.6) grayscale(0.5) !important;
-            cursor: not-allowed !important;
-          }
-
-          @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-6px); }
-            40% { transform: translateX(6px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
-          }
-          .animate-shake {
-            animation: shake 0.4s ease-in-out;
-          }
-
           @keyframes fadeInUp {
             from {
               opacity: 0;
@@ -628,62 +387,98 @@ export default function Campanha() {
                   </p>
                 </div>
 
-                {/* Container do Formulário Integrado */}
-                <div
-                  role="main"
-                  id="formulario-pag-abertura-de-empresa-060ce9f639cf1704454e"
-                  className={`py-0 w-full transition-all duration-300 ${isFormSubmitted ? "opacity-60 pointer-events-none grayscale-[20%]" : ""} ${!consent ? "consent-not-checked" : ""}`}
-                  onClickCapture={(e) => {
-                    if (!consent) {
-                      const target = e.target as HTMLElement
-                      if (
-                        target.closest(
-                          'button[type="submit"], input[type="submit"], .bricks-form__submit',
-                        )
-                      ) {
-                        e.stopPropagation()
-                        e.preventDefault()
-                        triggerConsentError()
-                      }
-                    }
-                  }}
-                  onSubmitCapture={(e) => {
-                    if (!consent) {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      triggerConsentError()
-                    }
-                  }}
-                  onKeyDownCapture={(e) => {
-                    if (!consent && e.key === "Enter") {
-                      e.stopPropagation()
-                      e.preventDefault()
-                      triggerConsentError()
-                    }
-                  }}
-                ></div>
-
-                {/* Consent Checkbox com tratamento de erros visual */}
+                {/* Formulário Nativo React com WhatsApp */}
                 {!isFormSubmitted && (
-                  <div
-                    className={`mt-4 flex items-start gap-3 p-3 rounded-xl border transition-all duration-300 ${showConsentError ? "border-red-500 bg-red-500/10 animate-shake" : "border-white/5 bg-[#0d6084]/15"}`}
-                  >
-                    <input
-                      type="checkbox"
-                      id="consent-checkbox"
-                      checked={consent}
-                      onChange={handleConsentChange}
-                      className="flex-shrink-0 w-4 h-4 mt-0.5 rounded border-gray-600 text-cyan-500 focus:ring-cyan-400 bg-slate-900 cursor-pointer"
-                    />
-                    <label
-                      htmlFor="consent-checkbox"
-                      className="text-[10px] text-slate-300 cursor-pointer leading-snug font-medium"
+                  <form onSubmit={handleFormSubmit} className="space-y-4 text-left animate-in fade-in duration-300">
+                    {errorMsg && (
+                      <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-xs text-center">
+                        {errorMsg}
+                      </div>
+                    )}
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">
+                        Nome Completo *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Seu nome completo"
+                        className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">
+                        E-mail *
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="seu@email.com"
+                        className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">
+                        Telefone / WhatsApp *
+                      </label>
+                      <input
+                        type="tel"
+                        required
+                        value={phone}
+                        onChange={handlePhoneChange}
+                        placeholder="(00) 00000-0000"
+                        className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-sm text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-300 mb-1">
+                        Ramo de Atuação *
+                      </label>
+                      <select
+                        required
+                        value={businessSegment}
+                        onChange={(e) => setBusinessSegment(e.target.value)}
+                        className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-4 py-2.5 text-sm text-white focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400 cursor-pointer"
+                      >
+                        <option value="" disabled className="bg-slate-950 text-slate-500">Selecione o ramo</option>
+                        <option value="Tecnologia / TI" className="bg-slate-950 text-white">Tecnologia / TI</option>
+                        <option value="Marketing / Infoprodutos" className="bg-slate-950 text-white">Marketing / Infoprodutos</option>
+                        <option value="Saúde / Clínicas" className="bg-slate-950 text-white">Saúde / Clínicas</option>
+                        <option value="Comércio / Varejo" className="bg-slate-950 text-white">Comércio / Varejo</option>
+                        <option value="Serviços em Geral" className="bg-slate-950 text-white">Serviços em Geral</option>
+                        <option value="Outro" className="bg-slate-950 text-white">Outro Ramo</option>
+                      </select>
+                    </div>
+
+                    <div
+                      className={`mt-4 flex items-start gap-3 p-3 rounded-xl border transition-all duration-300 ${showConsentError ? "border-red-500 bg-red-500/10 animate-shake" : "border-white/5 bg-[#0d6084]/15"}`}
                     >
-                      Concordo em receber comunicações e aceito que meus dados
-                      sejam utilizados para fins de marketing e personalização
-                      de ofertas.
-                    </label>
-                  </div>
+                      <input
+                        type="checkbox"
+                        id="consent-checkbox"
+                        checked={consent}
+                        onChange={handleConsentChange}
+                        className="flex-shrink-0 w-4 h-4 mt-0.5 rounded border-gray-600 text-cyan-500 focus:ring-cyan-400 bg-slate-900 cursor-pointer"
+                      />
+                      <label
+                        htmlFor="consent-checkbox"
+                        className="text-[10px] text-slate-300 cursor-pointer leading-snug font-medium"
+                      >
+                        Concordo em receber comunicações e aceito que meus dados sejam utilizados para fins de contato comercial e marketing da Bi2B.
+                      </label>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full mt-2 bg-gradient-to-r from-cyan-400 to-[#0d6084] hover:from-cyan-300 hover:to-[#0a4a62] text-white font-extrabold py-3.5 rounded-full shadow-[0_10px_25px_rgba(6,182,212,0.3)] transition-all uppercase tracking-wider text-xs"
+                    >
+                      Receber E-book Grátis
+                    </button>
+                  </form>
                 )}
 
                 {/* Indicador de Privacidade e Segurança */}
