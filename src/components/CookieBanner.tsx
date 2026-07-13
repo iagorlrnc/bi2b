@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useCookie } from "../contexts/CookieContext"
-import { ShieldCheck, Settings, X } from "lucide-react"
+import { ShieldCheck, Settings } from "lucide-react"
 
 export default function CookieBanner() {
-  const { isBannerOpen, acceptAll, rejectAll, savePreferences, setBannerOpen, preferences } = useCookie()
+  const { isBannerOpen, acceptAll, rejectAll, savePreferences, preferences } = useCookie()
   const [showSettings, setShowSettings] = useState(false)
   const [analytics, setAnalytics] = useState(true)
   const [marketing, setMarketing] = useState(true)
@@ -71,13 +71,6 @@ export default function CookieBanner() {
                 <ShieldCheck className="text-cyan-300" size={20} />
                 <h4 className="text-base font-semibold text-white">Configurar Preferências de Cookies</h4>
               </div>
-              <button
-                onClick={() => setShowSettings(false)}
-                className="text-slate-400 hover:text-white transition-colors"
-                aria-label="Voltar"
-              >
-                <X size={20} />
-              </button>
             </div>
 
             <div className="space-y-4">
@@ -139,27 +132,19 @@ export default function CookieBanner() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-white/10 pt-4">
+            <div className="flex items-center justify-end border-t border-white/10 pt-4 gap-3">
               <button
-                onClick={() => setBannerOpen(false)}
-                className="text-xs text-slate-400 hover:text-white transition-colors"
+                onClick={acceptAll}
+                className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-white/10"
               >
-                Cancelar
+                Aceitar Todos
               </button>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={acceptAll}
-                  className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-white transition-all hover:bg-white/10"
-                >
-                  Aceitar Todos
-                </button>
-                <button
-                  onClick={handleSave}
-                  className="rounded-full bg-cyan-500 px-4 py-2 text-xs font-bold text-white shadow-[0_4px_15px_rgba(6,182,212,0.2)] transition-all hover:opacity-90"
-                >
-                  Salvar Escolhas
-                </button>
-              </div>
+              <button
+                onClick={handleSave}
+                className="rounded-full bg-cyan-500 px-4 py-2 text-xs font-bold text-white shadow-[0_4px_15px_rgba(6,182,212,0.2)] transition-all hover:opacity-90"
+              >
+                Salvar Escolhas
+              </button>
             </div>
           </div>
         )}
